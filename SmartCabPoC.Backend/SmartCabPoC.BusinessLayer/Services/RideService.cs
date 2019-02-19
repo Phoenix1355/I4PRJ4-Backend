@@ -8,7 +8,8 @@ using SmartCabPoC.DataLayer.Repositories;
 namespace SmartCabPoC.BusinessLayer.Services
 {
     /// <summary>
-    /// Fairly redundant at the moment, but should handle all business logic related to rides.
+    /// This class contains business logic related to "Rides".
+    /// Fairly redundant at the moment, but its here to show the intent with the business logic layer.
     /// </summary>
     public class RideService : IRideService
     {

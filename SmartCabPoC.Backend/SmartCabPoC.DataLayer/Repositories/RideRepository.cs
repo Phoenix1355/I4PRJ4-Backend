@@ -8,13 +8,16 @@ using SmartCabPoC.DataLayer.Models;
 
 namespace SmartCabPoC.DataLayer.Repositories
 {
+    /// <summary>
+    /// This class exposes all the possible request to the database that is related to "Rides"
+    /// </summary>
     public class RideRepository : IRideRepository, IDisposable
     {
         private readonly SmartCabContext _context;
 
         public RideRepository(ISmartCabContext context)
         {
-            _context = (SmartCabContext)context;
+            _context = (SmartCabContext)context; //If we don't make this cast, we wont have access to eg. SaveChanges.
         }
 
 
