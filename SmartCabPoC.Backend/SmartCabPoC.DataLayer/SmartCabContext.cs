@@ -17,13 +17,6 @@ namespace SmartCabPoC.DataLayer
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //var username = "smartcabadmin";
-            //var password = "I4PRJ4gruppe7";
-
-            //optionsBuilder.UseSqlServer(
-            //    $"Server=tcp:boostersacademy.database.windows.net,1433;Initial Catalog=SmartCabPoC.PoC;Persist Security Info=False;User ID={username};Password={password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-            //    );
-
             optionsBuilder.UseSqlServer(_connectionString);
         }
     }
