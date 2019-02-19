@@ -11,11 +11,11 @@ namespace SmartCabPoC.WebAPILayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RideController : ControllerBase
+    public class RidesController : ControllerBase
     {
         private readonly IRideService _rideService;
 
-        public RideController(IRideService rideService)
+        public RidesController(IRideService rideService)
         {
             _rideService = rideService;
         }
@@ -23,7 +23,7 @@ namespace SmartCabPoC.WebAPILayer.Controllers
         /// <summary>
         /// Returns a json string representing an array of rides.
         /// 
-        /// Handles GET requests directed to the following url: api/ride.
+        /// Handles GET requests directed to the following url: api/rides.
         /// 
         /// Example of json returned:
         ///
@@ -49,7 +49,7 @@ namespace SmartCabPoC.WebAPILayer.Controllers
         /// <summary>
         /// Adds a new ride to the database.
         ///
-        /// Handles POST requests directed to the following url: api/ride.
+        /// Handles POST requests directed to the following url: api/rides.
         /// 
         /// Example of expected json:
         ///
