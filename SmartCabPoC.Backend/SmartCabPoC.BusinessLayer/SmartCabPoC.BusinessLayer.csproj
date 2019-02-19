@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SmartCabPoC.DataLayer\SmartCabPoC.DataLayer.csproj">
+      <Private></Private>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>
