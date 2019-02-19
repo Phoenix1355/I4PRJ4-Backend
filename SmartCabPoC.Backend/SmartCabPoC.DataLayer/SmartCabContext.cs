@@ -9,10 +9,8 @@ namespace SmartCabPoC.DataLayer
         private readonly string _connectionString;
         public DbSet<Ride> Rides { get; set; }
 
-
         public SmartCabContext(string configuration)
         {
-            //_connectionString = configuration.GetConnectionString("SmartCabPoC");
             _connectionString = configuration;
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

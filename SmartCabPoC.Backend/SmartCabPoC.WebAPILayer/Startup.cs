@@ -25,14 +25,9 @@ namespace SmartCabPoC.WebAPILayer
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            //The connectionstring is stored in Azure's appsettings to avoid version control
-            //https://stackoverflow.com/questions/34269106/read-connectionstring-outside-startup-from-appsetting-json-in-vnext/40902384
-            //https://blogs.msdn.microsoft.com/waws/2018/06/12/asp-net-core-settings-for-azure-app-service/
-            var connectionString = Configuration.GetConnectionString("SmartCabPoC");
-
-            //Set up dependencies --> dependency injection
+            //Set up dependencies --> dependency injection. Se some tips in the link below:
             //https://cmatskas.com/net-core-dependency-injection-with-constructor-parameters-2/
-            services.AddScoped<ISmartCabContext>(s => new SmartCabContext(connectionString));
+            services.AddScoped<ISmartCabContext>(s => new SmartCabContext(GetConnectionString()));
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
         }
@@ -52,6 +47,26 @@ namespace SmartCabPoC.WebAPILayer
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        /// <summary>
+        /// Gets the connection string for the sql database. 
+        /// <para>This is stored in azure if run online or in secrets.json (which is not included in version control) if run locally.</para>
+        /// Check out these sources for an explanation:
+        /// <para>https://stackoverflow.com/questions/34269106/read-connectionstring-outside-startup-from-appsetting-json-in-vnext/40902384</para>
+        /// <para>https://blogs.msdn.microsoft.com/waws/2018/06/12/asp-net-core-settings-for-azure-app-service/</para>
+        /// </summary>
+        /// <returns>The connection string for the database</returns>
+        private string GetConnectionString()
+        {
+            var connectionString = Configuration.GetConnectionString("SmartCabPoC");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = Configuration["ConnectionString"];
+            }
+
+            return connectionString;
         }
     }
 }
