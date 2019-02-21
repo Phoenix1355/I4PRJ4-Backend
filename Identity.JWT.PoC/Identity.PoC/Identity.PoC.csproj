@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>63931de1-64c0-4c3c-ae8f-8cf0a73f686f</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190221030117_init.cs" />
+    <Compile Remove="Migrations\20190221030117_init.Designer.cs" />
+    <Compile Remove="Migrations\20190221030539_init.cs" />
+    <Compile Remove="Migrations\20190221030539_init.Designer.cs" />
+    <Compile Remove="Migrations\20190221050459_addcustomerandride.cs" />
+    <Compile Remove="Migrations\20190221050459_addcustomerandride.Designer.cs" />
+    <Compile Remove="Migrations\20190221050914_RenameCustomer.cs" />
+    <Compile Remove="Migrations\20190221050914_RenameCustomer.Designer.cs" />
+    <Compile Remove="Migrations\20190221052410_init.cs" />
+    <Compile Remove="Migrations\20190221052410_init.Designer.cs" />
+    <Compile Remove="Migrations\20190221052439_init.cs" />
+    <Compile Remove="Migrations\20190221052439_init.Designer.cs" />
+    <Compile Remove="Migrations\20190221053126_init2.cs" />
+    <Compile Remove="Migrations\20190221053126_init2.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>
