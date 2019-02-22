@@ -15,9 +15,9 @@ namespace SmartCabPoC.DataLayer.Repositories
     {
         private readonly SmartCabContext _context;
 
-        public RideRepository(ISmartCabContext context)
+        public RideRepository(SmartCabContext context)
         {
-            _context = (SmartCabContext)context; //If we don't make this cast, we wont have access to eg. SaveChanges.
+            _context = context; //If we don't make this cast, we wont have access to eg. SaveChanges.
         }
 
 

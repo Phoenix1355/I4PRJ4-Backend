@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartCabPoC.BusinessLayer.Abstractions;
@@ -27,9 +28,14 @@ namespace SmartCabPoC.WebAPILayer
 
             //Set up dependencies --> dependency injection. Se some tips in the link below:
             //https://cmatskas.com/net-core-dependency-injection-with-constructor-parameters-2/
-            services.AddScoped<ISmartCabContext>(s => new SmartCabContext(GetConnectionString()));
+            
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
+
+            //services.AddScoped<ISmartCabContext>(s => new SmartCabContext());
+            //This is the other option for injection. 
+            services.AddDbContext<SmartCabContext>(options => options.UseSqlServer(GetConnectionString()));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
