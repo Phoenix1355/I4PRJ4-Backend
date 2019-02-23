@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Backend.BusinessLogicLayer.Interfaces;
+using Backend.BusinessLogicLayer.Services;
+using Backend.DataAccessLayer;
+using Backend.DataAccessLayer.Interfaces;
+using Backend.DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace CAB.Architecture.PoC
+namespace Backend.Api
 {
     public class Startup
     {
@@ -26,6 +25,12 @@ namespace CAB.Architecture.PoC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddDbContext<ApplicationContext>(options =>
+                options.UseSqlServer(GetConnectionString()));
+
+            services.AddScoped<IRideService, RideService>();
+            services.AddScoped<IRideRepository, RideRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +48,11 @@ namespace CAB.Architecture.PoC
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private string GetConnectionString()
+        {
+            return @"data source=.\;initial catalog=mydb;integrated security=true";
         }
     }
 }

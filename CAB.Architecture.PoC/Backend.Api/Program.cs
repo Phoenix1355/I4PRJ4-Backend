@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CAB.Architecture.PoC
+namespace Backend.Api
 {
     public class Program
     {
