@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +11,7 @@ using SmartCabPoC.BusinessLayer.Services;
 using SmartCabPoC.DataLayer;
 using SmartCabPoC.DataLayer.Abstractions;
 using SmartCabPoC.DataLayer.Repositories;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace SmartCabPoC.WebAPILayer
 {
@@ -30,6 +34,21 @@ namespace SmartCabPoC.WebAPILayer
             services.AddScoped<ISmartCabContext>(s => new SmartCabContext(GetConnectionString()));
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
+
+            //Swagger setup
+            services.AddSwaggerGen(x =>
+            {
+                x.SwaggerDoc("v1", new Info
+                {
+                    Title = "SmartCab WebAPi Documentation",
+                    Description = "This is the documentation for SmartCab's awesome WebAPI",
+                    Version = "1.0"
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                x.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,6 +63,14 @@ namespace SmartCabPoC.WebAPILayer
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            //Swagger config
+            app.UseSwagger();
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("./swagger/v1/swagger.json", "SmartCab WebAPI");
+                x.RoutePrefix = string.Empty;
+            });
 
             app.UseHttpsRedirection();
             app.UseMvc();

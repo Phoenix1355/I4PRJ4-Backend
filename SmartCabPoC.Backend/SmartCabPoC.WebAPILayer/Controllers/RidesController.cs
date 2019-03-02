@@ -21,25 +21,12 @@ namespace SmartCabPoC.WebAPILayer.Controllers
         }
 
         /// <summary>
-        /// Returns a json string representing an array of rides.
-        /// 
-        /// Handles GET requests directed to the following url: api/rides.
-        /// 
-        /// Example of json returned:
-        ///
-        ///     [
-        ///         {
-        ///             "id": 1,
-        ///             "departureTime": "2019-10-21T20:15:00"
-        ///         },
-        ///         {
-        ///             "id": 2,
-        ///             "departureTime": "2019-10-21T20:15:00"
-        ///         }
-        ///     ]
-        /// 
+        /// Returns all rides in stored in the system.
         /// </summary>
+        /// <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
         /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">Unauthorized</response>
         [HttpGet]
         public async Task<IEnumerable<Ride>> Get()
         {
@@ -48,28 +35,20 @@ namespace SmartCabPoC.WebAPILayer.Controllers
 
         /// <summary>
         /// Adds a new ride to the database.
-        ///
-        /// Handles POST requests directed to the following url: api/rides.
-        /// 
-        /// Example of expected json:
-        ///
-        ///     {
-        ///         "DepartureTime": "2019-10-21 20:15"
-        ///     }
-        /// 
         /// </summary>
-        /// <param name="ride">A ride represented as a json string.</param>
+        /// <remarks>
+        /// <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>
+        /// <para></para>
+        /// <para>Another line</para>
+        /// </remarks>
+        /// <param name="ride">The ride that should be added to the database</param>
         /// <returns></returns>
+        /// <response code="200">Success</response>
+        /// <response code="401">Unauthorized</response>
         [HttpPost]
         public async Task Post([FromBody] Ride ride)
         {
             await _rideService.AddRideAsync(ride);
         }
-
-
-        
-
-        
-
-}
+    }
 }
