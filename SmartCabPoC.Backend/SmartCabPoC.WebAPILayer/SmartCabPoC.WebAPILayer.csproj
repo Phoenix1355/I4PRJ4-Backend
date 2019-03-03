@@ -6,9 +6,9 @@
     <UserSecretsId>f4ce4d28-1f4c-4740-948b-0216857d5e40</UserSecretsId>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!--<NoWarn>$(NoWarn);1591</NoWarn>-->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Repos\IKT\ikt4-prj4\Backend\SmartCabPoC.Backend\SmartCabPoC.WebAPILayer\SmartCabPoC.WebAPILayer.xml</DocumentationFile>
+    <NoWarn>1701;1702; 1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

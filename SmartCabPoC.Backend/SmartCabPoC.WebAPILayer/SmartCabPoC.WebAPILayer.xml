@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SmartCabPoC.WebAPILayer</name>
+    </assembly>
+    <members>
+        <member name="M:SmartCabPoC.WebAPILayer.Controllers.RidesController.Get">
+            <summary>
+            Returns all rides in stored in the system.
+            </summary>
+            <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
+            <returns></returns>
+            <response code="200">Success</response>
+            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:SmartCabPoC.WebAPILayer.Controllers.RidesController.Post(SmartCabPoC.DataLayer.Models.Ride)">
+            <summary>
+            Adds a new ride to the database.
+            </summary>
+            <remarks>
+            <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>
+            <para></para>
+            <para>Another line</para>
+            </remarks>
+            <param name="ride">The ride that should be added to the database</param>
+            <returns></returns>
+            <response code="200">Success</response>
+            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:SmartCabPoC.WebAPILayer.Startup.GetConnectionString">
+            <summary>
+            Gets the connection string for the sql database. 
+            <para>This is stored in azure if run online or in secrets.json (which is not included in version control) if run locally.</para>
+            Check out these sources for an explanation:
+            <para>https://stackoverflow.com/questions/34269106/read-connectionstring-outside-startup-from-appsetting-json-in-vnext/40902384</para>
+            <para>https://blogs.msdn.microsoft.com/waws/2018/06/12/asp-net-core-settings-for-azure-app-service/</para>
+            </summary>
+            <returns>The connection string for the database</returns>
+        </member>
+    </members>
+</doc>
