@@ -10,10 +10,15 @@
             </summary>
             <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
             <returns></returns>
-            <response code="200">Success</response>
-            <response code="401">Unauthorized</response>
         </member>
-        <member name="M:Backend.Api.Controllers.RidesController.Post(Backend.DataAccessLayer.Models.Ride)">
+        <member name="M:Backend.Api.Controllers.RidesController.Get(System.Int32)">
+            <summary>
+            Returns a specific ride with the given id
+            </summary>
+            <param name="id">The id of the ride that is returned</param>
+            <returns></returns>
+        </member>
+        <member name="M:Backend.Api.Controllers.RidesController.Post(Backend.BusinessLogicLayer.DataTransferObjects.RideDTO)">
             <summary>
             Adds a new ride to the database.
             </summary>
@@ -22,10 +27,22 @@
             <para></para>
             <para>Another line</para>
             </remarks>
-            <param name="ride">The ride that should be added to the database</param>
+            <param name="rideDTO">The ride that should be added to the database</param>
             <returns></returns>
-            <response code="200">Success</response>
-            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:Backend.Api.Controllers.RidesController.Put(Backend.DataAccessLayer.Models.Ride)">
+            <summary>
+            Modifies an existing ride and returns the updated ride
+            </summary>
+            <param name="ride">The ride to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:Backend.Api.Controllers.RidesController.Delete(System.Int32)">
+            <summary>
+            Deletes a ride and returns the deleted ride
+            </summary>
+            <param name="id">The id of the ride to delete</param>
+            <returns></returns>
         </member>
     </members>
 </doc>

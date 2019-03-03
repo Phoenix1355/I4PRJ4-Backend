@@ -16,24 +16,50 @@ namespace Backend.DataAccessLayer.Repositories
 
         public RideRepository(ApplicationContext context)
         {
-            _context = (ApplicationContext)context; //If we don't make this cast, we wont have access to eg. SaveChanges.
+            _context = context;
         }
 
 
         public async Task<List<Ride>> GetAllRidesAsync()
         {
             var rides = await Task.Run(() => _context.Rides.ToList());
-
             return rides;
         }
 
-
-        public async Task AddRide(Ride ride)
+        public async Task<Ride> GetRideByIdAsync(int id)
         {
-            await Task.Run(() =>
+            var ride = await Task.Run(() => _context.Rides.SingleOrDefault(r => r.Id == id));
+            return ride;
+        }
+
+        public async Task<Ride> AddRideAsync(Ride ride)
+        {
+            return await Task.Run(() =>
             {
                 _context.Rides.Add(ride);
                 _context.SaveChanges();
+                return ride;
+            });
+        }
+
+        public async Task<Ride> UpdateRideAsync(Ride ride)
+        {
+            return await Task.Run(() =>
+            {
+                _context.Rides.Update(ride);
+                _context.SaveChanges();
+                return ride;
+            });
+        }
+
+        public async Task<Ride> DeleteRideAsync(int id)
+        {
+            return await Task.Run(() =>
+            {
+                var ride = _context.Rides.SingleOrDefault(r => r.Id == id);
+                _context.Rides.Remove(ride);
+                _context.SaveChanges();
+                return ride;
             });
         }
 

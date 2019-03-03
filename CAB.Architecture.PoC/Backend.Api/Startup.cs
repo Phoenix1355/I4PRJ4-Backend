@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using AutoMapper;
+using Backend.BusinessLogicLayer.DataTransferObjects;
 using Backend.BusinessLogicLayer.Interfaces;
 using Backend.BusinessLogicLayer.Services;
 using Backend.DataAccessLayer;
 using Backend.DataAccessLayer.Interfaces;
+using Backend.DataAccessLayer.Models;
 using Backend.DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,13 +33,21 @@ namespace Backend.Api
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            //================== AutoMapper setup =======================
+            services.AddAutoMapper(mapper =>
+            {
+                mapper.CreateMap<RideDTO, Ride>().ReverseMap(); //Setup two way map for RideDTO <-> Ride. This must be done for all wanted mappings
+            });
+
+            //================== DbContext setup ========================
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(GetConnectionString()));
 
+            //================== Dependency injection setup =============
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
 
-            //This line adds Swagger generation services to our container.
+            //===================== Swagger setup =======================
             services.AddSwaggerGen(x =>
             {
                 //The generated Swagger JSON file will have these properties.
@@ -78,6 +89,12 @@ namespace Backend.Api
             });
 
             app.UseHttpsRedirection();
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller}/{action}/{id}");
+            //});
             app.UseMvc();
         }
 

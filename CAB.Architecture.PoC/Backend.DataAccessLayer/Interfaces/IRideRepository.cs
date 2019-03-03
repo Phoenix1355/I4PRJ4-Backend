@@ -10,6 +10,9 @@ namespace Backend.DataAccessLayer.Interfaces
     public interface IRideRepository
     {
         Task<List<Ride>> GetAllRidesAsync();
-        Task AddRide(Ride ride);
+        Task<Ride> GetRideByIdAsync(int id);
+        Task<Ride> AddRideAsync(Ride ride);
+        Task<Ride> UpdateRideAsync(Ride ride);
+        Task<Ride> DeleteRideAsync(int id);
     }
 }
