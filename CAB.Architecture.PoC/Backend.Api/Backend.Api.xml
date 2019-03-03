@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Backend.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Backend.Api.Controllers.RidesController.Get">
+            <summary>
+            Returns all rides in stored in the system.
+            </summary>
+            <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
+            <returns></returns>
+            <response code="200">Success</response>
+            <response code="401">Unauthorized</response>
+        </member>
+        <member name="M:Backend.Api.Controllers.RidesController.Post(Backend.DataAccessLayer.Models.Ride)">
+            <summary>
+            Adds a new ride to the database.
+            </summary>
+            <remarks>
+            <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>
+            <para></para>
+            <para>Another line</para>
+            </remarks>
+            <param name="ride">The ride that should be added to the database</param>
+            <returns></returns>
+            <response code="200">Success</response>
+            <response code="401">Unauthorized</response>
+        </member>
+    </members>
+</doc>
