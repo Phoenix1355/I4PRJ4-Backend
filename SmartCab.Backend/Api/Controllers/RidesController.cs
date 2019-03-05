@@ -25,7 +25,7 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Returns all rides in stored in the system.
+        /// Returns all rides stored in the system.
         /// </summary>
         /// <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
         /// <returns></returns>
@@ -83,7 +83,7 @@ namespace Api.Controllers
         /// <summary>
         /// Modifies an existing ride and returns the updated ride
         /// </summary>
-        /// <param name="ride">The ride to update</param>
+        /// <param name="ride">The ride that should be updated</param>
         /// <returns></returns>
         [HttpPut]
         [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
@@ -103,7 +103,7 @@ namespace Api.Controllers
         /// <summary>
         /// Deletes a ride and returns the deleted ride
         /// </summary>
-        /// <param name="id">The id of the ride to delete</param>
+        /// <param name="id">The id of the ride that should be deleted</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

@@ -34,14 +34,14 @@
             <summary>
             Modifies an existing ride and returns the updated ride
             </summary>
-            <param name="ride">The ride to update</param>
+            <param name="ride">The ride that should be updated</param>
             <returns></returns>
         </member>
         <member name="M:Api.Controllers.RidesController.Delete(System.Int32)">
             <summary>
             Deletes a ride and returns the deleted ride
             </summary>
-            <param name="id">The id of the ride to delete</param>
+            <param name="id">The id of the ride that should be deleted</param>
             <returns></returns>
         </member>
     </members>

@@ -60,7 +60,7 @@ namespace Api
                 x.SwaggerDoc("v1", new Info
                 {
                     Title = "SmartCab WebAPi Documentation",
-                    Description = "This is the documentation for SmartCab's awesome WebAPI",
+                    Description = "This is the documentation for SmartCab's WebAPI",
                     Version = "1.0"
                 });
 

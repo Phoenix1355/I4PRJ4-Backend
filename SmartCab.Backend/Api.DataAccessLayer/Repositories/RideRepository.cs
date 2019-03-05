@@ -19,7 +19,6 @@ namespace Api.DataAccessLayer.Repositories
             _context = context;
         }
 
-
         public async Task<List<Ride>> GetAllRidesAsync()
         {
             var rides = await Task.Run(() => _context.Rides.ToList());
