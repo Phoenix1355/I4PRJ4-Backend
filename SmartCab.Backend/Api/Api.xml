@@ -6,7 +6,7 @@
     <members>
         <member name="M:Api.Controllers.RidesController.Get">
             <summary>
-            Returns all rides in stored in the system.
+            Returns all rides stored in the system.
             </summary>
             <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
             <returns></returns>
