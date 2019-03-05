@@ -10,7 +10,7 @@ namespace Api.DataAccessLayer
 
         public ApplicationContext(DbContextOptions<ApplicationContext> context) : base(context)
         {
-
+            //Setup is done in the API projects Startup.cs
         }
     }
 }
