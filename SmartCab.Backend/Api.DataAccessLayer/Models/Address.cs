@@ -1,4 +1,4 @@
-﻿namespace Api.BusinessLogicLayer.Models
+﻿namespace Api.DataAccessLayer.Models
 {
     public class Address
     {

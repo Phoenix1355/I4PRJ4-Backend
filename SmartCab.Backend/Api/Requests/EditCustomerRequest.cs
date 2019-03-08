@@ -1,6 +1,6 @@
 ﻿namespace Api.ViewModels
 {
-    public class EditCustomerViewModel
+    public class EditCustomerRequest
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataTransferObjects;
+using Api.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,97 +25,51 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Returns all rides stored in the system.
+        /// Returns all open rides stored in the system.
         /// </summary>
-        /// <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
-        /// <returns></returns>
+        /// <param name="authorization">A valid JWT token that is associated to a taxi company account</param>
+        /// <returns>All open rides stored in the system</returns>
+        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Produces("application/json")]
+        [Route("[action]")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Ride>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Open([FromHeader] string authorization)
         {
-            return Ok(await _rideService.GetAllRidesAsync());
+            var rides = new List<Ride>(); //TODO make some call to service layer
+            return Ok(rides);
         }
 
         /// <summary>
-        /// Returns a specific ride with the given id
+        /// Creates a new ride
         /// </summary>
-        /// <param name="id">The id of the ride that is returned</param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
+        /// <param name="authorization">A valid JWT token.</param>
+        /// <param name="request">Information about the ride that should be updated.</param>
+        /// <returns>The created ride.</returns>
+        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Produces("application/json")]
         [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
-        public async Task<ActionResult<Ride>> Get(int id)
+        [Route("[action]")]
+        [HttpPost]
+        public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
-            var ride = await _rideService.GetRideByIdAsync(id);
-
-            if (ride == null)
-            {
-                return NotFound("The ride does not exist");
-            }
-
+            var ride = new Ride(); //TODO call service layer
             return Ok(ride);
         }
 
         /// <summary>
-        /// Adds a new ride to the database.
+        /// Updates the ride with the supplied ID so it is accepted.
         /// </summary>
-        /// <remarks>
-        /// <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>
-        /// <para></para>
-        /// <para>Another line</para>
-        /// </remarks>
-        /// <param name="rideDTO">The ride that should be added to the database</param>
+        /// <param name="authorization">A valid JWT token.</param>
+        /// <param name="id">The id of the ride that should be accepted.</param>
         /// <returns></returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(Ride), StatusCodes.Status201Created)]
-        public async Task<IActionResult> Post([FromBody] RideDTO rideDTO)
-        {
-            var ride = _mapper.Map<RideDTO, Ride>(rideDTO);
-            var createdRide = await _rideService.AddRideAsync(ride);
-
-            if (createdRide == null)
-            {
-                return BadRequest("Something went wrong, try again.");
-            }
-
-            return Created($"/api/rides/{createdRide.Id}", createdRide);
-        }
-
-        /// <summary>
-        /// Modifies an existing ride and returns the updated ride
-        /// </summary>
-        /// <param name="ride">The ride that should be updated</param>
-        /// <returns></returns>
+        /// <response code="400">Could mean that the ride was no longer in an "accepted" state when the request made it to the server</response>
+        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Route("{id}/[action]")]
         [HttpPut]
-        [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Put([FromBody] Ride ride)
+        public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
         {
-            try
-            {
-                var updatedRide = await _rideService.UpdateRideAsync(ride);
-                return Ok(updatedRide);
-            }
-            catch (Exception e)
-            {
-                return BadRequest("The ride could not be updated, as it appears it does not exist. \n\n" + e);
-            }
-        }
-
-        /// <summary>
-        /// Deletes a ride and returns the deleted ride
-        /// </summary>
-        /// <param name="id">The id of the ride that should be deleted</param>
-        /// <returns></returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                return Ok(await _rideService.DeleteRideAsync(id));
-            }
-            catch (Exception e)
-            {
-                return BadRequest("The ride could not be deleted, as it appears it does not exist. \n\n" + e);
-            }
+            return Ok($"The ride with {id} is now successfully marked as accepted.");
         }
     }
 }

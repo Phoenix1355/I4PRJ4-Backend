@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Api.DataTransferObjects
+namespace Api.ViewModels
 {
-    public class RideDTO
+    public class CreateRideRequest
     {
         public DateTime DepartureTime { get; set; }
     }

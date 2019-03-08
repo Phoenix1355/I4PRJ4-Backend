@@ -1,12 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>037e83b3-2c27-4fda-aa46-144f67cf1079</UserSecretsId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Repos\I4PRJ4-Backend\SmartCab.Backend\Api\Api.xml</DocumentationFile>
+  <!--For some reason we need to add the below property group for swagger ui to work when hosted on azure
+  It won't be enough to enable it through the ui in visual studio-->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 

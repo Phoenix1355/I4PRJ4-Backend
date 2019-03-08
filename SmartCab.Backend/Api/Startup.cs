@@ -10,7 +10,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
-using Api.DataTransferObjects;
+using Api.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,7 +42,7 @@ namespace Api
             //================== AutoMapper setup =======================
             services.AddAutoMapper(mapper =>
             {
-                mapper.CreateMap<RideDTO, Ride>().ReverseMap(); //Setup two way map for RideDTO <-> Ride. This must be done for all wanted mappings
+                mapper.CreateMap<CreateRideRequest, Ride>().ReverseMap(); //Setup two way map for CreateRideRequest <-> Ride. This must be done for all wanted mappings
             });
 
             //================== DbContext setup ========================

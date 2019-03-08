@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
-using Api.DataTransferObjects;
+using Api.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,11 +20,11 @@ namespace Api.Controllers
         /// <remarks>
         /// Currently now authorization is required to make this request.
         /// </remarks>
-        /// <param name="priceRequest">Consists of an start address and an end address.</param>
+        /// <param name="request">Consists of an start address and an end address.</param>
         /// <returns>Th</returns>
         [HttpPost]
         [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Post([FromBody] PriceRequest priceRequest)
+        public async Task<IActionResult> Post([FromBody] PriceRequest request)
         {
             var someCalculatedPrice = 199.9;
             return Ok(someCalculatedPrice);

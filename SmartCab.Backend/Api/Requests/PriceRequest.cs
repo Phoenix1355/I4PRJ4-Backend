@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Models;
+﻿using Api.DataAccessLayer.Models;
 
-namespace Api.DataTransferObjects
+namespace Api.ViewModels
 {
     public class PriceRequest
     {

@@ -18,7 +18,7 @@
             <param name="id">The id of the ride that is returned</param>
             <returns></returns>
         </member>
-        <member name="M:Api.Controllers.RidesController.Post(Api.DataTransferObjects.RideDTO)">
+        <member name="M:Api.Controllers.RidesController.Post(Api.DataTransferObjects.CreateRideRequest)">
             <summary>
             Adds a new ride to the database.
             </summary>
@@ -27,7 +27,7 @@
             <para></para>
             <para>Another line</para>
             </remarks>
-            <param name="rideDTO">The ride that should be added to the database</param>
+            <param name="request">The ride that should be added to the database</param>
             <returns></returns>
         </member>
         <member name="M:Api.Controllers.RidesController.Put(Api.DataAccessLayer.Models.Ride)">

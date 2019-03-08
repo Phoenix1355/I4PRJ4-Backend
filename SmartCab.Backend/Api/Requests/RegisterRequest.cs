@@ -2,7 +2,7 @@
 
 namespace Api.ViewModels
 {
-    public class RegisterViewModel
+    public class RegisterRequest
     {
         [Required]
         [EmailAddress]
