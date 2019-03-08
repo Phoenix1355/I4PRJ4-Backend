@@ -19,10 +19,10 @@ namespace Api.Controllers
         /// </summary>
         /// <remarks>
         /// The following requirements apply to the username:
-        /// ---- Minimum length: 8
+        /// ---- Some requirement: Some value
         /// 
         /// The following requirements apply to the password:
-        /// ---- Minimum length: 8
+        /// ---- Some requirement: Some value
         /// </remarks>
         /// <param name="model">The data needed to create the customer account</param>
         /// <returns>The created customer's username.</returns>

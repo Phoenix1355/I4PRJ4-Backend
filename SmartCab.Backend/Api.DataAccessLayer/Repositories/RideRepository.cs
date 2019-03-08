@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -21,45 +22,36 @@ namespace Api.DataAccessLayer.Repositories
 
         public async Task<List<Ride>> GetAllRidesAsync()
         {
-            var rides = await Task.Run(() => _context.Rides.ToList());
+            var rides = await _context.Rides.ToListAsync();
             return rides;
         }
 
         public async Task<Ride> GetRideByIdAsync(int id)
         {
-            var ride = await Task.Run(() => _context.Rides.SingleOrDefault(r => r.Id == id));
+            var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
             return ride;
         }
 
         public async Task<Ride> AddRideAsync(Ride ride)
         {
-            return await Task.Run(() =>
-            {
-                _context.Rides.Add(ride);
-                _context.SaveChanges();
-                return ride;
-            });
+            await _context.Rides.AddAsync(ride);
+            await _context.SaveChangesAsync();
+            return ride;
         }
 
         public async Task<Ride> UpdateRideAsync(Ride ride)
         {
-            return await Task.Run(() =>
-            {
-                _context.Rides.Update(ride);
-                _context.SaveChanges();
-                return ride;
-            });
+            _context.Rides.Update(ride);
+            await _context.SaveChangesAsync();
+            return ride;
         }
 
         public async Task<Ride> DeleteRideAsync(int id)
         {
-            return await Task.Run(() =>
-            {
-                var ride = _context.Rides.SingleOrDefault(r => r.Id == id);
-                _context.Rides.Remove(ride);
-                _context.SaveChanges();
-                return ride;
-            });
+            var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
+            _context.Rides.Remove(ride);
+            await _context.SaveChangesAsync();
+            return ride;
         }
 
         #region IDisposable implementation

@@ -16,9 +16,11 @@ namespace Api.Controllers
 
         /// <summary>
         /// Calculates and returns the price for a taxi ride based on two addresses.
-        /// <remarks></remarks>
         /// </summary>
-        /// <param name="priceRequest">Consists of an start address and an end address</param>
+        /// <remarks>
+        /// Currently now authorization is required to make this request.
+        /// </remarks>
+        /// <param name="priceRequest">Consists of an start address and an end address.</param>
         /// <returns>Th</returns>
         [HttpPost]
         [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
