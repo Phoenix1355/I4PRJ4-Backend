@@ -52,21 +52,6 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Cancels the supplied JWT token.
-        /// </summary>
-        /// <param name="authorization">A valid JWT token.</param>
-        /// <returns>200 if the supplied JWT token is valid otherwise 401</returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
-        [Route("[action]")]
-        [HttpPost]
-        public async Task<IActionResult> Logout([FromHeader] string authorization)
-        {
-            //Add token to blacklist
-            //https://piotrgankiewicz.com/2018/04/25/canceling-jwt-tokens-in-net-core/
-            return Ok("Logout successful");
-        }
-
-        /// <summary>
         /// Updates the customer account with the supplied information.
         /// </summary>
         /// <param name="authorization">A valid JWT token.</param>
