@@ -22,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
+using Hangfire;
 
 namespace Api
 {
@@ -52,6 +53,13 @@ namespace Api
             //================== Dependency injection setup =============
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
+
+            //================== Hangfire setup ======================= 
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(GetConnectionString());
+            });
+
 
             //===================== Swagger setup =======================
             services.AddSwaggerGen(x =>
@@ -94,6 +102,14 @@ namespace Api
                 x.RoutePrefix = string.Empty;
             });
 
+
+            //Enables the handboard dashboard and server. 
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+
+
+
             app.UseHttpsRedirection();
             app.UseMvc();
         }
@@ -101,7 +117,7 @@ namespace Api
         private string GetConnectionString()
         {
             //return Configuration["ConnectionString"]; //will look in secrets.json
-            return @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
+            return @"Data Source=.\SQLExpress;Integrated Security=True";
         }
     }
 }
