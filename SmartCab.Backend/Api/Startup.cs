@@ -107,7 +107,8 @@ namespace Api
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
-
+            //An example of how to use Hangfire for background tasks. 
+            RecurringJob.AddOrUpdate(() => Console.Write("Example of recurring!"), Cron.Minutely);
 
 
             app.UseHttpsRedirection();
