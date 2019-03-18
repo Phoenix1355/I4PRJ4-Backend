@@ -1,4 +1,4 @@
-﻿namespace Api.ViewModels
+﻿namespace Api.Requests
 {
     public class EditCustomerRequest
     {

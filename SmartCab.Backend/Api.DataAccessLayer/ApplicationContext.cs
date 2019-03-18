@@ -1,12 +1,14 @@
 ﻿using System;
 using Api.DataAccessLayer.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer
 {
-    public class ApplicationContext : DbContext
+    public class ApplicationContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Ride> Rides { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> context) : base(context)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Api.ViewModels
+namespace Api.Requests
 {
     public class CreateRideRequest
     {

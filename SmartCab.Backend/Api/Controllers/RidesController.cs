@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.ViewModels;
+using Api.Requests;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

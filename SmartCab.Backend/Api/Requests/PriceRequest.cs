@@ -1,6 +1,6 @@
 ﻿using Api.DataAccessLayer.Models;
 
-namespace Api.ViewModels
+namespace Api.Requests
 {
     public class PriceRequest
     {

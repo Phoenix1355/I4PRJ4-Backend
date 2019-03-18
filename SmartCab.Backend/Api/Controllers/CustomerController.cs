@@ -2,9 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Requests;
+using Api.DataAccessLayer;
+using Api.DataAccessLayer.Models;
+using Api.Requests;
 using Api.Responses;
-using Api.ViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
@@ -14,6 +19,13 @@ namespace Api.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        private readonly ICustomerService _customerService;
+
+        public CustomerController(ICustomerService customerService)
+        {
+            _customerService = customerService;
+        }
+
         /// <summary>
         /// Registers a new customer account and returns the username for the created account.
         /// </summary>
@@ -32,8 +44,8 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            //register logic
-            return Ok(new RegisterResponse {Username = "Some username"});
+            var token = await _customerService.AddCustomerAsync(request);
+            return Ok(new LoginResponse { Token = token });
         }
 
         /// <summary>
@@ -48,7 +60,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Login(LoginRequest request)
         {
             //check credentials logic
-            return Ok(new LoginResponse {Token = "Some generated token"});
+            return Ok(new LoginResponse { Token = "Some generated token" });
         }
 
         /// <summary>
