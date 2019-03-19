@@ -41,6 +41,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
+            //Create the identity user and try to add the user to the database
             var user = new ApplicationUser
             {
                 UserName = request.Email,
@@ -49,6 +50,7 @@ namespace Api.BusinessLogicLayer.Services
 
             var result = await _applicationUserRepository.AddApplicationUserAsync(user, request.Password);
 
+            //If the identity user was successfully added, then create the customer object and assign a role to it
             if (result.Succeeded)
             {
                 var customer = new Customer
@@ -62,10 +64,12 @@ namespace Api.BusinessLogicLayer.Services
                 await _customerRepository.AddCustomerAsync(customer);
                 await _applicationUserRepository.AddToRoleAsync(user, "Customer");
 
-                var token = await _jwtService.GenerateJwtToken(request.Email, user);
+                //Create the token, wrap it and return the response
+                var token = _jwtService.GenerateJwtToken(request.Email, user);
                 return new RegisterResponse {Token = token};
             }
 
+            //If the identity user was not successfully added, then throw an error containing the error message from the identity framework
             throw new ArgumentException(result.Errors.First().Description);
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Api.DataAccessLayer.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Models
 {
