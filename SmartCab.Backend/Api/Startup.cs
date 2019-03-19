@@ -59,6 +59,16 @@ namespace Api
                     .AddEntityFrameworkStores<ApplicationContext>()
                     .AddDefaultTokenProviders();
 
+            // ====== Configure password requirements =====
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+            });
+
             // ======= Define policies ======
             services.AddAuthorization(options =>
             {

@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Api.BusinessLogicLayer.Interfaces
 {
+    /// <summary>
+    /// Defines a number of methods used to generate Json Web Tokens
+    /// </summary>
     public interface IJwtService
     {
-        Task<string> GenerateJwtToken(string email, IdentityUser user);
+        string GenerateJwtToken(string email, IdentityUser user);
     }
 }

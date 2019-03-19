@@ -1,20 +1,29 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
-using Api.DataAccessLayer;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api.BusinessLogicLayer.Services
 {
+    /// <summary>
+    /// Exposes methods containing business logic related to customers.
+    /// </summary>
     public class CustomerService : ICustomerService
     {
         private readonly IJwtService _jwtService;
         private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly ICustomerRepository _customerRepository;
 
+        /// <summary>
+        /// Constructor for this class.
+        /// </summary>
+        /// <param name="jwtService">Used to generate Json Web Tokens</param>
+        /// <param name="customerRepository">Used to access the database when updating/creating customers</param>
+        /// <param name="applicationUserRepository">Used to access the database when updating/creating customers</param>
         public CustomerService(
             IJwtService jwtService, 
             ICustomerRepository customerRepository, 
@@ -25,7 +34,12 @@ namespace Api.BusinessLogicLayer.Services
             _applicationUserRepository = applicationUserRepository;
         }
 
-        public async Task<string> AddCustomerAsync(RegisterRequest request)
+        /// <summary>
+        /// Adds a new customer to the database asynchronously and returns a JWT token wrapped in a response object.
+        /// </summary>
+        /// <param name="request">The required data needed to create the customer</param>
+        /// <returns>A RegisterResponse object containing a valid JWT token</returns>
+        public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
             var user = new ApplicationUser
             {
@@ -49,10 +63,10 @@ namespace Api.BusinessLogicLayer.Services
                 await _applicationUserRepository.AddToRoleAsync(user, "Customer");
 
                 var token = await _jwtService.GenerateJwtToken(request.Email, user);
-                return token;
+                return new RegisterResponse {Token = token};
             }
 
-            throw new ApplicationException("Unexpected error");
+            throw new ArgumentException(result.Errors.First().Description);
         }
     }
 }

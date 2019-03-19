@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.Requests;
 using Api.Responses;
 using Microsoft.AspNetCore.Http;
@@ -33,7 +34,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             //register logic
-            return Ok(new RegisterResponse { Username = "Some username" });
+            return Ok(new RegisterResponse { Token = "Some username" });
         }
 
         /// <summary>

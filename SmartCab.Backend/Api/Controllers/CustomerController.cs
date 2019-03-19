@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
@@ -27,25 +28,41 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Registers a new customer account and returns the username for the created account.
+        /// Registers a new customer and issues a token to the calling client.
         /// </summary>
         /// <remarks>
-        /// The following requirements apply to the username:
-        /// ---- Some requirement: Some value
-        /// 
+        /// When a customer is successfully created a status 200 will be returned.
+        /// This response will contain a JWT token that is tied to the created account.
+        /// The token must be used when making requests to other endpoints in this API.
+        /// <br/>
         /// The following requirements apply to the password:
-        /// ---- Some requirement: Some value
+        /// ---- Minimum 8 characters long
+        /// ---- Minimum one lower case letter
+        /// ---- Minimum one upper case letter
+        /// ---- Minimum one number
+        /// ---- Minimum one non-alphanumeric letter
         /// </remarks>
-        /// <param name="request">The data needed to create the customer account</param>
-        /// <returns>The created customer's username.</returns>
+        /// <param name="request">The data needed to create the customer</param>
+        /// <returns>A valid JWT token that is tied to the created customer</returns>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var token = await _customerService.AddCustomerAsync(request);
-            return Ok(new LoginResponse { Token = token });
+            try
+            {
+                var response = await _customerService.AddCustomerAsync(request);
+                return Ok(response);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+            }
         }
 
         /// <summary>
