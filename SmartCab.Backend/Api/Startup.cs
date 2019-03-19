@@ -96,7 +96,7 @@ namespace Api
             services.AddScoped<IRideRepository, RideRepository>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             //===================== Swagger setup =======================

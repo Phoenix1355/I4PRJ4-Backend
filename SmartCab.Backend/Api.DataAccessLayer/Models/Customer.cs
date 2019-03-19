@@ -1,6 +1,8 @@
-﻿namespace Api.DataAccessLayer.Models
+﻿using Api.DataAccessLayer.Interfaces;
+
+namespace Api.DataAccessLayer.Models
 {
-    public class Customer
+    public class Customer : ICustomer
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -15,21 +15,14 @@ namespace Api.BusinessLogicLayer.Services
 {
     public class JwtService : IJwtService
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public JwtService(
-            IConfiguration configuration, 
-            SignInManager<ApplicationUser> signInManager, 
-            UserManager<ApplicationUser> userManager)
+        public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _signInManager = signInManager;
-            _userManager = userManager;
         }
 
-        public async Task<string> GetJwtToken(string email, IdentityUser user)
+        public async Task<string> GenerateJwtToken(string email, IdentityUser user)
         {
             var isCustomer = true; //TODO: Replace with call to database layer
             var isTaxiCompany = false; //TODO: Replace with call to database layer

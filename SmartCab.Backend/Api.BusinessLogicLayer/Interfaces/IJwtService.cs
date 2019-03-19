@@ -5,6 +5,6 @@ namespace Api.BusinessLogicLayer.Interfaces
 {
     public interface IJwtService
     {
-        Task<string> GetJwtToken(string email, IdentityUser user);
+        Task<string> GenerateJwtToken(string email, IdentityUser user);
     }
 }

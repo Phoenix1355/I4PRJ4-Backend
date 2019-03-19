@@ -12,17 +12,17 @@ namespace Api.BusinessLogicLayer.Services
     public class CustomerService : ICustomerService
     {
         private readonly IJwtService _jwtService;
-        private readonly IIdentityService _identityService;
+        private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly ICustomerRepository _customerRepository;
 
         public CustomerService(
             IJwtService jwtService, 
-            IIdentityService identityService, 
-            ICustomerRepository customerRepository)
+            ICustomerRepository customerRepository, 
+            IApplicationUserRepository applicationUserRepository)
         {
             _jwtService = jwtService;
-            _identityService = identityService;
             _customerRepository = customerRepository;
+            _applicationUserRepository = applicationUserRepository;
         }
 
         public async Task<string> AddCustomerAsync(RegisterRequest request)
@@ -33,7 +33,7 @@ namespace Api.BusinessLogicLayer.Services
                 Email = request.Email
             };
 
-            var result = await _identityService.AddApplicationUserAsync(user, request.Password);
+            var result = await _applicationUserRepository.AddApplicationUserAsync(user, request.Password);
 
             if (result.Succeeded)
             {
@@ -46,9 +46,9 @@ namespace Api.BusinessLogicLayer.Services
                 };
 
                 await _customerRepository.AddCustomerAsync(customer);
-                await _identityService.AddToRoleAsync(user, "Customer");
+                await _applicationUserRepository.AddToRoleAsync(user, "Customer");
 
-                var token = await _jwtService.GetJwtToken(request.Email, user);
+                var token = await _jwtService.GenerateJwtToken(request.Email, user);
                 return token;
             }
 

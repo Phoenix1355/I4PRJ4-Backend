@@ -2,9 +2,9 @@
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Api.BusinessLogicLayer.Interfaces
+namespace Api.DataAccessLayer.Interfaces
 {
-    public interface IIdentityService
+    public interface IApplicationUserRepository
     {
         Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password);
 

@@ -1,19 +1,17 @@
 ﻿using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Interfaces;
+using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Api.BusinessLogicLayer.Services
+namespace Api.DataAccessLayer.Repositories
 {
-    public class IdentityService : IIdentityService
+    public class ApplicationUserRepository : IApplicationUserRepository
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public IdentityService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public ApplicationUserRepository(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
         }
 
         public async Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password)
