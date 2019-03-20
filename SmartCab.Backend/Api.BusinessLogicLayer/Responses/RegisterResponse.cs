@@ -1,4 +1,6 @@
-﻿namespace Api.BusinessLogicLayer.Responses
+﻿using Api.BusinessLogicLayer.DataTransferObjects;
+
+namespace Api.BusinessLogicLayer.Responses
 {
     /// <summary>
     /// Defines the data returned when the endpoint api/customer/register successfully returns.
@@ -11,5 +13,6 @@
     public class RegisterResponse
     {
         public string Token { get; set; }
+        public CustomerDto Customer { get; set; }
     }
 }

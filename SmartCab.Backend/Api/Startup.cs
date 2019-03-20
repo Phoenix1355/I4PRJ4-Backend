@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
@@ -48,6 +49,7 @@ namespace Api
             services.AddAutoMapper(mapper =>
             {
                 mapper.CreateMap<CreateRideRequest, Ride>().ReverseMap(); //Setup two way map for CreateRideRequest <-> Ride. This must be done for all wanted mappings
+                mapper.CreateMap<Customer, CustomerDto>();
             });
 
             //================== DbContext setup ========================

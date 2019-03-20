@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using AutoMapper;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -17,6 +19,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IJwtService _jwtService;
         private readonly IApplicationUserRepository _applicationUserRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Constructor for this class.
@@ -24,14 +27,17 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
         /// <param name="customerRepository">Used to access the database when updating/creating customers</param>
         /// <param name="applicationUserRepository">Used to access the database when updating/creating customers</param>
+        /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
             IJwtService jwtService, 
             ICustomerRepository customerRepository, 
-            IApplicationUserRepository applicationUserRepository)
+            IApplicationUserRepository applicationUserRepository, 
+            IMapper mapper)
         {
             _jwtService = jwtService;
             _customerRepository = customerRepository;
             _applicationUserRepository = applicationUserRepository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -53,7 +59,7 @@ namespace Api.BusinessLogicLayer.Services
             //If the identity user was successfully added, then create the customer object and assign a role to it
             if (result.Succeeded)
             {
-                var customer = new Customer
+                ICustomer customer = new Customer
                 {
                     ApplicationUserId = user.Id,
                     Name = request.Name,
@@ -62,12 +68,19 @@ namespace Api.BusinessLogicLayer.Services
                 };
 
                 var role = "Customer";
-                await _customerRepository.AddCustomerAsync(customer);
+                customer = await _customerRepository.AddCustomerAsync(customer);
+
                 await _applicationUserRepository.AddToRoleAsync(user, role);
 
                 //Create the token, wrap it and return the response
+                var customerDto = _mapper.Map<CustomerDto>(customer);
                 var token = _jwtService.GenerateJwtToken(request.Email, user, role);
-                return new RegisterResponse {Token = token};
+                var response = new RegisterResponse
+                {
+                    Token = token,
+                    Customer = customerDto
+                };
+                return response;
             }
 
             //If the identity user was not successfully added, then throw an error containing the error message from the identity framework
