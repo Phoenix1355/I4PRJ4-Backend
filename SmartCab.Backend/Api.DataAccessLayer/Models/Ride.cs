@@ -11,13 +11,17 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public DateTime DepartureTime { get; set; }
 
+        public int StartDestinationId { get; set; }
+
         public Address StartDestination { get; set; }
+    
+        public int  SlutDestinationId { get; set; }
 
         public Address SlutDestination { get; set; }
 
         [Required]
         public DateTime LatestConfirmed { get; set; }
-
+        
         [Required]
         public int CountPassengers { get; set; }
 
