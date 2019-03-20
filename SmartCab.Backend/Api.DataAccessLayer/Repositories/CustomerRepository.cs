@@ -14,9 +14,9 @@ namespace Api.DataAccessLayer.Repositories
             _context = context;
         }
 
-        public async Task<ICustomer> AddCustomerAsync(ICustomer customer)
+        public async Task<Customer> AddCustomerAsync(Customer customer)
         {
-            await _context.Customers.AddAsync((Customer)customer);
+            await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
             return customer;
         }
