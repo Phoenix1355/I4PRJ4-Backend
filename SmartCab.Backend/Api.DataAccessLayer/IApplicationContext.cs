@@ -7,5 +7,6 @@ namespace Api.DataAccessLayer
     {
         DbSet<Ride> Rides { get; set; }
         DbSet<Customer> Customers { get; set; }
+        DbSet<TaxiCompany> TaxiCompanies { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace Api.DataAccessLayer
     {
         public DbSet<Ride> Rides { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<TaxiCompany> TaxiCompanies { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> context) : base(context)
         {
