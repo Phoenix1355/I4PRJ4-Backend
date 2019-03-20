@@ -61,11 +61,12 @@ namespace Api.BusinessLogicLayer.Services
                     Email = request.Email
                 };
 
+                var role = "Customer";
                 await _customerRepository.AddCustomerAsync(customer);
-                await _applicationUserRepository.AddToRoleAsync(user, "Customer");
+                await _applicationUserRepository.AddToRoleAsync(user, role);
 
                 //Create the token, wrap it and return the response
-                var token = _jwtService.GenerateJwtToken(request.Email, user);
+                var token = _jwtService.GenerateJwtToken(request.Email, user, role);
                 return new RegisterResponse {Token = token};
             }
 

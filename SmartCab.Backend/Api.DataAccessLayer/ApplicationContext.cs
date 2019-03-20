@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer
 {
-    public class ApplicationContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationContext : IdentityDbContext<ApplicationUser>, IApplicationContext
     {
         public DbSet<Ride> Rides { get; set; }
         public DbSet<Customer> Customers { get; set; }

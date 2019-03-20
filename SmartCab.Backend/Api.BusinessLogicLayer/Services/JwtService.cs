@@ -34,27 +34,16 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="email">Emails for the account that the token should be issued to.</param>
         /// <param name="user">The identity user the token should be issued to.</param>
+        /// <param name="role">The role the token should apply to</param>
         /// <returns>A token that is tied to the specified user.</returns>
-        public string GenerateJwtToken(string email, IdentityUser user)
+        public string GenerateJwtToken(string email, IdentityUser user, string role)
         {
-            var isCustomer = true; //TODO: Replace with call to database layer
-            var isTaxiCompany = false; //TODO: Replace with call to database layer
-
             var claims = new List<Claim>();
             claims.Add(new Claim(JwtRegisteredClaimNames.Sub, email));
             claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
             claims.Add(new Claim(ClaimTypes.Name, email));
-
-            if (isCustomer)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Customer"));
-            }
-
-            if (isTaxiCompany)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "TaxiCompany"));
-            }
+            claims.Add(new Claim(ClaimTypes.Role, role));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
