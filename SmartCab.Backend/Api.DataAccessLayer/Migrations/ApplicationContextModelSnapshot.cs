@@ -15,7 +15,7 @@ namespace Api.DataAccessLayer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -98,6 +98,8 @@ namespace Api.DataAccessLayer.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired();
 
+                    b.Property<string>("Email");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -134,7 +136,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasIndex("TaxiCompanyId");
 
-                    b.ToTable("CustomerRideses");
+                    b.ToTable("CustomerRides");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.MatchedRides", b =>
@@ -342,7 +344,7 @@ namespace Api.DataAccessLayer.Migrations
             modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
                 {
                     b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
-                        .WithMany("CustomerRideses")
+                        .WithMany("CustomerRides")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -352,7 +354,7 @@ namespace Api.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Api.DataAccessLayer.Models.TaxiCompany", "TaxiCompany")
-                        .WithMany("CustomerRideses")
+                        .WithMany("CustomerRides")
                         .HasForeignKey("TaxiCompanyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

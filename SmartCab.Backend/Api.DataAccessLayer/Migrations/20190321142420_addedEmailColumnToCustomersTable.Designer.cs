@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190320211528_AddressConstraints")]
-    partial class AddressConstraints
+    [Migration("20190321142420_addedEmailColumnToCustomersTable")]
+    partial class addedEmailColumnToCustomersTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -99,6 +99,8 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<string>("ApplicationUserId")
                         .IsRequired();
+
+                    b.Property<string>("Email");
 
                     b.Property<string>("Name")
                         .IsRequired();

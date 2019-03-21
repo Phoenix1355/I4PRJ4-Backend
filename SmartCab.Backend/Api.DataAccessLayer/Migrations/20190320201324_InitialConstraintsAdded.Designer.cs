@@ -136,7 +136,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasIndex("TaxiCompanyId");
 
-                    b.ToTable("CustomerRideses");
+                    b.ToTable("CustomerRides");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.MatchedRides", b =>
@@ -344,7 +344,7 @@ namespace Api.DataAccessLayer.Migrations
             modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
                 {
                     b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
-                        .WithMany("CustomerRideses")
+                        .WithMany("CustomerRides")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -354,7 +354,7 @@ namespace Api.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Api.DataAccessLayer.Models.TaxiCompany", "TaxiCompany")
-                        .WithMany("CustomerRideses")
+                        .WithMany("CustomerRides")
                         .HasForeignKey("TaxiCompanyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

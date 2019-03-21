@@ -54,7 +54,10 @@ namespace Api
 
             //================== DbContext setup ========================
             services.AddDbContext<ApplicationContext>(options =>
-                options.UseSqlServer(GetConnectionString()));
+            {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(GetConnectionString());
+            });
 
             // ======= Add Identity ========
             services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -171,7 +174,6 @@ namespace Api
             }
 
             return connectionString;
-            //return @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
         }
 
         private async Task CreateRoles(IServiceProvider services)

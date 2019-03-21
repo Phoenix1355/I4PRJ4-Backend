@@ -2,6 +2,7 @@
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Api.DataAccessLayer
 {
@@ -12,9 +13,10 @@ namespace Api.DataAccessLayer
         public DbSet<Customer> Customers { get; set; }
         public DbSet<TaxiCompany> TaxiCompanies { get; set; }
 
-        public DbSet<CustomerRides> CustomerRideses { get; set; }
+        public DbSet<CustomerRides> CustomerRides { get; set; }
 
         public DbSet<SharedOpenRide> SharedOpenRides { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> context) : base(context)
         {
