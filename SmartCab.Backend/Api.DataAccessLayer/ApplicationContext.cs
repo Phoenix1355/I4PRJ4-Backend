@@ -22,6 +22,8 @@ namespace Api.DataAccessLayer
         }
         protected override void OnModelCreating(ModelBuilder modelbuilder)
         {
+            base.OnModelCreating(modelbuilder);
+
             modelbuilder.Entity<Ride>()
                 .HasOne(ride=> ride.StartDestination)
                 .WithMany()
