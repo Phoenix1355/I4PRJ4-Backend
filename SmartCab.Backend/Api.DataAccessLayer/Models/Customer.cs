@@ -15,9 +15,6 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public string PhoneNumber { get; set; }
 
-        [NotMapped]
-        public string Email { get; private set; }
-
         [Required]
         public string ApplicationUserId { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }

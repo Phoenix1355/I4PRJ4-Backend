@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190321160738_AddedOwnershipAndRemovedEmail")]
+    [Migration("20190321162727_AddedOwnershipAndRemovedEmail")]
     partial class AddedOwnershipAndRemovedEmail
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
