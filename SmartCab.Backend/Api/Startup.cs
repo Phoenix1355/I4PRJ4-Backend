@@ -49,7 +49,10 @@ namespace Api
             services.AddAutoMapper(mapper =>
             {
                 mapper.CreateMap<CreateRideRequest, Ride>().ReverseMap(); //Setup two way map for CreateRideRequest <-> Ride. This must be done for all wanted mappings
-                mapper.CreateMap<Customer, CustomerDto>();
+
+                //Digs into ApplicationUser for email. 
+                mapper.CreateMap<Customer, CustomerDto>()
+                    .ForMember(customerDto => customerDto.Email, customer => customer.MapFrom(c => c.ApplicationUser.Email));
             });
 
             //================== DbContext setup ========================

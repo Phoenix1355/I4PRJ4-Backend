@@ -22,19 +22,5 @@ namespace Api.DataAccessLayer
         {
             //Setup is done in the API projects Startup.cs
         }
-        protected override void OnModelCreating(ModelBuilder modelbuilder)
-        {
-            base.OnModelCreating(modelbuilder);
-
-            modelbuilder.Entity<Ride>()
-                .HasOne(ride=> ride.StartDestination)
-                .WithMany()
-                .OnDelete(DeleteBehavior.ClientSetNull); // no ON DELETE
-
-            modelbuilder.Entity<Ride>()
-                .HasOne(ride => ride.SlutDestination)
-                .WithMany()
-                .OnDelete(DeleteBehavior.ClientSetNull); // no ON DELETE
-        }
     }
 }

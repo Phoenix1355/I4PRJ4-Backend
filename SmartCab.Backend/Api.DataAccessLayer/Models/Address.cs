@@ -1,8 +1,10 @@
-﻿namespace Api.DataAccessLayer.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Api.DataAccessLayer.Models
 {
+    [Owned]
     public class Address
     {
-        public int Id { get; set; }
         public string CityName { get; set; }
         public int PostalCode { get; set; }
         public string StreetName { get; set; }
