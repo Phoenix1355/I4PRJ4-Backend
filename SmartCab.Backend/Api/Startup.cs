@@ -164,8 +164,14 @@ namespace Api
 
         private string GetConnectionString()
         {
-            //return Configuration["ConnectionString"]; //will look in secrets.json
-            return @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
+            var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look in secrets.json
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
+            }
+
+            return connectionString;
+            //return @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
         }
 
         private async Task CreateRoles(IServiceProvider services)
