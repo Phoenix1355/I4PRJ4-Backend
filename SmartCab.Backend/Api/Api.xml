@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Api</name>
+    </assembly>
+    <members>
+        <member name="M:Api.Controllers.RidesController.Get">
+            <summary>
+            Returns all rides stored in the system.
+            </summary>
+            <remarks>Iam some remark that can be use to supply some additional information to the consumer of the API.</remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Api.Controllers.RidesController.Get(System.Int32)">
+            <summary>
+            Returns a specific ride with the given id
+            </summary>
+            <param name="id">The id of the ride that is returned</param>
+            <returns></returns>
+        </member>
+        <member name="M:Api.Controllers.RidesController.Post(Api.DataTransferObjects.CreateRideRequest)">
+            <summary>
+            Adds a new ride to the database.
+            </summary>
+            <remarks>
+            <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>
+            <para></para>
+            <para>Another line</para>
+            </remarks>
+            <param name="request">The ride that should be added to the database</param>
+            <returns></returns>
+        </member>
+        <member name="M:Api.Controllers.RidesController.Put(Api.DataAccessLayer.Models.Ride)">
+            <summary>
+            Modifies an existing ride and returns the updated ride
+            </summary>
+            <param name="ride">The ride that should be updated</param>
+            <returns></returns>
+        </member>
+        <member name="M:Api.Controllers.RidesController.Delete(System.Int32)">
+            <summary>
+            Deletes a ride and returns the deleted ride
+            </summary>
+            <param name="id">The id of the ride that should be deleted</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
