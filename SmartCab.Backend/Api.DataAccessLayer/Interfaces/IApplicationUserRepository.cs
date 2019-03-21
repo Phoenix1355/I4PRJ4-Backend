@@ -9,5 +9,6 @@ namespace Api.DataAccessLayer.Interfaces
         Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password);
 
         Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role);
+        Task<SignInResult> SignInAsync(string email, string password);
     }
 }

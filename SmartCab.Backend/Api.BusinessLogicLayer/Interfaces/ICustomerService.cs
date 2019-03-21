@@ -12,5 +12,6 @@ namespace Api.BusinessLogicLayer.Interfaces
     public interface ICustomerService
     {
         Task<RegisterResponse> AddCustomerAsync(RegisterRequest request);
+        Task<LoginResponse> LoginCustomerAsync(LoginRequest request);
     }
 }

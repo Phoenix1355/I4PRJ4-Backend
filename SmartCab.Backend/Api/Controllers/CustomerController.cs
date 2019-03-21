@@ -76,8 +76,19 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            //check credentials logic
-            return Ok(new LoginResponse { Token = "Some generated token" });
+            try
+            {
+                var response = await _customerService.LoginCustomerAsync(request);
+                return Ok(response);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+            }
         }
 
         /// <summary>

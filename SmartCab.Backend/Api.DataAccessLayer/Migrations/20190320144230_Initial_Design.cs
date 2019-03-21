@@ -70,7 +70,7 @@ namespace Api.DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerRideses",
+                name: "CustomerRides",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -132,17 +132,17 @@ namespace Api.DataAccessLayer.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerRideses_CustomerId",
-                table: "CustomerRideses",
+                table: "CustomerRides",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerRideses_RideId",
-                table: "CustomerRideses",
+                table: "CustomerRides",
                 column: "RideId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerRideses_TaxiCompanyId",
-                table: "CustomerRideses",
+                table: "CustomerRides",
                 column: "TaxiCompanyId");
 
             migrationBuilder.AddForeignKey(
@@ -188,7 +188,7 @@ namespace Api.DataAccessLayer.Migrations
                 name: "Address");
 
             migrationBuilder.DropTable(
-                name: "CustomerRideses");
+                name: "CustomerRides");
 
             migrationBuilder.DropTable(
                 name: "MatchedRides");

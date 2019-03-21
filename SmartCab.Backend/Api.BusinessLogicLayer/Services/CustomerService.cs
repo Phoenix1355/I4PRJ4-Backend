@@ -86,5 +86,26 @@ namespace Api.BusinessLogicLayer.Services
             //If the identity user was not successfully added, then throw an error containing the error message from the identity framework
             throw new ArgumentException(result.Errors.First().Description);
         }
+
+        public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
+        {
+            var result = await _applicationUserRepository.SignInAsync(request.Email, request.Password);
+
+            if (result.Succeeded)
+            {
+                var customer = await _customerRepository.GetCustomerAsync(request.Email);
+
+                var token = _jwtService.GenerateJwtToken(request.Email, customer.ApplicationUser, "Customer");
+                var customerDto = _mapper.Map<CustomerDto>(customer);
+                var response = new LoginResponse
+                {
+                    Token = token,
+                    Customer = customerDto
+                };
+                return response;
+            }
+
+            throw new ArgumentException("Login failed. Credentials was not found in the database.");
+        }
     }
 }

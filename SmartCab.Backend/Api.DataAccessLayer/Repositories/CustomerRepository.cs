@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -18,6 +20,18 @@ namespace Api.DataAccessLayer.Repositories
         {
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
+            return customer;
+        }
+
+        public async Task<Customer> GetCustomerAsync(string email)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+
+            if (customer == null)
+            {
+                throw new ArgumentNullException("Customer does not exist.");
+            }
+
             return customer;
         }
 

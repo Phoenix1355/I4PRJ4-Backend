@@ -13,11 +13,11 @@ namespace Api.DataAccessLayer.Models
 
         public int StartDestinationId { get; set; }
 
-        public Address StartDestination { get; set; }
+        public virtual Address StartDestination { get; set; }
     
         public int  SlutDestinationId { get; set; }
 
-        public Address SlutDestination { get; set; }
+        public virtual Address SlutDestination { get; set; }
 
         [Required]
         public DateTime LatestConfirmed { get; set; }

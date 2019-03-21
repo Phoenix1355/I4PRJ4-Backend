@@ -12,11 +12,12 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public string Name { get; set; }
 
-        [NotMapped]
         public string Email
         {
-            get => ApplicationUser.Email;
-            set => ApplicationUser.Email = value;
+            get;
+            set;
+            //get => ApplicationUser.Email;
+            //set => ApplicationUser.Email = value;
         }
 
         [Required]
@@ -26,6 +27,6 @@ namespace Api.DataAccessLayer.Models
         public string ApplicationUserId { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
 
-        public List<CustomerRides> CustomerRideses { get; set; }
+        public virtual List<CustomerRides> CustomerRides { get; set; }
     }
 }
