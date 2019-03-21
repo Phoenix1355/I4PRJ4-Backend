@@ -4,14 +4,16 @@ using Api.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190320144230_Initial_Design")]
+    partial class Initial_Design
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,19 +97,19 @@ namespace Api.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired();
+                    b.Property<string>("ApplicationUserId");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Email");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired();
+                    b.Property<string>("Name");
+
+                    b.Property<string>("PhoneNumber");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[ApplicationUserId] IS NOT NULL");
 
                     b.ToTable("Customers");
                 });
@@ -167,9 +169,9 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<int>("Price");
 
-                    b.Property<int>("SlutDestinationId");
+                    b.Property<int?>("SlutDestinationId");
 
-                    b.Property<int>("StartDestinationId");
+                    b.Property<int?>("StartDestinationId");
 
                     b.HasKey("Id");
 
@@ -189,6 +191,8 @@ namespace Api.DataAccessLayer.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ApplicationUserId");
+
+                    b.Property<string>("Email");
 
                     b.Property<string>("Name");
 
@@ -335,8 +339,7 @@ namespace Api.DataAccessLayer.Migrations
                 {
                     b.HasOne("Api.DataAccessLayer.Models.ApplicationUser", "ApplicationUser")
                         .WithOne("Customer")
-                        .HasForeignKey("Api.DataAccessLayer.Models.Customer", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("Api.DataAccessLayer.Models.Customer", "ApplicationUserId");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>

@@ -5,6 +5,6 @@ namespace Api.DataAccessLayer.Interfaces
 {
     public interface ICustomerRepository
     {
-        Task<ICustomer> AddCustomerAsync(ICustomer customer);
+        Task<Customer> AddCustomerAsync(Customer customer);
     }
 }

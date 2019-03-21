@@ -59,7 +59,7 @@ namespace Api.BusinessLogicLayer.Services
             //If the identity user was successfully added, then create the customer object and assign a role to it
             if (result.Succeeded)
             {
-                ICustomer customer = new Customer
+                Customer customer = new Customer
                 {
                     ApplicationUserId = user.Id,
                     Name = request.Name,
