@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.Data.Sqlite;
 using NSubstitute;
 using NUnit.Framework;
@@ -17,24 +18,20 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     class CustomerRepositoryTests
     {
         private CustomerRepository uut;
-        private ApplicationContext content;
-        private DbConnection connection;
+        private ApplicationContextFactory factory;
 
         [SetUp]
         void SetUp()
         {
-            DbConnection connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
-            var options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseSqlite(connection)
-                .Options;
-
-            content = new ApplicationContext(options);
-            uut = new CustomerRepository(content);
+            factory = new ApplicationContextFactory();
+            uut = new CustomerRepository(factory.CreateContext());
         }
 
         [TearDown]
-        void TearDown() => connection.Dispose();
+        void TearDown()
+        {
+            factory.Dispose();
+        }
 
         [Test]
         void firstTest()
@@ -48,10 +45,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             uut.AddCustomerAsync(testCustomer).Wait();
 
-            var customerInserted = content.Customers.FirstOrDefault(Customer => Customer.ApplicationUserId.Equals("ID"));
+            using (var content = factory.CreateContext())
+            {
+                var customerInserted = content.Customers.FirstOrDefault(Customer => Customer.ApplicationUserId.Equals("ID"));
 
-            Assert.That(customerInserted.Name,Is.EqualTo("Name"));
-
+                Assert.That(customerInserted.Name, Is.EqualTo("Name"));
+            }
         }
         
     }

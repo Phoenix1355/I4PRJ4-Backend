@@ -21,8 +21,4 @@
     <ProjectReference Include="..\Api.DataAccessLayer\Api.DataAccessLayer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Factories\" />
-  </ItemGroup>
-
 </Project>
