@@ -25,7 +25,7 @@ namespace Api.DataAccessLayer.Repositories
 
         public async Task<Customer> GetCustomerAsync(string email)
         {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUser.Email == email);
 
             if (customer == null)
             {

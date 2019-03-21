@@ -64,7 +64,6 @@ namespace Api.BusinessLogicLayer.Services
                     ApplicationUserId = user.Id,
                     Name = request.Name,
                     PhoneNumber = request.PhoneNumber,
-                    Email = request.Email
                 };
 
                 var role = "Customer";

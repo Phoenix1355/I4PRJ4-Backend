@@ -12,14 +12,6 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public string Name { get; set; }
 
-        public string Email
-        {
-            get;
-            set;
-            //get => ApplicationUser.Email;
-            //set => ApplicationUser.Email = value;
-        }
-
         [Required]
         public string PhoneNumber { get; set; }
 
