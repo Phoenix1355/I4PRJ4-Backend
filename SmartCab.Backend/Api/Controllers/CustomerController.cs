@@ -9,6 +9,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using Api.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -112,6 +113,7 @@ namespace Api.Controllers
         /// <param name="authorization">A valid JWT token.</param>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Policy = "CustomerRights")]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
@@ -120,7 +122,7 @@ namespace Api.Controllers
         {
             //Get name from JWT token --> User.Identity.Name --> this will access a claim set on the token
             //Get rides from database and return it
-            return Ok();
+            return Ok(User.Identity.Name);
         }
     }
 }
