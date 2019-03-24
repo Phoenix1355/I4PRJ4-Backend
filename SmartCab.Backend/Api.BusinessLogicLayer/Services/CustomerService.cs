@@ -71,9 +71,9 @@ namespace Api.BusinessLogicLayer.Services
 
                 await _applicationUserRepository.AddToRoleAsync(user, role);
 
-                //Create the token, wrap it and return the response
+                //Create the token, wrap it and return the response with a customerDto
                 var customerDto = _mapper.Map<CustomerDto>(customer);
-                var token = _jwtService.GenerateJwtToken(request.Email, user, role);
+                var token = _jwtService.GenerateJwtToken(request.Email, role);
                 var response = new RegisterResponse
                 {
                     Token = token,
@@ -83,7 +83,7 @@ namespace Api.BusinessLogicLayer.Services
             }
 
             //If the identity user was not successfully added, then throw an error containing the error message from the identity framework
-            throw new ArgumentException(result.Errors.First().Description);
+            throw new ArgumentException(result.Errors.FirstOrDefault()?.Description);
         }
 
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
@@ -94,7 +94,7 @@ namespace Api.BusinessLogicLayer.Services
             {
                 var customer = await _customerRepository.GetCustomerAsync(request.Email);
 
-                var token = _jwtService.GenerateJwtToken(request.Email, customer.ApplicationUser, "Customer");
+                var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
                 var customerDto = _mapper.Map<CustomerDto>(customer);
                 var response = new LoginResponse
                 {
