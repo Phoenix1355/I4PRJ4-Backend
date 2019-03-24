@@ -66,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [TestCase(100)]
         [TestCase(1000)]
         [TestCase(10000000)]
-        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpiration(int lengthInSeconds)
+        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpirationStoredAsAClaim(int lengthInSeconds)
         {
             //Create uut
             var configuration = Substitute.For<IConfiguration>();
@@ -94,7 +94,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [TestCase(100)]
         [TestCase(1000)]
         [TestCase(10000000)]
-        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpiration2(int lengthInSeconds)
+        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpirationStoredOutsideClaims(int lengthInSeconds)
         {
             //Create uut
             var configuration = Substitute.For<IConfiguration>();
