@@ -10,6 +10,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services

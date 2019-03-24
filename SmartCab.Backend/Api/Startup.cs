@@ -19,9 +19,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -127,8 +129,6 @@ namespace Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 x.IncludeXmlComments(xmlPath);
             });
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -164,7 +164,7 @@ namespace Api
 
         private string GetConnectionString()
         {
-            var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look in secrets.json
+            var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look online and then in secrets.json
             if (string.IsNullOrEmpty(connectionString))
             {
                 connectionString = @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";

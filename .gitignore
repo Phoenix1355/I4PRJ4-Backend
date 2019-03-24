@@ -195,3 +195,5 @@ FakesAssemblies/
 #Makefile output
 *.o
 *.d
+/SmartCab.Backend/Api/Properties/PublishProfiles/SmartCabBackend - Real deploy.pubxml
+/SmartCab.Backend/Api/Properties/PublishProfiles/SmartCabBackend - FTP1.pubxml
