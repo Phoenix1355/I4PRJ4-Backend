@@ -1,11 +1,14 @@
 ﻿using System;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
+using Api.DataAccessLayer.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services
@@ -50,13 +53,66 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         //TODO: Ask Mads how to do this...
-        //[Test]
-        //public void AddCustomerAsync_AddingCustomerSucceeds_ReturnsAResisterResponse()
-        //{
-        //    var identityResult = IdentityResult.Success;
-        //    _applicationUserRepository.AddApplicationUserAsync(null, null).ReturnsForAnyArgs(identityResult);
+        [Test]
+        public void AddCustomerAsync_AddingCustomerSucceeds_ReturnsAResisterResponseToken()
+        {
+            var identityResult = IdentityResult.Success;
+            _applicationUserRepository.AddApplicationUserAsync(null, null).ReturnsForAnyArgs(identityResult);
+                Customer customer = new Customer()
+                {
+                    ApplicationUserId = "ID",
+                    Name = "Michael",
+                    Id = 1,
+                    PhoneNumber = "12345678"
+                };
+                _customerRepository.AddCustomerAsync(null).ReturnsForAnyArgs<Customer>(customer);
+                _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs<string>("Token");
+                
 
-        //    Assert.That(() => _customerService.AddCustomerAsync(_request), Throws.TypeOf<ArgumentException>());
-        //}
+                var result = _customerService.AddCustomerAsync(_request).Result;
+
+                Assert.That(result.Token ,Is.EqualTo("Token"));
+               
+            // Assert.That(result.Token, Is.EqualTo("Token"));
+        }
+
+        [Test]
+        public void AddCustomerAsync_AddingCustomerSucceeds_ReturnsAResisterResponseCustomer()
+        {
+            var identityResult = IdentityResult.Success;
+            _applicationUserRepository.AddApplicationUserAsync(null, null).ReturnsForAnyArgs(identityResult);
+            Customer customer = new Customer()
+            {
+                ApplicationUserId = "ID",
+                Name = _request.Name,
+                Id = 1,
+                PhoneNumber = _request.PhoneNumber
+            };
+            _customerRepository.AddCustomerAsync(null).ReturnsForAnyArgs<Customer>(customer);
+
+            CustomerDto customerDto = new CustomerDto()
+            {
+                Email = _request.Email,
+                Name = _request.Name,
+                PhoneNumber = _request.PhoneNumber
+            };
+
+            _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
+
+            var result = _customerService.AddCustomerAsync(_request).Result;
+
+            Assert.That(result.Customer, Is.EqualTo(customerDto));
+
+        }
+
+        [Test]
+        public void AddCustomerAsync_AddingCustomerFailss_ThrowsArgumentException()
+        {
+            var identityResult = IdentityResult.Failed();
+            _applicationUserRepository.AddApplicationUserAsync(null, null).ReturnsForAnyArgs(identityResult);
+
+            Assert.That(() => _customerService.AddCustomerAsync(_request), Throws.TypeOf<ArgumentException>());
+        }
+
     }
 }
