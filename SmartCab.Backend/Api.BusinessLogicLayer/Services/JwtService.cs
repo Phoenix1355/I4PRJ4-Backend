@@ -44,7 +44,7 @@ namespace Api.BusinessLogicLayer.Services
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             //Set the expiration datetime 
-            var expirationDate = DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JwtExpireDays"])); //TODO: Change from seconds to eg. days
+            var expirationDate = DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JwtExpireSeconds"])); //TODO: Change from seconds to eg. days
 
             //Set claims for the token. These can be accessed later on
             var claims = new List<Claim>();

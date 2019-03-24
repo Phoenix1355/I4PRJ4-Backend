@@ -98,7 +98,7 @@ namespace Api
                     {
                         ValidateIssuer = false, //We are not using the issuer feature
                         ValidateAudience = false, //We are not using the audience feature
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration[Constants.JwtSecretKey])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
