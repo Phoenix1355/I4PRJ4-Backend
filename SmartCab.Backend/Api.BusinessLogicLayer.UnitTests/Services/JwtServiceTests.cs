@@ -16,7 +16,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
     {
         private const string JwtSecret = "JwtKey";
         private const string JwtSecretValue = "SOME_SECRET_KEY_USED_FOR_TESTING";
-        private const string JwtExpire = "JwtExpireDays";
+        private const string JwtExpire = "JwtExpireSeconds";
         private const string JwtExpireValue = "1000";
 
         [TestCase("test1@gmail.com")]
