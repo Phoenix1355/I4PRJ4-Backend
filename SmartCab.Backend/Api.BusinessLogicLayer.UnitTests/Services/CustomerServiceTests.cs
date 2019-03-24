@@ -60,14 +60,14 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         {
             var identityResult = IdentityResult.Success;
             _applicationUserRepository.AddApplicationUserAsync(null, null).ReturnsForAnyArgs(identityResult);
-                Customer customer = new Customer()
-                {
-                    ApplicationUserId = "ID",
-                    Name = "Michael",
-                    Id = 1,
-                    PhoneNumber = "12345678"
-                };
-                _customerRepository.AddCustomerAsync(null).ReturnsForAnyArgs<Customer>(customer);
+            Customer customer = new Customer()
+            {
+                ApplicationUserId = "ID",
+                Name = _request.Name,
+                Id = 1,
+                PhoneNumber = _request.PhoneNumber
+            };
+            _customerRepository.AddCustomerAsync(null).ReturnsForAnyArgs<Customer>(customer);
                 _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs<string>("Token");
                 
 
