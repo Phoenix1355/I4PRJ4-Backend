@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Api.BusinessLogicLayer\Api.BusinessLogicLayer.csproj" />
     <ProjectReference Include="..\Api.DataAccessLayer\Api.DataAccessLayer.csproj" />
-    <ProjectReference Include="..\Api.Settings\Api.Settings.csproj" />
   </ItemGroup>
 
 </Project>

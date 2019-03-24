@@ -61,9 +61,6 @@ namespace Api
                 options.UseSqlServer(GetConnectionString());
             });
 
-            //================== Inject app settings ====================
-            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
-
             // ======= Add Identity ========
             services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationContext>()
@@ -87,7 +84,6 @@ namespace Api
             });
 
             // ======= Add JWT Authentication ========
-            var jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();//we need to access the config when creating the signing key below
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services
                 .AddAuthentication(options =>
@@ -105,7 +101,7 @@ namespace Api
                     {
                         ValidateIssuer = false, //We are not using the issuer feature
                         ValidateAudience = false, //We are not using the audience feature
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.JwtKey)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
@@ -169,7 +165,7 @@ namespace Api
 
         private string GetConnectionString()
         {
-            var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look in secrets.json
+            var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look online and then in secrets.json
             if (string.IsNullOrEmpty(connectionString))
             {
                 connectionString = @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";

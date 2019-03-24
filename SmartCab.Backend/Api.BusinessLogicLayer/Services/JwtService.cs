@@ -27,10 +27,9 @@ namespace Api.BusinessLogicLayer.Services
         /// Constructor for this class.
         /// </summary>
         /// <param name="configuration">Used to access the configuration file in the Api project</param>
-        public JwtService(IConfiguration configuration, IOptions<JwtSettings> jwtSettings)
+        public JwtService(IConfiguration configuration)
         {
             _configuration = configuration;
-            var key = jwtSettings.Value.JwtKey;
         }
 
         /// <summary>
