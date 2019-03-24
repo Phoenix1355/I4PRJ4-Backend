@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
-using Api.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
