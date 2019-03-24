@@ -13,7 +13,9 @@ namespace Api.DataAccessLayer.UnitTests.Factories
         private DbContextOptions<ApplicationContext> CreateOptions()
         {
             return new DbContextOptionsBuilder<ApplicationContext>()
+                .UseLazyLoadingProxies()
                 .UseSqlite(_connection).Options;
+
         }
 
         public ApplicationContext CreateContext()
