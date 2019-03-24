@@ -14,7 +14,6 @@ using Microsoft.Data.Sqlite;
 using NSubstitute;
 using NUnit.Framework;
 using Microsoft.EntityFrameworkCore;
-using SmartCabPoc.Integration.Test;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
@@ -109,6 +108,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
             }
+        }
+
+        [Test]
+        public void Dispose_DisposeOfObject_Disposes()
+        {
+            _uut.Dispose();
         }
     }
 }
