@@ -73,6 +73,8 @@ namespace Api.BusinessLogicLayer.Services
 
                 //Create the token, wrap it and return the response with a customerDto
                 var customerDto = _mapper.Map<CustomerDto>(customer);
+
+
                 var token = _jwtService.GenerateJwtToken(request.Email, role);
                 var response = new RegisterResponse
                 {
