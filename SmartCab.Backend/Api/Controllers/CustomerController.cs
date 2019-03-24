@@ -59,7 +59,7 @@ namespace Api.Controllers
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                return BadRequest("Hej");
             }
             catch (Exception e)
             {

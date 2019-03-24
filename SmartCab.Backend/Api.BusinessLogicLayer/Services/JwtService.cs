@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
+using Api.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
@@ -25,9 +27,10 @@ namespace Api.BusinessLogicLayer.Services
         /// Constructor for this class.
         /// </summary>
         /// <param name="configuration">Used to access the configuration file in the Api project</param>
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, IOptions<JwtSettings> jwtSettings)
         {
             _configuration = configuration;
+            var key = jwtSettings.Value.JwtKey;
         }
 
         /// <summary>

@@ -13,15 +13,18 @@ using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.Requests;
+using Api.Settings;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -58,6 +61,9 @@ namespace Api
                 options.UseSqlServer(GetConnectionString());
             });
 
+            //================== Inject app settings ====================
+            services.Configure<JwtSettings>(Configuration.GetSection("JwtSettings"));
+
             // ======= Add Identity ========
             services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationContext>()
@@ -81,6 +87,7 @@ namespace Api
             });
 
             // ======= Add JWT Authentication ========
+            var jwtSettings = Configuration.GetSection("JwtSettings").Get<JwtSettings>();//we need to access the config when creating the signing key below
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
             services
                 .AddAuthentication(options =>
@@ -98,7 +105,7 @@ namespace Api
                     {
                         ValidateIssuer = false, //We are not using the issuer feature
                         ValidateAudience = false, //We are not using the audience feature
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.JwtKey)),
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
@@ -127,8 +134,6 @@ namespace Api
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 x.IncludeXmlComments(xmlPath);
             });
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
