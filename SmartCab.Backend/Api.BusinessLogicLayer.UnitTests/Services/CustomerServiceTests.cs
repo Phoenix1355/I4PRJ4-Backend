@@ -53,6 +53,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         //TODO: Ask Mads how to do this...
+        //Would just stub it out like normal. Otherwise you need to use the real implementation of the dataAccessLayer.
+        //If this is needed in the future, you can use the factory to create inmemory context, and supply the relevant Content for Repositories
         [Test]
         public void AddCustomerAsync_AddingCustomerSucceeds_ReturnsAResisterResponseToken()
         {
@@ -72,8 +74,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 var result = _customerService.AddCustomerAsync(_request).Result;
 
                 Assert.That(result.Token ,Is.EqualTo("Token"));
-               
-            // Assert.That(result.Token, Is.EqualTo("Token"));
         }
 
         [Test]
