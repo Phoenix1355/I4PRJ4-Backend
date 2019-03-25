@@ -22,7 +22,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
-
         private RegisterRequest _request;
 
         [SetUp]

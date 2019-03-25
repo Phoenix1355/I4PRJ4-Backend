@@ -113,7 +113,7 @@ namespace Api.Controllers
         /// </summary>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
-        [Authorize(Policy = "CustomerRights")]
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
