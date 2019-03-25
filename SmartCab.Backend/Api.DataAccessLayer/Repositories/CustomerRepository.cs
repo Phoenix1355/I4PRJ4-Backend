@@ -23,11 +23,11 @@ namespace Api.DataAccessLayer.Repositories
         {
             using (var transaction = _context.Database.BeginTransaction())
             { 
-                var result = await _applicationUserRepository.AddApplicationUserAsync(user, password);
+                var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(user, password);
 
                 string role = nameof(Customer);
-                var x = await _applicationUserRepository.AddToRoleAsync(user, role);
-                if (result.Succeeded && x.Succeeded)
+                var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
+                if (resultAddApplicationUser.Succeeded && resultAddRole.Succeeded)
                 {
                     await _context.Customers.AddAsync(customer);
                     await _context.SaveChangesAsync();
@@ -35,8 +35,13 @@ namespace Api.DataAccessLayer.Repositories
                     return customer;
                 }
                 transaction.Rollback();
+
+                string error = resultAddRole.Errors.FirstOrDefault().Description + ", "+ resultAddApplicationUser.Errors.FirstOrDefault().Description;
+                throw new ArgumentException(error);
             }
-            throw new ArgumentException();
+            
+
+            
         }
 
 
