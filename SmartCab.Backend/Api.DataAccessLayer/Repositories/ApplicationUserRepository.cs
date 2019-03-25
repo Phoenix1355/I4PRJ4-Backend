@@ -13,7 +13,9 @@ namespace Api.DataAccessLayer.Repositories
         public ApplicationUserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
+            
             _signInManager = signInManager;
+            
         }
 
         public async Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password)

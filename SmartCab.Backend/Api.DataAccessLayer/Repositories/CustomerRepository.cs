@@ -10,23 +10,32 @@ namespace Api.DataAccessLayer.Repositories
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
         private readonly ApplicationContext _context;
-
-        public CustomerRepository(ApplicationContext context)
+        private readonly ApplicationUserRepository _applicationUserRepository;
+        public CustomerRepository(ApplicationContext context, ApplicationUserRepository applicationUserRepository)
         {
             _context = context;
+            _applicationUserRepository = applicationUserRepository;
         }
 
-        public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer)
+        public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
         {
+
+
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                _applicationUserRepository.AddApplicationUserAsync(user, password);
+
+
+                await _context.Customers.AddAsync(customer);
+                await _context.SaveChangesAsync();
+            }
 
             //var role = "Customer";
             //customer = await _customerRepository.AddCustomerAsync(customer);
 
             //await _applicationUserRepository.AddToRoleAsync(user, role);
 
-            await _context.Customers.AddAsync(customer);
-            await _context.SaveChangesAsync();
-            return customer;
+
         }
 
         public async Task<Customer> GetCustomerAsync(string email)
