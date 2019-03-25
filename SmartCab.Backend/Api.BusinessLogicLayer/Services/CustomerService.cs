@@ -29,9 +29,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="applicationUserRepository">Used to access the database when updating/creating customers</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
-            IJwtService jwtService, 
-            ICustomerRepository customerRepository, 
-            IApplicationUserRepository applicationUserRepository, 
+            IJwtService jwtService,
+            ICustomerRepository customerRepository,
+            IApplicationUserRepository applicationUserRepository,
             IMapper mapper)
         {
             _jwtService = jwtService;
@@ -67,7 +67,7 @@ namespace Api.BusinessLogicLayer.Services
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
-            var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
+            var token = _jwtService.GenerateJwtToken(request.Email, nameof(Customer));
             var response = new RegisterResponse
             {
                 Token = token,
@@ -85,7 +85,7 @@ namespace Api.BusinessLogicLayer.Services
             {
                 var customer = await _customerRepository.GetCustomerAsync(request.Email);
 
-                var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
+                var token = _jwtService.GenerateJwtToken(request.Email, nameof(Customer));
                 var customerDto = _mapper.Map<CustomerDto>(customer);
                 var response = new LoginResponse
                 {
