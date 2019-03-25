@@ -47,54 +47,34 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
-            //Create the identity user and try to add the user to the database
+            //Create the identity user
             var user = new ApplicationUser
             {
                 UserName = request.Email,
                 Email = request.Email
             };
 
-            var customer = new Customer()
+            //Create the customer
+            var customer = new Customer
             {
                 ApplicationUserId = user.Id,
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber,
             };
 
-            var res = await _customerRepository.AddCustomerAsync(user, customer);
+            //Overwrite the customer with the one created and create a CustomerDto
+            customer = await _customerRepository.AddCustomerAsync(user, customer, request.Password);
+            var customerDto = _mapper.Map<CustomerDto>(customer);
 
-
-
-
-            var result = await _applicationUserRepository.AddApplicationUserAsync(user, request.Password);
-
-            //If the identity user was successfully added, then create the customer object and assign a role to it
-            if (result.Succeeded)
+            //Create the token, wrap it and return the response with the customerDto
+            var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
+            var response = new RegisterResponse
             {
-                //Customer customer = new Customer
-                //{
-                //    ApplicationUserId = user.Id,
-                //    Name = request.Name,
-                //    PhoneNumber = request.PhoneNumber,
-                //};
+                Token = token,
+                Customer = customerDto
+            };
 
-                
-
-                //Create the token, wrap it and return the response with a customerDto
-                var customerDto = _mapper.Map<CustomerDto>(customer);
-
-
-                var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
-                var response = new RegisterResponse
-                {
-                    Token = token,
-                    Customer = customerDto
-                };
-                return response;
-            }
-
-            //If the identity user was not successfully added, then throw an error containing the error message from the identity framework
-            throw new ArgumentException(result.Errors.FirstOrDefault()?.Description);
+            return response;
         }
 
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
