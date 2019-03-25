@@ -54,28 +54,37 @@ namespace Api.BusinessLogicLayer.Services
                 Email = request.Email
             };
 
+            var customer = new Customer()
+            {
+                ApplicationUserId = user.Id,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber,
+            };
+
+            var res = await _customerRepository.AddCustomerAsync(user, customer);
+
+
+
+
             var result = await _applicationUserRepository.AddApplicationUserAsync(user, request.Password);
 
             //If the identity user was successfully added, then create the customer object and assign a role to it
             if (result.Succeeded)
             {
-                Customer customer = new Customer
-                {
-                    ApplicationUserId = user.Id,
-                    Name = request.Name,
-                    PhoneNumber = request.PhoneNumber,
-                };
+                //Customer customer = new Customer
+                //{
+                //    ApplicationUserId = user.Id,
+                //    Name = request.Name,
+                //    PhoneNumber = request.PhoneNumber,
+                //};
 
-                var role = "Customer";
-                customer = await _customerRepository.AddCustomerAsync(customer);
-
-                await _applicationUserRepository.AddToRoleAsync(user, role);
+                
 
                 //Create the token, wrap it and return the response with a customerDto
                 var customerDto = _mapper.Map<CustomerDto>(customer);
 
 
-                var token = _jwtService.GenerateJwtToken(request.Email, role);
+                var token = _jwtService.GenerateJwtToken(request.Email, "Customer");
                 var response = new RegisterResponse
                 {
                     Token = token,

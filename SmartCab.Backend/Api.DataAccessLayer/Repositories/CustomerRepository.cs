@@ -16,8 +16,14 @@ namespace Api.DataAccessLayer.Repositories
             _context = context;
         }
 
-        public async Task<Customer> AddCustomerAsync(Customer customer)
+        public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer)
         {
+
+            //var role = "Customer";
+            //customer = await _customerRepository.AddCustomerAsync(customer);
+
+            //await _applicationUserRepository.AddToRoleAsync(user, role);
+
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
             return customer;
