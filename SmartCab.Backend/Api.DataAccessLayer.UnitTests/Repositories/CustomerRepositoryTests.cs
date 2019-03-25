@@ -4,30 +4,34 @@ using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
-using NSubstitute;
 using NUnit.Framework;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
-   [TestFixture]
+    [TestFixture]
     public class CustomerRepositoryTests
     {
         private CustomerRepository _uut;
         private ApplicationContextFactory _factory;
+        private FakeSignInManager _mockSignManager;
+        private FakeUserManager _mockUserManager;
 
         [SetUp]
         public void SetUp()
         {
             _factory = new ApplicationContextFactory();
-            _uut = new CustomerRepository(_factory.CreateContext()); 
+            _mockSignManager = new FakeSignInManager();
+            _mockUserManager = new FakeUserManager();
+            ApplicationUserRepository applicationUserRepository = new ApplicationUserRepository(_mockUserManager,_mockSignManager);
+            _uut = new CustomerRepository(_factory.CreateContext(), applicationUserRepository); 
         }
 
         [TearDown]
@@ -54,8 +58,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 PhoneNumber = "12345678",
             };
 
-            _uut.AddCustomerAsync(customerToAddToDatabase).Wait();
-
+            _uut.AddCustomerAsync(user, customerToAddToDatabase, "Qwer111!").Wait();
             using (var content = _factory.CreateContext())
             {
                 var customerFromDatabase = content.Customers.FirstOrDefault(customer => customer.ApplicationUserId.Equals(user.Id));
@@ -63,6 +66,30 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
             }
             
+        }
+
+        [Test]
+        public void AddCustomerAsync_ApplicationUserInvalid_CustomerAlreadyExistsInDatabase()
+        {
+            ApplicationUser user = new ApplicationUser();
+            Customer customerToAddToDatabase = new Customer
+            {
+                ApplicationUserId = user.Id,
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
+
+            using (var content = _factory.CreateContext())
+            {
+                content.ApplicationUsers.Add(user);
+                content.Customers.Add(customerToAddToDatabase);
+                content.SaveChanges();
+            }
+
+
+            Assert.ThrowsAsync<ArgumentException>(()=>_uut.AddCustomerAsync(user, customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
