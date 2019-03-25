@@ -12,8 +12,9 @@ namespace Api.BusinessLogicLayer.Requests
     /// </summary>
     public class RegisterRequest
     {
+        //Regex taken from: https://docs.microsoft.com/en-us/dotnet/standard/base-types/how-to-verify-that-strings-are-in-valid-email-format
         [Required]
-        [EmailAddress]
+        [RegularExpression(Constants.EmailRegex, ErrorMessage = Constants.EmailRegexErrorMessage)]
         public string Email { get; set; }
 
         [Required] //Requirements for the password are set using the Identity Framework. Look in Startup.cs and see how its done
@@ -28,7 +29,7 @@ namespace Api.BusinessLogicLayer.Requests
         public string Name { get; set; }
 
         [Required]
-        [RegularExpression("^[1-9][0-9]{7}$", ErrorMessage = "The phone number must consist of exactly 8 numbers and cannot start with 0.")] //8 digits and cannot start with 0
+        [RegularExpression(Constants.PhoneNumberRegex, ErrorMessage = Constants.PhoneNumberRegexErrorMessage)] //8 digits and cannot start with 0
         public string PhoneNumber { get; set; }
     }
 }

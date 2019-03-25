@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,18 +12,38 @@ namespace Api.DataAccessLayer.Repositories
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
         private readonly ApplicationContext _context;
-
-        public CustomerRepository(ApplicationContext context)
+        private readonly IApplicationUserRepository _applicationUserRepository;
+        public CustomerRepository(ApplicationContext context, IApplicationUserRepository applicationUserRepository)
         {
             _context = context;
+            _applicationUserRepository = applicationUserRepository;
         }
 
-        public async Task<Customer> AddCustomerAsync(Customer customer)
+        public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
         {
-            await _context.Customers.AddAsync(customer);
-            await _context.SaveChangesAsync();
-            return customer;
+            using (var transaction = _context.Database.BeginTransaction())
+            { 
+                var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(user, password);
+
+                string role = nameof(Customer);
+                var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
+                if (resultAddApplicationUser.Succeeded && resultAddRole.Succeeded)
+                {
+                    await _context.Customers.AddAsync(customer);
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                    return customer;
+                }
+                transaction.Rollback();
+
+                string error = "No changes applied";
+                throw new ArgumentException(error);
+            }
+            
+
+            
         }
+
 
         public async Task<Customer> GetCustomerAsync(string email)
         {

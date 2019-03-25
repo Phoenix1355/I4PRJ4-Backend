@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
@@ -9,6 +10,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using Api.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -109,18 +111,24 @@ namespace Api.Controllers
         /// <summary>
         /// Returns all rides belonging to the customer associated with the supplied JWT token.
         /// </summary>
-        /// <param name="authorization">A valid JWT token.</param>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
         [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Rides([FromHeader] string authorization)
+        public async Task<IActionResult> Rides()
         {
+            var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            var expiration = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Expiration)?.Value;
             //Get name from JWT token --> User.Identity.Name --> this will access a claim set on the token
             //Get rides from database and return it
-            return Ok();
+            return Ok(new
+            {
+                Email = email,
+                Expiration = expiration
+            });
         }
     }
 }
