@@ -9,11 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.BusinessLogicLayer", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.DataAccessLayer", "Api.DataAccessLayer\Api.DataAccessLayer.csproj", "{5F21EC2C-41CE-4F60-AC9C-F1978DA3369C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.UnitTests", "Api.UnitTests\Api.UnitTests.csproj", "{F4F46E48-49A2-4959-9725-AF6F27363895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.UnitTests", "Api.UnitTests\Api.UnitTests.csproj", "{F4F46E48-49A2-4959-9725-AF6F27363895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.BusinessLogicLayer.UnitTests", "Api.BusinessLogicLayer.UnitTests\Api.BusinessLogicLayer.UnitTests.csproj", "{1FE9356E-3E4C-4772-A2C0-EDF24A115E60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.BusinessLogicLayer.UnitTests", "Api.BusinessLogicLayer.UnitTests\Api.BusinessLogicLayer.UnitTests.csproj", "{1FE9356E-3E4C-4772-A2C0-EDF24A115E60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.DataAccessLayer.UnitTests", "Api.DataAccessLayer.UnitTests\Api.DataAccessLayer.UnitTests.csproj", "{CDE7DC32-349A-454A-A6B6-0F25DC73CBA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.DataAccessLayer.UnitTests", "Api.DataAccessLayer.UnitTests\Api.DataAccessLayer.UnitTests.csproj", "{CDE7DC32-349A-454A-A6B6-0F25DC73CBA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api.IntegrationTests", "Api.IntegrationTests\Api.IntegrationTests.csproj", "{16456F56-FE94-4F7D-8ACC-C3CFC408A4B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{CDE7DC32-349A-454A-A6B6-0F25DC73CBA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDE7DC32-349A-454A-A6B6-0F25DC73CBA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDE7DC32-349A-454A-A6B6-0F25DC73CBA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16456F56-FE94-4F7D-8ACC-C3CFC408A4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16456F56-FE94-4F7D-8ACC-C3CFC408A4B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16456F56-FE94-4F7D-8ACC-C3CFC408A4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16456F56-FE94-4F7D-8ACC-C3CFC408A4B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
