@@ -21,8 +21,8 @@ namespace Api.DataAccessLayer.Repositories
 
         public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
         {
-            //using (var transaction = new TransactionScope())
-            //{
+            using (var transaction = _context.Database.BeginTransaction())
+            { 
                 var result = await _applicationUserRepository.AddApplicationUserAsync(user, password);
 
                 string role = nameof(Customer);
@@ -31,11 +31,11 @@ namespace Api.DataAccessLayer.Repositories
                 {
                     await _context.Customers.AddAsync(customer);
                     await _context.SaveChangesAsync();
-              //      transaction.Complete();
+                    transaction.Commit();
                     return customer;
                 }
-                //transaction.Dispose();
-            //}
+                transaction.Rollback();
+            }
             throw new ArgumentException();
         }
 
