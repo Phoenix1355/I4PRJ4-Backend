@@ -16,6 +16,7 @@ namespace Api.DataAccessLayer.UnitTests.Factories
             {
                 context.Database.EnsureCreated();
             }
+           
         }
 
         public DbConnection Connection { get; private set; }
@@ -24,7 +25,7 @@ namespace Api.DataAccessLayer.UnitTests.Factories
         {
             return new DbContextOptionsBuilder<ApplicationContext>()
                 .UseLazyLoadingProxies()
-                .UseSqlite(Connection).Options;
+                .UseSqlServer(Connection).Options;
 
         }
 

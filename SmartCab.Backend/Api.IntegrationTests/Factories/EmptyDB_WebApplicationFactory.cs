@@ -27,14 +27,14 @@ namespace SmartCabPoc.Integration.Test
             {
                 // Create a new service provider.
                 var serviceProvider = new ServiceCollection()
-                    .AddEntityFrameworkSqlite()
+                    .AddEntityFrameworkSqlServer()
                     .AddEntityFrameworkProxies()
                     .BuildServiceProvider();
 
                 services.AddDbContext<ApplicationContext>(options =>
                 {
                     options.UseLazyLoadingProxies();
-                    options.UseSqlite(_connection);
+                    options.UseSqlServer(_connection);
                     options.UseInternalServiceProvider(serviceProvider);
                 });
             });

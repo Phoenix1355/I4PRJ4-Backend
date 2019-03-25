@@ -1,3 +1,4 @@
+using System.Data;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;
@@ -18,19 +20,24 @@ namespace Api.IntegrationTests.Customers
     {
         private HttpClient _client;
         private SqliteConnectionFactory _connectionFactory;
+        private ApplicationContextFactory _applicationContextFactory;
+        private IDbContextTransaction _transaction;
 
         [SetUp]
         public void Setup()
         {
             _connectionFactory = new SqliteConnectionFactory();
+            _applicationContextFactory = new ApplicationContextFactory(_connectionFactory.Connection);
             var webFactory = new EmptyDB_WebApplicationFactory<Startup>(_connectionFactory.Connection);
 
             _client = webFactory.CreateClient();
+            //_transaction = _applicationContextFactory.CreateContext().Database.BeginTransaction();
         }
 
         [TearDown]
         public void TearDown()
         {
+            
             _connectionFactory.Dispose();
         }
 
@@ -39,7 +46,7 @@ namespace Api.IntegrationTests.Customers
         {
             var request = new RegisterRequest
             {
-                Email = "test4@gmail.com",
+                Email = "test8@gmail.com",
                 Password = "Qwer111!",
                 PasswordRepeated = "Qwer111!",
                 Name = "test4",

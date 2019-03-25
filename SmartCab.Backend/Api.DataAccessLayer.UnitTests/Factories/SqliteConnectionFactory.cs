@@ -10,7 +10,7 @@ namespace Api.DataAccessLayer.UnitTests.Factories
     {
         public SqliteConnectionFactory()
         {
-            Connection = new SqliteConnection("DataSource=:memory:");
+            Connection = new SqlConnection(@"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;");
             Connection.Open();
         }
 
