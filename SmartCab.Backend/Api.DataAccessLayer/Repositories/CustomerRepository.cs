@@ -20,23 +20,21 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
         {
 
+            var result = await _applicationUserRepository.AddApplicationUserAsync(user, password);
 
-            using (var transaction = _context.Database.BeginTransaction())
+            var x = await _applicationUserRepository.AddToRoleAsync(user, nameof(Customer));
+            if (result.Succeeded && x.Succeeded)
             {
-                _applicationUserRepository.AddApplicationUserAsync(user, password);
-
-
                 await _context.Customers.AddAsync(customer);
                 await _context.SaveChangesAsync();
+                return customer;
             }
-
-            //var role = "Customer";
-            //customer = await _customerRepository.AddCustomerAsync(customer);
-
-            //await _applicationUserRepository.AddToRoleAsync(user, role);
-
-
+            throw new ArgumentException();
+            //_applicationUserRepository.deleteA
+            //tho
+            //Throw identity result fault. 
         }
+
 
         public async Task<Customer> GetCustomerAsync(string email)
         {
