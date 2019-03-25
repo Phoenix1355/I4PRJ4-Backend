@@ -8,16 +8,61 @@ using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using NSubstitute;
 using NUnit.Framework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
-   [TestFixture]
+    public class FakeSignInManager : SignInManager<ApplicationUser>
+    {
+        public FakeSignInManager()
+            : base(Substitute.For<FakeUserManager>(),
+                 Substitute.For<IHttpContextAccessor>(),
+                 Substitute.For<IUserClaimsPrincipalFactory<ApplicationUser>>(),
+                 Substitute.For<IOptions<IdentityOptions>>(),
+                 Substitute.For<ILogger<SignInManager<ApplicationUser>>>(),
+                 Substitute.For<IAuthenticationSchemeProvider>())
+        { }
+    }
+
+
+
+    public class FakeUserManager : UserManager<ApplicationUser>
+    {
+        public FakeUserManager()
+            : base( Substitute.For<IUserStore<ApplicationUser>>(),
+                 Substitute.For<IOptions<IdentityOptions>>(),
+                 Substitute.For<IPasswordHasher<ApplicationUser>>(),
+                new IUserValidator<ApplicationUser>[0],
+                new IPasswordValidator<ApplicationUser>[0],
+                 Substitute.For<ILookupNormalizer>(),
+                 Substitute.For<IdentityErrorDescriber>(),
+                 Substitute.For<IServiceProvider>(),
+                 Substitute.For<ILogger<UserManager<ApplicationUser>>>())
+        { }
+
+        public override Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        {
+            return Task.FromResult(IdentityResult.Success);
+        }
+
+        public override Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+        {
+            return Task.FromResult(IdentityResult.Success);
+        }
+
+    }
+
+    [TestFixture]
     public class CustomerRepositoryTests
     {
         private CustomerRepository _uut;
@@ -27,7 +72,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         public void SetUp()
         {
             _factory = new ApplicationContextFactory();
-            _uut = new CustomerRepository(_factory.CreateContext()); 
+            var mockSignManager = new FakeSignInManager();
+            var mockUserManager = new FakeUserManager();
+            //mockUserManager.AddToRoleAsync(null, null).ReturnsForAnyArgs<IdentityResult>(IdentityResult.Success);
+
+            ApplicationUserRepository applicationUserRepository = new ApplicationUserRepository(mockUserManager,mockSignManager);
+            _uut = new CustomerRepository(_factory.CreateContext(), applicationUserRepository); 
         }
 
         [TearDown]
@@ -54,7 +104,9 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 PhoneNumber = "12345678",
             };
 
-            _uut.AddCustomerAsync(customerToAddToDatabase).Wait();
+            
+
+            _uut.AddCustomerAsync(user, customerToAddToDatabase, "Qwer111!").Wait();
 
             using (var content = _factory.CreateContext())
             {
