@@ -36,7 +36,7 @@ namespace Api.DataAccessLayer.Repositories
                 }
                 transaction.Rollback();
 
-                string error = resultAddRole.Errors.FirstOrDefault().Description + ", "+ resultAddApplicationUser.Errors.FirstOrDefault().Description;
+                string error = "No changes applied";
                 throw new ArgumentException(error);
             }
             
