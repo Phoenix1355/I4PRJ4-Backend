@@ -177,7 +177,7 @@ namespace Api
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-            var roles = new[] { "Customer", "TaxiCompany" };
+            var roles = new[] { nameof(Customer), nameof(TaxiCompany) };
 
             foreach (var role in roles)
             {
