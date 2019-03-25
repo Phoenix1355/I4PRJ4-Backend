@@ -85,7 +85,9 @@ namespace Api
             app.UseMvc();
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
-            dbContext.Database.Migrate();
+            //dbContext.Database.Migrate();
+            dbContext.Database.EnsureCreated();
+
             CreateRoles(services).Wait();
         }
 
