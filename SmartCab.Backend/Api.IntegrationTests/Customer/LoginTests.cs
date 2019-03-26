@@ -20,98 +20,65 @@ using SmartCabPoc.Integration.Test;
 namespace Api.IntegrationTests.Customer
 {
     [TestFixture]
-    public class LoginTests : CustomerSetup
+    public class LoginTests : IntegrationSetup
     {
         [Test]
-        public async Task Register_ValidRequest_StatusOk()
+        public async Task Login_UserExists_LogsInAndReturnsCustomer()
         {
+            //Using client to create customer. 
             var request = getRegisterRequest();
+            await PostAsync("/api/customer/register", request);
 
-            var response = await PostAsync("/api/customer/register", request);
+            var loginRequest = getLoginRequest();
 
-            var responseBodyAsText = await response.Content.ReadAsStringAsync();
+            var response = await PostAsync("/api/customer/login", loginRequest);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
-        public async Task Register_RequestTwice_FirstOk()
+        public async Task Login_UserDoesNotExist_ReturnsBadRequest()
         {
+
+            var loginRequest = getLoginRequest();
+
+            var response = await PostAsync("/api/customer/login", loginRequest);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [TestCase("")]
+        [TestCase("length")]
+        [TestCase("alllowercase")]
+        [TestCase("CapsLetters")]
+        [TestCase("CapWithNumbers1")]
+        [TestCase("lowercasewithnumbers1")]
+        [TestCase("length#")]
+        public async Task Login_UserExistButWrongPasswordFormat_ReturnsBadRequest(string password)
+        {
+            //Using client to create customer. 
             var request = getRegisterRequest();
+            await PostAsync("/api/customer/register", request);
 
-            var responseFirstRequest = await PostAsync("/api/customer/register", request);
+            var loginRequest = getLoginRequest("test12@gmail.com", password);
 
-            var responseSecondRequest = await PostAsync("/api/customer/register", request);
+            var response = await PostAsync("/api/customer/login", loginRequest);
 
-            Assert.That(responseFirstRequest.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
-        public async Task Register_RequestTwice_SecondBadRequest()
+        public async Task Login_UserExistButWrongPasswordButRightFormat_ReturnsBadRequest()
         {
+            //Using client to create customer. 
             var request = getRegisterRequest();
+            await PostAsync("/api/customer/register", request);
 
-            var responseFirstRequest = await PostAsync("/api/customer/register", request);
+            var loginRequest = getLoginRequest("test12@gmail.com", "Qwer111#");
 
-            var responseSecondRequest = await PostAsync("/api/customer/register", request);
+            var response = await PostAsync("/api/customer/login", loginRequest);
 
-            Assert.That(responseSecondRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        }
-
-        //See LoginRequestTest for full range. 
-        [TestCase("a.gmail.com")]
-        [TestCase("plaintext")]
-        [TestCase("#@%^%#$@#$@#.com")]
-        [TestCase("Michael Moeller <email@domain.com>")]
-        public async Task Register_InvalidRequestEmail_GetsBadRequest(string email)
-        {
-            var request = getRegisterRequest(email);
-
-            var responseFirstRequest = await PostAsync("/api/customer/register", request);
-
-            Assert.That(responseFirstRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        }
-
-
-        
-        [TestCase("","")]
-        [TestCase("111111", "111111")]
-        [TestCase("111111#", "111111#")]
-        [TestCase("12345678", "12345678")]
-        [TestCase("232425aA", "2324252aA")]
-        [TestCase("999999aA#", "999999aA¤")]
-        [TestCase("99995599aA#", "99992399aA¤")]
-        public async Task Register_InvalidRequestPassword_GetsBadRequest(string password, string passwordRepeated)
-        {
-            Console.WriteLine(password);
-            var request = getRegisterRequest("test12@gmail.com","12345678",password,passwordRepeated);
-
-            var responseFirstRequest = await PostAsync("/api/customer/register", request);
-
-            Assert.That(responseFirstRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        }
-
-        private RegisterRequest getRegisterRequest(string email = "test12@gmail.com", 
-            string phonenumber = "12345678",
-            string password = "Qwer111!",
-            string passwordRepeated = "Qwer111!")
-        {
-            return new RegisterRequest
-            {
-                Email = email,
-                Password = password,
-                PasswordRepeated = passwordRepeated,
-                Name = "TestUser",
-                PhoneNumber = phonenumber
-            };
-        }
-
-
-        private async Task<HttpResponseMessage> PostAsync(string endPointUrl, object data)
-        {
-            var json = JsonConvert.SerializeObject(data);
-            var response = await _client.PostAsync(endPointUrl, new StringContent(json, Encoding.UTF8, "application/json"));
-            return response;
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
     }
 }

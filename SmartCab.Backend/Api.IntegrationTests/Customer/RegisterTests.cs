@@ -16,11 +16,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;
-
+using SmartCabPoc.Integration;
 namespace Api.IntegrationTests.Customer
 {
     [TestFixture]
-    public class RegisterTest : CustomerSetup
+    public class RegisterTest : IntegrationSetup
     {
         [Test]
         public async Task Register_ValidRequest_StatusOk()
@@ -89,29 +89,6 @@ namespace Api.IntegrationTests.Customer
             var responseFirstRequest = await PostAsync("/api/customer/register", request);
 
             Assert.That(responseFirstRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-        }
-
-        private RegisterRequest getRegisterRequest(string email = "test12@gmail.com", 
-            string phonenumber = "12345678",
-            string password = "Qwer111!",
-            string passwordRepeated = "Qwer111!")
-        {
-            return new RegisterRequest
-            {
-                Email = email,
-                Password = password,
-                PasswordRepeated = passwordRepeated,
-                Name = "TestUser",
-                PhoneNumber = phonenumber
-            };
-        }
-
-
-        private async Task<HttpResponseMessage> PostAsync(string endPointUrl, object data)
-        {
-            var json = JsonConvert.SerializeObject(data);
-            var response = await _client.PostAsync(endPointUrl, new StringContent(json, Encoding.UTF8, "application/json"));
-            return response;
         }
     }
 }
