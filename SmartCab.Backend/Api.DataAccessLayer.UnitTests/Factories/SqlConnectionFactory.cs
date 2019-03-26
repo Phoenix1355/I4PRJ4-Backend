@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.UnitTests.Factories
 {
-    public class SqliteConnectionFactory : IDisposable
+    public class SqlConnectionFactory : IDisposable
     {
-        public SqliteConnectionFactory()
+        public SqlConnectionFactory()
         {
             Connection = new SqlConnection(@"data source=.\sqlexpress;initial catalog=SmartCabDevTest;integrated security=true;");
             Connection.Open();

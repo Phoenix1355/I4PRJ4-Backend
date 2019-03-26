@@ -23,14 +23,14 @@ namespace Api.IntegrationTests.Customers
     public class CustomerIntegrationTest
     {
         private HttpClient _client;
-        private SqliteConnectionFactory _connectionFactory;
+        private SqlConnectionFactory _connectionFactory;
         private ApplicationContextFactory _applicationContextFactory;
         private IDbContextTransaction _transaction;
 
         [SetUp]
         public void Setup()
         {
-            _connectionFactory = new SqliteConnectionFactory();
+            _connectionFactory = new SqlConnectionFactory();
             _applicationContextFactory = new ApplicationContextFactory(_connectionFactory.Connection);
             var webFactory = new EmptyDB_WebApplicationFactory<Startup>(_connectionFactory.Connection);
 

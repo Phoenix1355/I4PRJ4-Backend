@@ -20,7 +20,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     public class CustomerRepositoryTests
     {
         private CustomerRepository _uut;
-        private SqliteConnectionFactory _connectionFactory;
+        private SqlConnectionFactory _connectionFactory;
         private ApplicationContextFactory _factory;
         private FakeSignInManager _mockSignManager;
         private FakeUserManager _mockUserManager;
@@ -28,7 +28,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [SetUp]
         public void SetUp()
         {
-            _connectionFactory = new SqliteConnectionFactory();
+            _connectionFactory = new SqlConnectionFactory();
             _factory = new ApplicationContextFactory(_connectionFactory.Connection);
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
