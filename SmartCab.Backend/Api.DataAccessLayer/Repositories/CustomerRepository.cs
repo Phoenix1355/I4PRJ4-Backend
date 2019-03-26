@@ -24,15 +24,17 @@ namespace Api.DataAccessLayer.Repositories
             using (var transaction = _context.Database.BeginTransaction())
             { 
                 var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(user, password);
-
-                string role = nameof(Customer);
-                var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
-                if (resultAddApplicationUser.Succeeded && resultAddRole.Succeeded)
+                if (resultAddApplicationUser.Succeeded)
                 {
-                    await _context.Customers.AddAsync(customer);
-                    await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return customer;
+                    string role = nameof(Customer);
+                    var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
+                    if (resultAddRole.Succeeded)
+                    {
+                        await _context.Customers.AddAsync(customer);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
+                        return customer;
+                    }
                 }
                 transaction.Rollback();
 

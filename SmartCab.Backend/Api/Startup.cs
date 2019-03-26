@@ -139,6 +139,7 @@ namespace Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
+                
             });
         }
 
