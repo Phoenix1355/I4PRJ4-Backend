@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -8,6 +11,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -31,13 +35,27 @@ namespace Api.IntegrationTests.Customers
             var webFactory = new EmptyDB_WebApplicationFactory<Startup>(_connectionFactory.Connection);
 
             _client = webFactory.CreateClient();
-            //_transaction = _applicationContextFactory.CreateContext().Database.BeginTransaction();
+            _applicationContextFactory.CreateContext().Database.Migrate();
         }
 
         [TearDown]
         public void TearDown()
         {
-            
+            using (var content = _applicationContextFactory.CreateContext())
+            {
+                var tablesToDelete = new List<String>()
+                {
+                    "Customers", "AspNetUsers", "Rides", "MatchedRides", "TaxiCompanies", "CustomerRides",
+                    "AspNetUserRoles", "AspNetRoles"
+                };
+                foreach (var table in tablesToDelete)
+                {
+                    string command = $"Delete from {table}";
+                    content.Database.ExecuteSqlCommand(command);
+                }
+               
+            }
+
             _connectionFactory.Dispose();
         }
 
@@ -46,7 +64,7 @@ namespace Api.IntegrationTests.Customers
         {
             var request = new RegisterRequest
             {
-                Email = "test8@gmail.com",
+                Email = "test12@gmail.com",
                 Password = "Qwer111!",
                 PasswordRepeated = "Qwer111!",
                 Name = "test4",
