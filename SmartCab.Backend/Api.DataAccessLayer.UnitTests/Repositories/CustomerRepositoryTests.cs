@@ -20,7 +20,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     public class CustomerRepositoryTests
     {
         private CustomerRepository _uut;
-        private SqlConnectionFactory _connectionFactory;
         private ApplicationContextFactory _factory;
         private FakeSignInManager _mockSignManager;
         private FakeUserManager _mockUserManager;
@@ -28,8 +27,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [SetUp]
         public void SetUp()
         {
-            _connectionFactory = new SqlConnectionFactory();
-            _factory = new ApplicationContextFactory(_connectionFactory.Connection);
+            _factory = new ApplicationContextFactory(Guid.NewGuid().ToString());
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
             ApplicationUserRepository applicationUserRepository = new ApplicationUserRepository(_mockUserManager,_mockSignManager);
@@ -39,7 +37,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [TearDown]
         public void TearDown()
         {
-            _connectionFactory.Dispose();
+
         }
 
         [Test]

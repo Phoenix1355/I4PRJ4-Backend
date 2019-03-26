@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Api;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.UnitTests.Factories;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 
 namespace SmartCabPoc.Integration.Test
@@ -13,13 +16,13 @@ namespace SmartCabPoc.Integration.Test
     public class EmptyDB_WebApplicationFactory<TStartup>
         : WebApplicationFactory<Startup>
     {
-        private DbConnection _connection;
 
-        public EmptyDB_WebApplicationFactory(DbConnection connection)
+        private string _guid;
+
+        public EmptyDB_WebApplicationFactory(string guid)
         {
-            _connection = connection;
+            _guid = guid;
         }
-
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -27,17 +30,32 @@ namespace SmartCabPoc.Integration.Test
             {
                 // Create a new service provider.
                 var serviceProvider = new ServiceCollection()
-                    .AddEntityFrameworkSqlServer()
+                    .AddEntityFrameworkInMemoryDatabase()
                     .AddEntityFrameworkProxies()
                     .BuildServiceProvider();
 
                 services.AddDbContext<ApplicationContext>(options =>
                 {
                     options.UseLazyLoadingProxies();
-                    options.UseSqlServer(_connection);
+                    options.ConfigureWarnings(warning => warning.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+                    options.UseInMemoryDatabase(_guid);
                     options.UseInternalServiceProvider(serviceProvider);
                 });
-            });
+
+                var sp = services.BuildServiceProvider();
+
+                // Create a scope to obtain a reference to the database
+                // context (ApplicationDbContext).
+                using (var scope = sp.CreateScope())
+                {
+                    var scopedServices = scope.ServiceProvider;
+                    var db = scopedServices.GetRequiredService<ApplicationContext>();
+                    
+                    // Ensure the database is created.
+                    db.Database.EnsureCreated();
+                }
+            
+        });
         }
     }
 }

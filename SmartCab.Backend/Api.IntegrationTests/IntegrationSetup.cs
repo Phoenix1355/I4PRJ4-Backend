@@ -15,21 +15,24 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-        protected SqlConnectionFactory _connectionFactory;
+        
         protected ApplicationContextFactory _applicationContextFactory;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _connectionFactory = new SqlConnectionFactory();
-            _applicationContextFactory = new ApplicationContextFactory(_connectionFactory.Connection);
-            _applicationContextFactory.CreateContext().Database.Migrate();
+            
+            
+            
+            //_applicationContextFactory.CreateContext().Database.Migrate();
         }
 
         [SetUp]
         public void Setup()
         {
-            var webFactory = new EmptyDB_WebApplicationFactory<Startup>(_connectionFactory.Connection);
+            string guid = Guid.NewGuid().ToString();
+            _applicationContextFactory = new ApplicationContextFactory(guid);
+            var webFactory = new EmptyDB_WebApplicationFactory<Startup>(guid);
             _client = webFactory.CreateClient();
         }
 
@@ -37,29 +40,12 @@ namespace Api.IntegrationTests
         [TearDown]
         public void TearDown()
         {
-            //Cleaning up all entries in database.
-            using (var content = _applicationContextFactory.CreateContext())
-            {
-                //All relevant tables for deletion.
-                var tablesToDelete = new List<String>()
-                {
-                    "Customers", "AspNetUsers", "Rides", "MatchedRides", "TaxiCompanies", "CustomerRides",
-                    "AspNetUserRoles", "AspNetRoles"
-                };
-
-                foreach (var table in tablesToDelete)
-                {
-                    string command = $"Delete from {table}";
-                    content.Database.ExecuteSqlCommand(command);
-                }
-            }
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
 
-            _connectionFactory.Dispose();
         }
 
         protected LoginRequest getLoginRequest(string email = "test12@gmail.com",
