@@ -4,6 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace Api.DataAccessLayer.Models
 {
+    /// <summary>
+    /// A base ride containing all common ride attributes. 
+    /// </summary>
     public class Ride
     {
         public int Id { get; set; }

@@ -2,6 +2,9 @@
 
 namespace Api.DataAccessLayer.Models
 {
+    /// <summary>
+    /// Address table in database. Is not selfcontained in a table, but is mapped in Ride. 
+    /// </summary>
     [Owned]
     public class Address
     {

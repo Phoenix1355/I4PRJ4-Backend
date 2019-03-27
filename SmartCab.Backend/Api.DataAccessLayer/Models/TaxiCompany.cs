@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Api.DataAccessLayer.Models
 {
+    /// <summary>
+    /// Contains all commen properties regarding Taxi Companies. 
+    /// </summary>
     public class TaxiCompany
     {
         public int Id { get; set; }

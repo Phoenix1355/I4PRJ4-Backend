@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Interfaces
 {
+    /// <summary>
+    /// Interface for ApplicationUserRepository, containing relevant methods. 
+    /// </summary>
     public interface IApplicationUserRepository
     {
         Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password);
