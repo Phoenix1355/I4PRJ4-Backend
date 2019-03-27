@@ -15,37 +15,14 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-        
-        protected ApplicationContextFactory _applicationContextFactory;
-
-        [OneTimeSetUp]
-        public void OneTimeSetup()
-        {
-            
-            
-            
-            //_applicationContextFactory.CreateContext().Database.Migrate();
-        }
+       
 
         [SetUp]
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
-            _applicationContextFactory = new ApplicationContextFactory(guid);
             var webFactory = new EmptyDB_WebApplicationFactory<Startup>(guid);
             _client = webFactory.CreateClient();
-        }
-
-
-        [TearDown]
-        public void TearDown()
-        {
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-
         }
 
         protected LoginRequest getLoginRequest(string email = "test12@gmail.com",

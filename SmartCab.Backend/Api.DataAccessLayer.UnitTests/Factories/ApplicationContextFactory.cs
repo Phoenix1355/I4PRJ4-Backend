@@ -2,35 +2,45 @@
 using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Api.DataAccessLayer.UnitTests.Factories
 {
     //Reference to: https://www.meziantou.net/2017/09/11/testing-ef-core-in-memory-using-sqlite
-    public class ApplicationContextFactory
+    public class ApplicationContextFactory : IDisposable
     {
-        private string _guid;
-
-        public ApplicationContextFactory(string guid)
-        {
-            _guid = guid;
-            using (var context = new ApplicationContext(CreateOptions()))
-            {
-                context.Database.EnsureCreated();
-            }
-        }
+        private DbConnection _connection;
 
         private DbContextOptions<ApplicationContext> CreateOptions()
         {
             return new DbContextOptionsBuilder<ApplicationContext>()
                 .UseLazyLoadingProxies()
-                .ConfigureWarnings(warning => warning.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-                .UseInMemoryDatabase(_guid).Options;
+                .UseSqlite(_connection).Options;
+
         }
 
         public ApplicationContext CreateContext()
         {
-                return new ApplicationContext(CreateOptions());
+            if (_connection == null)
+            {
+                _connection = new SqliteConnection("DataSource=:memory:");
+                _connection.Open();
+
+                using (var context = new ApplicationContext(CreateOptions()))
+                {
+                    context.Database.EnsureCreated();
+                }
+            }
+
+            return new ApplicationContext(CreateOptions());
+        }
+
+        public void Dispose()
+        {
+            if (_connection != null)
+            {
+                _connection.Dispose();
+                _connection = null;
+            }
         }
     }
 }

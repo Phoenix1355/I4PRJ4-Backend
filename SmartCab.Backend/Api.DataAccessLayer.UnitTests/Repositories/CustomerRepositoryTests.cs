@@ -27,7 +27,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [SetUp]
         public void SetUp()
         {
-            _factory = new ApplicationContextFactory(Guid.NewGuid().ToString());
+            _factory = new ApplicationContextFactory();
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
             ApplicationUserRepository applicationUserRepository = new ApplicationUserRepository(_mockUserManager,_mockSignManager);
@@ -37,7 +37,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [TearDown]
         public void TearDown()
         {
-
+            _factory.Dispose();
         }
 
         [Test]
