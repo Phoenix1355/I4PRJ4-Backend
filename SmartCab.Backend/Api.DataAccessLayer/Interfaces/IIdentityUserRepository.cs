@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Identity;
 namespace Api.DataAccessLayer.Interfaces
 {
     /// <summary>
-    /// Interface for ApplicationUserRepository, containing relevant methods. 
+    /// Interface for IdentityUserRepository, containing relevant methods. 
     /// </summary>
-    public interface IApplicationUserRepository
+    public interface IIdentityUserRepository
     {
-        Task<IdentityResult> AddApplicationUserAsync(IdentityUser user, string password);
+        Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password);
 
         Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role);
         Task<SignInResult> SignInAsync(string email, string password);

@@ -102,7 +102,6 @@ namespace Api
                 mapper.CreateMap<CreateRideRequest, Ride>()
                       .ReverseMap(); //Setup two way map for CreateRideRequest
 
-                //Digs into ApplicationUser for email. 
                 mapper.CreateMap<Customer, CustomerDto>();
             });
         }
@@ -181,7 +180,7 @@ namespace Api
             services.AddScoped<IRideRepository, RideRepository>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<ICustomerService, CustomerService>();
-            services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            services.AddScoped<IIdentityUserRepository, IdentityUserRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
         }
 

@@ -10,27 +10,27 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// CustomerRepository with autoinjection of context and applicationUserRepository. 
+    /// CustomerRepository with autoinjection of context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
         private readonly ApplicationContext _context;
-        private readonly IApplicationUserRepository _applicationUserRepository;
+        private readonly IIdentityUserRepository _identityUserRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
         /// </summary>
         /// <param name="context">The context - Autoinjected</param>
-        /// <param name="applicationUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(ApplicationContext context, IApplicationUserRepository applicationUserRepository)
+        /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
+        public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
             _context = context;
-            _applicationUserRepository = applicationUserRepository;
+            _identityUserRepository = identityUserRepository;
         }
 
         /// <summary>
-        /// Adds the customer and applicationUser asynchronous in a transaction
+        /// Adds the customer asynchronous in a transaction
         /// </summary>
         /// <param name="customer">The customer to add</param>
         /// <param name="password">The users password </param>
@@ -40,11 +40,11 @@ namespace Api.DataAccessLayer.Repositories
         {
             using (var transaction = _context.Database.BeginTransaction())
             { 
-                var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(customer, password);
-                if (resultAddApplicationUser.Succeeded)
+                var identityResult = await _identityUserRepository.AddIdentityUserAsync(customer, password);
+                if (identityResult.Succeeded)
                 {
                     string role = nameof(Customer);
-                    var resultAddRole = await _applicationUserRepository.AddToRoleAsync(customer, role);
+                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(customer, role);
                     if (resultAddRole.Succeeded)
                     {
                         transaction.Commit();
@@ -56,9 +56,6 @@ namespace Api.DataAccessLayer.Repositories
                 string error = "No changes applied";
                 throw new ArgumentException(error);
             }
-            
-
-            
         }
 
         /// <summary>

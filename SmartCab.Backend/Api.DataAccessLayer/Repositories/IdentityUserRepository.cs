@@ -7,40 +7,38 @@ namespace Api.DataAccessLayer.Repositories
 {
 
     /// <summary>
-    /// Implementaion of IApplicationUserRepository, all methods regarding ApplicationUser from Identity framework. 
+    /// Implementation of IIdentityUserRepository, all methods regarding IdentityUser from Identity framework. 
     /// </summary>
-    /// <seealso cref="Api.DataAccessLayer.Interfaces.IApplicationUserRepository" />
-    public class ApplicationUserRepository : IApplicationUserRepository
+    /// <seealso cref="IIdentityUserRepository" />
+    public class IdentityUserRepository : IIdentityUserRepository
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationUserRepository"/> class.
+        /// Initializes a new instance of the <see cref="IdentityUserRepository"/> class.
         /// </summary>
         /// <param name="userManager">The user manager - Autoinjected</param>
         /// <param name="signInManager">The sign in manager - Autoinjected</param>
-        public ApplicationUserRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public IdentityUserRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
-            
             _signInManager = signInManager;
-            
         }
 
         /// <summary>
-        /// Adds the application user asynchronous.
+        /// Adds the IdentityUser asynchronous.
         /// </summary>
         /// <param name="user">The user to create</param>
         /// <param name="password">The users password</param>
         /// <returns></returns>
-        public async Task<IdentityResult> AddApplicationUserAsync(IdentityUser user, string password)
+        public async Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
         }
 
         /// <summary>
-        /// Adds to role to user asynchronous.
+        /// Adds to role to the IdentityUser asynchronous.
         /// </summary>
         /// <param name="user">The user to add the role to</param>
         /// <param name="role">The role.</param>
@@ -51,7 +49,7 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Signs the user in asynchronous based on email and password
+        /// Signs the IdentityUser in asynchronous based on email and password.
         /// </summary>
         /// <param name="email">The email.</param>
         /// <param name="password">The password.</param>

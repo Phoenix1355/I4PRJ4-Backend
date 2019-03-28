@@ -30,8 +30,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _factory = new ApplicationContextFactory();
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
-            ApplicationUserRepository applicationUserRepository = new ApplicationUserRepository(_mockUserManager,_mockSignManager);
-            _uut = new CustomerRepository(_factory.CreateContext(), applicationUserRepository); 
+            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager,_mockSignManager);
+            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository); 
         }
 
         [TearDown]
@@ -41,7 +41,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void AddCustomerAsync_ApplicationUserValid_CustomerExistsInDatabase()
+        public void AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
         {
             Customer customer = new Customer
             {
@@ -70,7 +70,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void AddCustomerAsync_ApplicationUserInvalid_CustomerAlreadyExistsInDatabase()
+        public void AddCustomerAsync_CustomerInvalid_CustomerAlreadyExistsInDatabase()
         {
             Customer customerToAddToDatabase = new Customer
             {
@@ -91,7 +91,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void GetCustomerAsyncc_CustomerInDatabase_ReturnsCustomer()
+        public void GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
             Customer customerAddedToDatabase = new Customer
             {

@@ -20,7 +20,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         #region Setup and fields
 
         private IJwtService _jwtService;
-        private IApplicationUserRepository _applicationUserRepository;
+        private IIdentityUserRepository _identityUserRepository;
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
@@ -29,10 +29,10 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public void Setup()
         {
             _jwtService = Substitute.For<IJwtService>();
-            _applicationUserRepository = Substitute.For<IApplicationUserRepository>();
+            _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            _customerService = new CustomerService(_jwtService, _customerRepository, _applicationUserRepository, _mapper);
+            _customerService = new CustomerService(_jwtService, _customerRepository, _identityUserRepository, _mapper);
         }
 
             #endregion
@@ -115,7 +115,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _applicationUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
 
             var customerDto = new CustomerDto
@@ -141,7 +141,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _applicationUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
 
             var customerDto = new CustomerDto
@@ -167,7 +167,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var signinResult = SignInResult.Failed;
-            _applicationUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signinResult);
+            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signinResult);
 
             Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<ArgumentException>());
         }

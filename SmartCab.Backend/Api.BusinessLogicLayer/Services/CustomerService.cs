@@ -17,7 +17,7 @@ namespace Api.BusinessLogicLayer.Services
     public class CustomerService : ICustomerService
     {
         private readonly IJwtService _jwtService;
-        private readonly IApplicationUserRepository _applicationUserRepository;
+        private readonly IIdentityUserRepository _identityUserRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
 
@@ -26,17 +26,17 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
         /// <param name="customerRepository">Used to access the database when updating/creating customers</param>
-        /// <param name="applicationUserRepository">Used to access the database when updating/creating customers</param>
+        /// <param name="identityUserRepository">Used to access the database when updating/creating customers</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
             IJwtService jwtService,
             ICustomerRepository customerRepository,
-            IApplicationUserRepository applicationUserRepository,
+            IIdentityUserRepository identityUserRepository,
             IMapper mapper)
         {
             _jwtService = jwtService;
             _customerRepository = customerRepository;
-            _applicationUserRepository = applicationUserRepository;
+            _identityUserRepository = identityUserRepository;
             _mapper = mapper;
         }
 
@@ -86,7 +86,7 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
             //Check if its possible to log in
-            var result = await _applicationUserRepository.SignInAsync(request.Email, request.Password);
+            var result = await _identityUserRepository.SignInAsync(request.Email, request.Password);
 
             if (result.Succeeded)
             {
