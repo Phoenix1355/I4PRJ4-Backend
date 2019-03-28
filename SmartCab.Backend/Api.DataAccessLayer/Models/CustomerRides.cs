@@ -1,5 +1,9 @@
 ﻿namespace Api.DataAccessLayer.Models
 {
+
+    /// <summary>
+    /// Junction table between rides, customer and taxicompanies. 
+    /// </summary>
     public class CustomerRides
     {
         public int Id { get; set; }

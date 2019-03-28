@@ -5,6 +5,9 @@ using Api.DataAccessLayer.Interfaces;
 
 namespace Api.DataAccessLayer.Models
 {
+    /// <summary>
+    /// Our customer object
+    /// </summary>
     public class Customer
     {
         public int Id { get; set; }

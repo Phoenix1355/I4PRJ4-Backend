@@ -85,7 +85,9 @@ namespace Api
             app.UseMvc();
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
-            dbContext.Database.Migrate();
+            //dbContext.Database.Migrate();
+            dbContext.Database.EnsureCreated() ;
+
             CreateRoles(services).Wait();
         }
 
@@ -137,6 +139,7 @@ namespace Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
+                
             });
         }
 

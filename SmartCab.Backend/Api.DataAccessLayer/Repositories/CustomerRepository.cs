@@ -9,30 +9,50 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
+    /// <summary>
+    /// CustomerRepository with autoinjection of context and applicationUserRepository. 
+    /// </summary>
+    /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
+    /// <seealso cref="System.IDisposable" />
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
         private readonly ApplicationContext _context;
         private readonly IApplicationUserRepository _applicationUserRepository;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
+        /// </summary>
+        /// <param name="context">The context - Autoinjected</param>
+        /// <param name="applicationUserRepository">The application user repository - Autoinjected</param>
         public CustomerRepository(ApplicationContext context, IApplicationUserRepository applicationUserRepository)
         {
             _context = context;
             _applicationUserRepository = applicationUserRepository;
         }
 
+        /// <summary>
+        /// Adds the customer and applicationUser asynchronous in a transaction
+        /// </summary>
+        /// <param name="user">The userto add</param>
+        /// <param name="customer">The customer to add</param>
+        /// <param name="password">The users password </param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
         {
             using (var transaction = _context.Database.BeginTransaction())
             { 
                 var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(user, password);
-
-                string role = nameof(Customer);
-                var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
-                if (resultAddApplicationUser.Succeeded && resultAddRole.Succeeded)
+                if (resultAddApplicationUser.Succeeded)
                 {
-                    await _context.Customers.AddAsync(customer);
-                    await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return customer;
+                    string role = nameof(Customer);
+                    var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
+                    if (resultAddRole.Succeeded)
+                    {
+                        await _context.Customers.AddAsync(customer);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
+                        return customer;
+                    }
                 }
                 transaction.Rollback();
 
@@ -44,7 +64,12 @@ namespace Api.DataAccessLayer.Repositories
             
         }
 
-
+        /// <summary>
+        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
+        /// </summary>
+        /// <param name="email">The email.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Customer does not exist.</exception>
         public async Task<Customer> GetCustomerAsync(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUser.Email == email);
