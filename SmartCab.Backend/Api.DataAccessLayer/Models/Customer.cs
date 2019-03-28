@@ -2,25 +2,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Api.DataAccessLayer.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Models
 {
     /// <summary>
     /// Our customer object
     /// </summary>
-    public class Customer
+    public class Customer : IdentityUser
     {
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
-
-        [Required]
-        public string PhoneNumber { get; set; }
-
-        [Required]
-        public string ApplicationUserId { get; set; }
-        public virtual ApplicationUser ApplicationUser { get; set; }
 
         public virtual List<CustomerRides> CustomerRides { get; set; }
     }

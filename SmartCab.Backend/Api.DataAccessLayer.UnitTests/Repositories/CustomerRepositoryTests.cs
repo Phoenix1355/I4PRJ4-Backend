@@ -43,25 +43,16 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void AddCustomerAsync_ApplicationUserValid_CustomerExistsInDatabase()
         {
-            ApplicationUser user = new ApplicationUser();
-            using (var content = _factory.CreateContext())
+            Customer customer = new Customer
             {
-                content.ApplicationUsers.Add(user);
-                content.SaveChanges();
-            }
-
-
-            Customer customerToAddToDatabase = new Customer
-            {
-                ApplicationUserId = user.Id,
                 Name = "Name",
                 PhoneNumber = "12345678",
             };
 
-            _uut.AddCustomerAsync(user, customerToAddToDatabase, "Qwer111!").Wait();
+            _uut.AddCustomerAsync(customer, "Qwer111!").Wait();
             using (var content = _factory.CreateContext())
             {
-                var customerFromDatabase = content.Customers.FirstOrDefault(customer => customer.ApplicationUserId.Equals(user.Id));
+                var customerFromDatabase = content.Customers.FirstOrDefault(customerFromDB => customerFromDB.Equals(customer.Id));
 
                 Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
             }
@@ -71,10 +62,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void AddCustomerAsync_ApplicationUserInvalid_CustomerAlreadyExistsInDatabase()
         {
-            ApplicationUser user = new ApplicationUser();
             Customer customerToAddToDatabase = new Customer
             {
-                ApplicationUserId = user.Id,
                 Name = "Name",
                 PhoneNumber = "12345678",
             };
@@ -83,38 +72,33 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             using (var content = _factory.CreateContext())
             {
-                content.ApplicationUsers.Add(user);
                 content.Customers.Add(customerToAddToDatabase);
                 content.SaveChanges();
             }
 
 
-            Assert.ThrowsAsync<ArgumentException>(()=>_uut.AddCustomerAsync(user, customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<ArgumentException>(()=>_uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
         public void GetCustomerAsyncc_CustomerInDatabase_ReturnsCustomer()
         {
-            ApplicationUser user = new ApplicationUser();
-            user.Email = "valid@email.com";
             Customer customerAddedToDatabase = new Customer
             {
-                ApplicationUserId = user.Id,
+                Email = "valid@email.com",
                 Name = "Name",
                 PhoneNumber = "12345678",
             };
 
             using (var content = _factory.CreateContext())
             {
-                content.ApplicationUsers.Add(user);
                 content.Customers.Add(customerAddedToDatabase);
                 content.SaveChanges();
             }
 
 
-            var customerReturned = _uut.GetCustomerAsync(user.Email).Result;
+            var customerReturned = _uut.GetCustomerAsync(customerAddedToDatabase.Email).Result;
             Assert.That(customerReturned.Name, Is.EqualTo("Name"));
-
         }
 
         [Test]

@@ -8,30 +8,30 @@ using NSubstitute;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
-    public class FakeUserManager : UserManager<ApplicationUser>
+    public class FakeUserManager : UserManager<IdentityUser>
     {
         public FakeUserManager()
-            : base( Substitute.For<IUserStore<ApplicationUser>>(),
+            : base( Substitute.For<IUserStore<IdentityUser>>(),
                 Substitute.For<IOptions<IdentityOptions>>(),
-                Substitute.For<IPasswordHasher<ApplicationUser>>(),
-                new IUserValidator<ApplicationUser>[0],
-                new IPasswordValidator<ApplicationUser>[0],
+                Substitute.For<IPasswordHasher<IdentityUser>>(),
+                new IUserValidator<IdentityUser>[0],
+                new IPasswordValidator<IdentityUser>[0],
                 Substitute.For<ILookupNormalizer>(),
                 Substitute.For<IdentityErrorDescriber>(),
                 Substitute.For<IServiceProvider>(),
-                Substitute.For<ILogger<UserManager<ApplicationUser>>>())
+                Substitute.For<ILogger<UserManager<IdentityUser>>>())
         { }
 
         public IdentityResult CreateAsyncReturn { get; set; } = IdentityResult.Success;
 
         public IdentityResult AddToRoleAsyncReturn { get; set; } = IdentityResult.Success;
 
-        public override Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        public override Task<IdentityResult> CreateAsync(IdentityUser user, string password)
         {
             return Task.FromResult(CreateAsyncReturn);
         }
 
-        public override Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+        public override Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             return Task.FromResult(AddToRoleAsyncReturn);
         }

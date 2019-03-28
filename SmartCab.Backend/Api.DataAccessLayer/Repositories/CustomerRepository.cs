@@ -32,20 +32,19 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Adds the customer and applicationUser asynchronous in a transaction
         /// </summary>
-        /// <param name="user">The userto add</param>
         /// <param name="customer">The customer to add</param>
         /// <param name="password">The users password </param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public async Task<Customer> AddCustomerAsync(ApplicationUser user, Customer customer, string password)
+        public async Task<Customer> AddCustomerAsync(Customer customer, string password)
         {
             using (var transaction = _context.Database.BeginTransaction())
             { 
-                var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(user, password);
+                var resultAddApplicationUser = await _applicationUserRepository.AddApplicationUserAsync(customer, password);
                 if (resultAddApplicationUser.Succeeded)
                 {
                     string role = nameof(Customer);
-                    var resultAddRole = await _applicationUserRepository.AddToRoleAsync(user, role);
+                    var resultAddRole = await _applicationUserRepository.AddToRoleAsync(customer, role);
                     if (resultAddRole.Succeeded)
                     {
                         await _context.Customers.AddAsync(customer);
@@ -72,7 +71,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <exception cref="ArgumentNullException">Customer does not exist.</exception>
         public async Task<Customer> GetCustomerAsync(string email)
         {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.ApplicationUser.Email == email);
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
 
             if (customer == null)
             {

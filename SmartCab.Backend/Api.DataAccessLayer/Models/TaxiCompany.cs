@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Models
 {
     /// <summary>
     /// Contains all commen properties regarding Taxi Companies. 
     /// </summary>
-    public class TaxiCompany
+    public class TaxiCompany : IdentityUser
     {
-        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        public string ApplicationUserId { get; set; }
-        public virtual ApplicationUser ApplicationUser { get; set; }
+
         public virtual List<CustomerRides> CustomerRides { get; set; }
     }
 }

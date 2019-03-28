@@ -103,8 +103,7 @@ namespace Api
                       .ReverseMap(); //Setup two way map for CreateRideRequest
 
                 //Digs into ApplicationUser for email. 
-                mapper.CreateMap<Customer, CustomerDto>()
-                      .ForMember(customerDto => customerDto.Email, customer => customer.MapFrom(c => c.ApplicationUser.Email));
+                mapper.CreateMap<Customer, CustomerDto>();
             });
         }
 
@@ -127,7 +126,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddIdentityFramework(IServiceCollection services)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationContext>()
                     .AddDefaultTokenProviders();
 

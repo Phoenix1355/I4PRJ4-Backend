@@ -12,15 +12,15 @@ namespace Api.DataAccessLayer.Repositories
     /// <seealso cref="Api.DataAccessLayer.Interfaces.IApplicationUserRepository" />
     public class ApplicationUserRepository : IApplicationUserRepository
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationUserRepository"/> class.
         /// </summary>
         /// <param name="userManager">The user manager - Autoinjected</param>
         /// <param name="signInManager">The sign in manager - Autoinjected</param>
-        public ApplicationUserRepository(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public ApplicationUserRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
             
@@ -34,7 +34,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user">The user to create</param>
         /// <param name="password">The users password</param>
         /// <returns></returns>
-        public async Task<IdentityResult> AddApplicationUserAsync(ApplicationUser user, string password)
+        public async Task<IdentityResult> AddApplicationUserAsync(IdentityUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
         }
@@ -45,7 +45,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user">The user to add the role to</param>
         /// <param name="role">The role.</param>
         /// <returns></returns>
-        public async Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+        public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             return await _userManager.AddToRoleAsync(user, role);
         }

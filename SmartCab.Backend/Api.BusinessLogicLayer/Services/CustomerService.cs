@@ -47,23 +47,18 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
-            //Create the identity user
-            var user = new ApplicationUser
-            {
-                UserName = request.Email,
-                Email = request.Email
-            };
 
             //Create the customer
             var customer = new Customer
             {
-                ApplicationUserId = user.Id,
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber,
+                UserName = request.Email,
+                Email = request.Email
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
-            customer = await _customerRepository.AddCustomerAsync(user, customer, request.Password);
+            customer = await _customerRepository.AddCustomerAsync(customer, request.Password);
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
