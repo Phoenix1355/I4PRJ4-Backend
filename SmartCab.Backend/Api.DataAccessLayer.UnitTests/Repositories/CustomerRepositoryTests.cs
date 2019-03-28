@@ -48,11 +48,21 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Name = "Name",
                 PhoneNumber = "12345678",
             };
+            //As function now relies on Identity framework, insert it manually. 
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+
 
             _uut.AddCustomerAsync(customer, "Qwer111!").Wait();
-            using (var content = _factory.CreateContext())
+
+
+
+            using (var context = _factory.CreateContext())
             {
-                var customerFromDatabase = content.Customers.FirstOrDefault(customerFromDB => customerFromDB.Equals(customer.Id));
+                var customerFromDatabase = context.Customers.FirstOrDefault(customerFromDB => customer.Id.Equals(customerFromDB.Id));
 
                 Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
             }

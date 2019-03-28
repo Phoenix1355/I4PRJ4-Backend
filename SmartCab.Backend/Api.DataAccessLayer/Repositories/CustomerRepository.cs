@@ -47,8 +47,6 @@ namespace Api.DataAccessLayer.Repositories
                     var resultAddRole = await _applicationUserRepository.AddToRoleAsync(customer, role);
                     if (resultAddRole.Succeeded)
                     {
-                        await _context.Customers.AddAsync(customer);
-                        await _context.SaveChangesAsync();
                         transaction.Commit();
                         return customer;
                     }
