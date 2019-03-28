@@ -70,7 +70,7 @@ namespace Api.Controllers
         /// <summary>
         /// Validates the user credentials and returns a JWT token if validation is successful.
         /// </summary>
-        /// <param name="request">The username and password that will be validated.</param>
+        /// <param name="request">The email and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
         [Produces("application/json")]
         [Route("[action]")]
@@ -89,7 +89,7 @@ namespace Api.Controllers
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
             }
         }
 

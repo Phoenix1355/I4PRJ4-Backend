@@ -43,6 +43,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <summary>
         /// Adds a new customer to the database asynchronously and returns a JWT token wrapped in a response object.
         /// </summary>
+        /// <remarks>
+        /// The generated token will only give access to endpoints which is available to customers.
+        /// </remarks>
         /// <param name="request">The required data needed to create the customer</param>
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
@@ -72,14 +75,25 @@ namespace Api.BusinessLogicLayer.Services
             return response;
         }
 
+        /// <summary>
+        /// Attempts to log the user in. Upon a successful login a new JWT token is generated and returned.
+        /// <remarks>
+        /// The generated token will only give access to endpoints which is available to customers.
+        /// </remarks>
+        /// </summary>
+        /// <param name="request">The email and password used to log in.</param>
+        /// <returns>A JWT token and certain information about the logged in user.</returns>
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
+            //Check if its possible to log in
             var result = await _applicationUserRepository.SignInAsync(request.Email, request.Password);
 
             if (result.Succeeded)
             {
+                //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
                 var customer = await _customerRepository.GetCustomerAsync(request.Email);
 
+                //All good, now generate the token and return it
                 var token = _jwtService.GenerateJwtToken(request.Email, nameof(Customer));
                 var customerDto = _mapper.Map<CustomerDto>(customer);
                 var response = new LoginResponse
@@ -90,6 +104,7 @@ namespace Api.BusinessLogicLayer.Services
                 return response;
             }
 
+            //Log in failed
             throw new ArgumentException("Login failed. Credentials was not found in the database.");
         }
     }

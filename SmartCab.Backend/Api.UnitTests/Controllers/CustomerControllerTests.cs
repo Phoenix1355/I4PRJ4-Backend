@@ -15,6 +15,8 @@ namespace Api.UnitTests.Controllers
     [TestFixture]
     public class CustomerControllerTests
     {
+        #region Setup and fields
+
         private ICustomerService _customerService;
         private CustomerController _customerController;
 
@@ -25,8 +27,12 @@ namespace Api.UnitTests.Controllers
             _customerController = new CustomerController(_customerService);
         }
 
+        #endregion
+
+        #region Register
+
         [Test]
-        public async Task Register_Success_ReturnOkResponse()
+        public async Task Register_Success_ReturnsOkResponse()
         {
             _customerService.AddCustomerAsync(null).ReturnsForAnyArgs(new RegisterResponse());
 
@@ -58,5 +64,45 @@ namespace Api.UnitTests.Controllers
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
         }
+
+        #endregion
+
+        #region Login
+
+        [Test]
+        public async Task Login_Success_ReturnsOkResponse()
+        {
+            _customerService.LoginCustomerAsync(null).ReturnsForAnyArgs(new LoginResponse());
+
+            var response = await _customerController.Login(null) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        [Test]
+        public async Task Login_ValidationFails_ReturnsBadRequestResponse()
+        {
+            _customerService
+                .When(x => x.LoginCustomerAsync(null))
+                .Do(x => throw new ArgumentException()); //Reaches the bad request clause which is errors we throw manually
+
+            var response = await _customerController.Login(null) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
+        }
+
+        [Test]
+        public async Task Login_UnknownErrorOccurs_ReturnsInternalErrorResponse()
+        {
+            _customerService
+                .When(x => x.LoginCustomerAsync(null))
+                .Do(x => throw new Exception()); //Reaches the "catch all" clause which is the unknown error clause
+
+            var response = await _customerController.Login(null) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status500InternalServerError));
+        }
+
+        #endregion
     }
 }
