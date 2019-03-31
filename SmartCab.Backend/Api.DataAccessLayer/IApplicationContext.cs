@@ -1,4 +1,5 @@
-﻿using Api.DataAccessLayer.Models;
+﻿using System;
+using Api.DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer
