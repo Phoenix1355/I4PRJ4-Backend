@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +9,11 @@ namespace Api.DataAccessLayer.UnitTests.Factories
     {
         private DbConnection _connection;
 
-        private DbContextOptions<> CreateOptions()
+        private DbContextOptions<ApplicationContext> CreateOptions()
         {
-            return new DbContextOptionsBuilder<ApplicationContext>()
+            return new DbContextOptionsBuilder<ApplicationContext>
                 .UseLazyLoadingProxies()
                 .UseSqlite(_connection).Options;
-
         }
 
         public ApplicationContext CreateContext()
