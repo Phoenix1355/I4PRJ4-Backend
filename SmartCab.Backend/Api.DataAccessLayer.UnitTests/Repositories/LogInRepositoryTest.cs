@@ -25,7 +25,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         private ApplicationUserRepository _uut;
         private ApplicationContextFactory _factory;
 
-        [Setup]
+        [SetUp]
         public void Setup()
         {
             _factory = new ApplicationContextFactory();
