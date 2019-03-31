@@ -20,16 +20,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
     [TestFixture]
-    public class LogInRepositoryTest
+    public class ApplicationUserRepository
     {
-        private LogInRepository _uut;
+        private ApplicationUserRepository _uut;
         private ApplicationContextFactory _factory;
 
         [Setup]
         public void Setup()
         {
             _factory = new ApplicationContextFactory();
-            _uut = new LogInRepository(_factory.CreateContext());
+            _uut = new ApplicationUserRepository(_factory.CreateContext());
         }
 
         [TearDown]
