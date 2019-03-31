@@ -13,13 +13,13 @@ using Microsoft.Extensions.Logging;
 
 namespace SmartCabPoc.Integration.Test
 {
-    public class EmptyDB_WebApplicationFactory<TStartup>
+    public class InMemoryApplicationFactory<TStartup>
         : WebApplicationFactory<Startup>
     {
 
         private string _guid;
 
-        public EmptyDB_WebApplicationFactory(string guid)
+        public InMemoryApplicationFactory(string guid)
         {
             _guid = guid;
         }

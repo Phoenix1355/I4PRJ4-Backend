@@ -21,7 +21,7 @@ namespace Api.IntegrationTests
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
-            var webFactory = new EmptyDB_WebApplicationFactory<Startup>(guid);
+            var webFactory = new InMemoryApplicationFactory<Startup>(guid);
             _client = webFactory.CreateClient();
         }
 

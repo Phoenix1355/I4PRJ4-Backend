@@ -20,14 +20,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     public class CustomerRepositoryTests
     {
         private CustomerRepository _uut;
-        private ApplicationContextFactory _factory;
+        private InMemorySqlLiteContextFactory _factory;
         private FakeSignInManager _mockSignManager;
         private FakeUserManager _mockUserManager;
 
         [SetUp]
         public void SetUp()
         {
-            _factory = new ApplicationContextFactory();
+            _factory = new InMemorySqlLiteContextFactory();
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
             IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager,_mockSignManager);
