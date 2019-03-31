@@ -10,7 +10,7 @@ namespace Api.DataAccessLayer.UnitTests.Factories
     {
         private DbConnection _connection;
 
-        private DbContextOptions<ApplicationContext> CreateOptions()
+        private DbContextOptions<> CreateOptions()
         {
             return new DbContextOptionsBuilder<ApplicationContext>()
                 .UseLazyLoadingProxies()
