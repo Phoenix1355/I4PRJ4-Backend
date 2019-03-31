@@ -3,7 +3,6 @@ using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Api.DataAccessLayer.UnitTests.Factories
 {
     //Reference to: https://www.meziantou.net/2017/09/11/testing-ef-core-in-memory-using-sqlite
