@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using Api.DataAccessLayer.Statuses;
 
 namespace Api.DataAccessLayer.Models
 {
@@ -34,5 +35,7 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public int Price { get; set; }
         
+        [Required]
+        public RideStatus RideStatus { get; set; }
     }
 }
