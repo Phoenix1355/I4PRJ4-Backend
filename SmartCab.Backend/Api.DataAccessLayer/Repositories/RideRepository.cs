@@ -31,11 +31,11 @@ namespace Api.DataAccessLayer.Repositories
         /// Returns all SoloRides with status WaitingForAccept
         /// </summary>
         /// <returns></returns>
-        public List<SoloRide> GetOpenSoloRides()
+        public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
                 .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
-                .ToList();
+                .ToListAsync();
             return rides;
         }
 
@@ -43,11 +43,11 @@ namespace Api.DataAccessLayer.Repositories
         /// Returns all MatchedRides with status WaitingForAccept
         /// </summary>
         /// <returns></returns>
-        public List<MatchedRides> GetOpenMatchedRides()
+        public Task<List<MatchedRides>> GetOpenMatchedRidesAsync()
         {
-            var rides = _context.MatchedRides
+            var rides =  _context.MatchedRides
                 .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
-                .ToList();
+                .ToListAsync();
             return rides;
         }
 

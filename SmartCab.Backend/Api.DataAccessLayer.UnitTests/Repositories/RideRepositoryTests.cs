@@ -51,7 +51,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
             
             Assert.That(rides.Count, Is.EqualTo(1));
         }
@@ -72,7 +72,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 }
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(5));
         }
@@ -90,7 +90,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.First().Id, Is.EqualTo(matchedRide.Id));
         }
@@ -98,7 +98,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void GetOpenMatchedRides_NoMatchedRides_Returns0()
         {
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
@@ -116,7 +116,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
@@ -137,7 +137,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
@@ -176,7 +176,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenMatchedRides();
+            var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(2));
         }
@@ -195,7 +195,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(1));
         }
@@ -203,7 +203,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void GetOpenSoloRides_0SoloRideInDatabase_Returns0Ride()
         {
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
@@ -222,7 +222,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             }
 
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(5));
         }
@@ -240,7 +240,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
@@ -256,7 +256,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                     context.SaveChanges();
             }
 
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.First().Id, Is.EqualTo(soloRide.Id));
         }
@@ -277,7 +277,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             }
 
-            var rides = _uut.GetOpenSoloRides();
+            var rides = _uut.GetOpenSoloRidesAsync().Result;
 
             Assert.That(rides.Where(x=>soloRideForIdCheck.Id == x.Id).Count, Is.EqualTo(1));
         }
