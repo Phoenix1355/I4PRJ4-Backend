@@ -7,6 +7,7 @@ using System.Text;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
+using Api.DataAccessLayer.UnitTests.Fakes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Testing;

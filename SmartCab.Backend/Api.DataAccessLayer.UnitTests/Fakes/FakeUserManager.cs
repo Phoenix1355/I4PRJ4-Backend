@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 
-namespace Api.DataAccessLayer.UnitTests.Repositories
+namespace Api.DataAccessLayer.UnitTests.Fakes
 {
     public class FakeUserManager : UserManager<IdentityUser>
     {
