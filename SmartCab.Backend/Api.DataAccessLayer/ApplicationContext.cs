@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Api.DataAccessLayer
 {
-    public class ApplicationContext : IdentityDbContext<IdentityUser>, IApplicationContext
+    public class ApplicationContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<Ride> Rides { get; set; }
         public DbSet<SoloRide> SoloRides { get; set; }

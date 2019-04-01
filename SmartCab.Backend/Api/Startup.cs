@@ -216,11 +216,6 @@ namespace Api
         private string GetConnectionString()
         {
             var connectionString = Configuration.GetConnectionString("ConnectionString"); //will look online and then in secrets.json
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                connectionString = @"data source=.\sqlexpress;initial catalog=SmartCabDev;integrated security=true;";
-            }
-
             return connectionString;
         }
 
