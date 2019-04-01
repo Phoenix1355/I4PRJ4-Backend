@@ -143,7 +143,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void GetOpenMatchedRides_SomeRideWithStatusAndSomeWithout_Returns2Ride(RideStatus rideStatus)
+        public void GetOpenMatchedRides_SomeRideWithStatusAndSomeWithout_Returns2Ride()
         {
             using (var context = _factory.CreateContext())
             {
@@ -181,6 +181,122 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(rides.Count, Is.EqualTo(2));
         }
 
+        #endregion
+
+        #region SoloRides
+
+        [Test]
+        public void GetOpenSoloRides_1SoloRideInDatabase_Returns1Ride()
+        {
+            using (var context = _factory.CreateContext())
+            {
+                SoloRide soloRide = getSoloRide();
+                context.SoloRides.Add(soloRide);
+                context.SaveChanges();
+            }
+
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void GetOpenSoloRides_0SoloRideInDatabase_Returns0Ride()
+        {
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetOpenSoloRides_5SoloRideInDatabase_Returns5Ride()
+        {
+            using (var context = _factory.CreateContext())
+            {
+                for (int x = 0; x < 5; x++)
+                {
+                    SoloRide soloRide = getSoloRide();
+                    context.SoloRides.Add(soloRide);
+                    context.SaveChanges();
+                }
+
+            }
+
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.Count, Is.EqualTo(5));
+        }
+
+        [TestCase(RideStatus.LookingForMatch)]
+        [TestCase(RideStatus.Accepted)]
+        [TestCase(RideStatus.Debited)]
+        [TestCase(RideStatus.Expired)]
+        public void GetOpenSoloRides_RideStatusCodeIsNotLookingForMatch_Returns0Ride(RideStatus rideStatus)
+        {
+            using (var context = _factory.CreateContext())
+            {
+                SoloRide soloRide = getSoloRide(rideStatus);
+                context.SoloRides.Add(soloRide);
+                context.SaveChanges();
+            }
+
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void GetOpenSoloRides_1SoloRideInDatabase_ReturnsRightIdOfRide()
+        {
+            SoloRide soloRide = getSoloRide();
+            using (var context = _factory.CreateContext())
+            {
+                    
+                    context.SoloRides.Add(soloRide);
+                    context.SaveChanges();
+            }
+
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.First().Id, Is.EqualTo(soloRide.Id));
+        }
+
+        public void GetOpenSoloRides_ContainsRides_SpecificRideWithIdCanBeFound()
+        {
+            SoloRide soloRideForIdCheck = getSoloRide();
+            using (var context = _factory.CreateContext())
+            {
+                context.SoloRides.Add(soloRideForIdCheck);
+                context.SaveChanges();
+                for (int x = 0; x < 5; x++)
+                {
+                    SoloRide soloRide = getSoloRide();
+                    context.SoloRides.Add(soloRide);
+                    context.SaveChanges();
+                }
+
+            }
+
+            var rides = _uut.GetOpenSoloRides();
+
+            Assert.That(rides.Where(x=>soloRideForIdCheck.Id == x.Id).Count, Is.EqualTo(1));
+        }
+
+
+        private SoloRide getSoloRide(RideStatus rideStatus = RideStatus.WaitingForAccept)
+        {
+            return new SoloRide()
+            {
+                RideStatus = rideStatus,
+                Price = 100,
+                CountPassengers = 2,
+                CreatedAt = DateTime.Now,
+                DepartureTime = DateTime.Now,
+                LatestConfirmed = DateTime.Now,
+                StartDestination = new Address("City ", 8210, "Street", 23),
+                SlutDestination = new Address("City ", 8210, "Street", 23)
+            };
+        }
         #endregion
     }
 }
