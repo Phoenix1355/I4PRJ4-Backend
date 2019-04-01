@@ -53,7 +53,7 @@ namespace Api.DataAccessLayer.Repositories
                 }
                 transaction.Rollback();
 
-                string error = "No changes applied";
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
                 throw new ArgumentException(error);
             }
         }
