@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Statuses;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -23,6 +24,22 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<List<Ride>> GetAllRidesAsync()
         {
             var rides = await _context.Rides.ToListAsync();
+            return rides;
+        }
+
+        public List<SoloRide> GetOpenSoloRides()
+        {
+            var rides = _context.SoloRides
+                .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
+                .ToList();
+            return rides;
+        }
+
+        public List<MatchedRides> GetOpenMatchedRides()
+        {
+            var rides = _context.MatchedRides
+                .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
+                .ToList();
             return rides;
         }
 
