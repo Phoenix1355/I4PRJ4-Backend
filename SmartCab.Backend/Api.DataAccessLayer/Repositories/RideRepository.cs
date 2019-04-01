@@ -27,6 +27,10 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
+        /// <summary>
+        /// Returns all SoloRides with status WaitingForAccept
+        /// </summary>
+        /// <returns></returns>
         public List<SoloRide> GetOpenSoloRides()
         {
             var rides = _context.SoloRides
@@ -35,6 +39,10 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
+        /// <summary>
+        /// Returns all MatchedRides with status WaitingForAccept
+        /// </summary>
+        /// <returns></returns>
         public List<MatchedRides> GetOpenMatchedRides()
         {
             var rides = _context.MatchedRides
