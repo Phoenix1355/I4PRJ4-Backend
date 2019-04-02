@@ -19,9 +19,9 @@ namespace Api.DataAccessLayer.Models
 
         public virtual Address StartDestination { get; set; }
     
-        public int  SlutDestinationId { get; set; }
+        public int  EndDestinationId { get; set; }
 
-        public virtual Address SlutDestination { get; set; }
+        public virtual Address EndDestination { get; set; }
 
         [Required]
         public DateTime LatestConfirmed { get; set; }

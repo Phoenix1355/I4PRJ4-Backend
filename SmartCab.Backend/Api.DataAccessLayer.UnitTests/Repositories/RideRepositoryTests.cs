@@ -294,7 +294,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 DepartureTime = DateTime.Now,
                 LatestConfirmed = DateTime.Now,
                 StartDestination = new Address("City ", 8210, "Street", 23),
-                SlutDestination = new Address("City ", 8210, "Street", 23)
+                EndDestination = new Address("City ", 8210, "Street", 23)
             };
         }
         #endregion
