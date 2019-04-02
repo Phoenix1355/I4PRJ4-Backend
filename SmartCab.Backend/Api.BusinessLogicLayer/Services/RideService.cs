@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
@@ -25,27 +26,28 @@ namespace Api.BusinessLogicLayer.Services
 
         public async Task<OpenRidesResponse> GetAllOpenRidesAsync()
         {
-            //Get solo and shared rides in parallel
-            var openSoloRidesTask = GetAllOpenSoloRidesAsync();
-            var openSharedRidesTask = GetAllOpenSharedRidesAsync();
-            await Task.WhenAll(openSoloRidesTask, openSharedRidesTask);
+            throw new NotImplementedException();
+            ////Get solo and shared rides in parallel
+            //var openSoloRidesTask = GetAllOpenSoloRidesAsync();
+            //var openSharedRidesTask = GetAllOpenSharedRidesAsync();
+            //await Task.WhenAll(openSoloRidesTask, openSharedRidesTask);
 
-            //.Result is not blocking since both tasks completed using WhenAll (see above)
-            var openSoloRides = openSoloRidesTask.Result;
-            var openSharedRides = openSharedRidesTask.Result;
+            ////.Result is not blocking since both tasks completed using WhenAll (see above)
+            //var openSoloRides = openSoloRidesTask.Result;
+            //var openSharedRides = openSharedRidesTask.Result;
 
-            //Map to dto's
-            var openSoloRidesDtos = _mapper.Map<List<SoloRide>, List<SoloRideDto>>(openSoloRides);
-            //Todo map shared rides to dto's
+            ////Map to dto's
+            //var openSoloRidesDtos = _mapper.Map<List<SoloRide>, List<SoloRideDto>>(openSoloRides);
+            ////Todo map shared rides to dto's
 
-            //Wrap dto's in a response
-            var response = new OpenRidesResponse
-            {
-                OpenSoloRides = openSoloRidesDtos,
-                //OpenSharedRides = openSharedRides //TODO: Add shared ride dto's to the response
-            };
+            ////Wrap dto's in a response
+            //var response = new OpenRidesResponse
+            //{
+            //    OpenSoloRides = openSoloRidesDtos,
+            //    //OpenSharedRides = openSharedRides //TODO: Add shared ride dto's to the response
+            //};
 
-            return response;
+            //return response;
         }
 
         private Task<List<SoloRide>> GetAllOpenSoloRidesAsync()
@@ -53,10 +55,10 @@ namespace Api.BusinessLogicLayer.Services
             return _rideRepository.GetOpenSoloRidesAsync();
         }
 
-        private Task<List<SharedOpenRide>> GetAllOpenSharedRidesAsync()
-        {
-            //TODO: Replace with a call to a repository method
-            return Task.Run(() => new List<SharedOpenRide>());
-        }
+        //private Task<List<SharedOpenRide>> GetAllOpenSharedRidesAsync()
+        //{
+        //    //TODO: Replace with a call to a repository method
+        //    return Task.Run(() => new List<SharedOpenRide>());
+        //}
     }
 }
