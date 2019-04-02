@@ -8,6 +8,7 @@
     <Compile Remove="Migrations\20190320200745_InitialConstraintsAdded.cs" />
     <Compile Remove="Migrations\20190320210902_AddressConstraints.cs" />
     <Compile Remove="Migrations\20190321141734_addedApplicationUserTable.cs" />
+    <Compile Remove="Migrations\20190402132155_added-annotations-to-order-table.cs" />
   </ItemGroup>
 
   <ItemGroup>
