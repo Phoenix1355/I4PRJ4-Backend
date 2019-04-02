@@ -15,6 +15,7 @@ namespace Api.DataAccessLayer.Models
         public virtual Address StartDestination { get; set; }
     
         public virtual Address EndDestination { get; set; }
+        public virtual Customer Customer { get; set; }
 
         [Required]
         public DateTime DepartureTime { get; set; }
@@ -33,7 +34,5 @@ namespace Api.DataAccessLayer.Models
         
         [Required]
         public RideStatus Status { get; set; }
-
-        public virtual Customer Customer { get; set; }
     }
 }

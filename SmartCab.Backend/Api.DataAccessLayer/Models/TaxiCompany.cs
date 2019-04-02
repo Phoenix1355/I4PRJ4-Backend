@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Identity;
 namespace Api.DataAccessLayer.Models
 {
     /// <summary>
-    /// Contains all commen properties regarding Taxi Companies. 
+    /// This class represents a taxi company account.
     /// </summary>
+    /// <remarks>
+    /// Inherits from IdentityUser which means a taxi company object has access to all the properties in the identity framework.<br/>
+    /// </remarks>
     public class TaxiCompany : IdentityUser
     {
         [Required]
