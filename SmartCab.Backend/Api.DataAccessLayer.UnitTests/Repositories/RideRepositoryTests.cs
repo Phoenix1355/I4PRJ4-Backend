@@ -95,52 +95,52 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         //    Assert.That(rides.First().Id, Is.EqualTo(matchedRide.Id));
         //}
 
-        [Test]
-        public void GetOpenMatchedRides_NoMatchedRides_Returns0()
-        {
-            var rides = _uut.GetOpenMatchedRidesAsync().Result;
+        //[Test]
+        //public void GetOpenMatchedRides_NoMatchedRides_Returns0()
+        //{
+        //    var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
-            Assert.That(rides.Count, Is.EqualTo(0));
-        }
+        //    Assert.That(rides.Count, Is.EqualTo(0));
+        //}
 
-        [Test]
-        public void GetOpenMatchedRides_RideHaveLookingForMatch_Returns0Ride()
-        {
-            using (var context = _factory.CreateContext())
-            {
-                MatchedRides matchedRide = new MatchedRides()
-                {
-                    Status = Status.LookingForMatch
-                };
-                context.MatchedRides.Add(matchedRide);
-                context.SaveChanges();
-            }
+        //[Test]
+        //public void GetOpenMatchedRides_RideHaveLookingForMatch_Returns0Ride()
+        //{
+        //    using (var context = _factory.CreateContext())
+        //    {
+        //        MatchedRides matchedRide = new MatchedRides()
+        //        {
+        //            Status = Status.LookingForMatch
+        //        };
+        //        context.MatchedRides.Add(matchedRide);
+        //        context.SaveChanges();
+        //    }
 
-            var rides = _uut.GetOpenMatchedRidesAsync().Result;
+        //    var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
-            Assert.That(rides.Count, Is.EqualTo(0));
-        }
+        //    Assert.That(rides.Count, Is.EqualTo(0));
+        //}
 
-        [TestCase(Status.LookingForMatch)]
-        //[TestCase(Status.Accepted)] //TODO
-        [TestCase(Status.Debited)]
-        [TestCase(Status.Expired)]
-        public void GetOpenMatchedRides_RideStatusCodeIsNotLookingForMatch_Returns0Ride(Status status)
-        {
-            using (var context = _factory.CreateContext())
-            {
-                MatchedRides matchedRide = new MatchedRides()
-                {
-                    Status = status
-                };
-                context.MatchedRides.Add(matchedRide);
-                context.SaveChanges();
-            }
+        //[TestCase(Status.LookingForMatch)]
+        ////[TestCase(Status.Accepted)] //TODO
+        //[TestCase(Status.Debited)]
+        //[TestCase(Status.Expired)]
+        //public void GetOpenMatchedRides_RideStatusCodeIsNotLookingForMatch_Returns0Ride(Status status)
+        //{
+        //    using (var context = _factory.CreateContext())
+        //    {
+        //        MatchedRides matchedRide = new MatchedRides()
+        //        {
+        //            Status = status
+        //        };
+        //        context.MatchedRides.Add(matchedRide);
+        //        context.SaveChanges();
+        //    }
 
-            var rides = _uut.GetOpenMatchedRidesAsync().Result;
+        //    var rides = _uut.GetOpenMatchedRidesAsync().Result;
 
-            Assert.That(rides.Count, Is.EqualTo(0));
-        }
+        //    Assert.That(rides.Count, Is.EqualTo(0));
+        //}
 
         //[Test]
         //public void GetOpenMatchedRides_SomeRideWithStatusAndSomeWithout_Returns2Ride()

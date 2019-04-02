@@ -39,18 +39,6 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
-        /// <summary>
-        /// Returns all MatchedRides with status WaitingForAccept
-        /// </summary>
-        /// <returns></returns>
-        public Task<List<MatchedRides>> GetOpenMatchedRidesAsync()
-        {
-            var rides =  _context.MatchedRides
-                .Where(x=>x.Status == Status.Expired) //TODO: Change this method
-                .ToListAsync();
-            return rides;
-        }
-
         public async Task<Ride> GetRideByIdAsync(int id)
         {
             var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
