@@ -7,8 +7,6 @@ namespace Api.DataAccessLayer.Statuses
     public enum RideStatus
     {
         LookingForMatch,
-        WaitingForAccept,
-        Accepted,
         Debited,
         Expired
     }

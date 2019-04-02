@@ -12,30 +12,27 @@ namespace Api.DataAccessLayer.Models
     {
         public int Id { get; set; }
 
+        public virtual Address StartDestination { get; set; }
+    
+        public virtual Address EndDestination { get; set; }
+        public virtual Customer Customer { get; set; }
+
         [Required]
         public DateTime DepartureTime { get; set; }
 
-        public int StartDestinationId { get; set; }
-
-        public virtual Address StartDestination { get; set; }
-    
-        public int  EndDestinationId { get; set; }
-
-        public virtual Address EndDestination { get; set; }
-
         [Required]
-        public DateTime LatestConfirmed { get; set; }
+        public DateTime ConfirmationDeadline { get; set; }
         
         [Required]
-        public int CountPassengers { get; set; }
+        public int PassengerCount { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public decimal Price { get; set; }
         
         [Required]
-        public RideStatus RideStatus { get; set; }
+        public RideStatus Status { get; set; }
     }
 }

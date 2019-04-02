@@ -34,19 +34,7 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
-                .ToListAsync();
-            return rides;
-        }
-
-        /// <summary>
-        /// Returns all MatchedRides with status WaitingForAccept
-        /// </summary>
-        /// <returns></returns>
-        public Task<List<MatchedRides>> GetOpenMatchedRidesAsync()
-        {
-            var rides =  _context.MatchedRides
-                .Where(x=>x.RideStatus == RideStatus.WaitingForAccept)
+                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
         }

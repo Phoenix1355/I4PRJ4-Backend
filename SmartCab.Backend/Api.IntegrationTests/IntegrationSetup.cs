@@ -15,14 +15,16 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-       
+        protected InMemoryApplicationFactory<Startup> _factory;
 
         [SetUp]
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
-            var webFactory = new InMemoryApplicationFactory<Startup>(guid);
-            _client = webFactory.CreateClient();
+            
+            _factory = new InMemoryApplicationFactory<Startup>(guid);
+            
+            _client = _factory.CreateClient();
         }
 
         protected LoginRequest getLoginRequest(string email = "test12@gmail.com",

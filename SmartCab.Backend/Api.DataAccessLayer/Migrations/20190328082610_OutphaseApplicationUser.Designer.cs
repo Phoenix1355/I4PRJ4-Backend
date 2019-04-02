@@ -67,16 +67,16 @@ namespace Api.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CountPassengers");
+                    b.Property<int>("PassengerCount");
 
-                    b.Property<DateTime>("CreatedAt");
+                    b.Property<DateTime>("CreatedOn");
 
                     b.Property<DateTime>("DepartureTime");
 
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<DateTime>("LatestConfirmed");
+                    b.Property<DateTime>("ConfirmationDeadline");
 
                     b.Property<int>("Price");
 
@@ -257,7 +257,7 @@ namespace Api.DataAccessLayer.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Api.DataAccessLayer.Models.SharedOpenRide", b =>
+            modelBuilder.Entity("Api.DataAccessLayer.Models.SharedRide", b =>
                 {
                     b.HasBaseType("Api.DataAccessLayer.Models.Ride");
 
@@ -265,7 +265,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasIndex("MatchedRidesId");
 
-                    b.HasDiscriminator().HasValue("SharedOpenRide");
+                    b.HasDiscriminator().HasValue("SharedRide");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.SoloRide", b =>
@@ -408,10 +408,10 @@ namespace Api.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("Api.DataAccessLayer.Models.SharedOpenRide", b =>
+            modelBuilder.Entity("Api.DataAccessLayer.Models.SharedRide", b =>
                 {
                     b.HasOne("Api.DataAccessLayer.Models.MatchedRides", "MatchedRides")
-                        .WithMany("SharedOpenRides")
+                        .WithMany("SharedRides")
                         .HasForeignKey("MatchedRidesId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
