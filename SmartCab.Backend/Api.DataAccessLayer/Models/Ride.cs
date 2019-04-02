@@ -36,7 +36,7 @@ namespace Api.DataAccessLayer.Models
         public decimal Price { get; set; }
         
         [Required]
-        public Status Status { get; set; }
+        public RideStatus Status { get; set; }
 
         public virtual Customer Customer { get; set; }
     }

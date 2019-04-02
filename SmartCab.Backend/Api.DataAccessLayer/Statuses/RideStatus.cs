@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Api.DataAccessLayer.Statuses
 {
-    public enum Status
+    public enum RideStatus
     {
         LookingForMatch,
         Debited,

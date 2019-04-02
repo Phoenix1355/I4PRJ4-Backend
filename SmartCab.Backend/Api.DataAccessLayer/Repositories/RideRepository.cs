@@ -34,7 +34,7 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x=>x.Status == Status.Expired) //TODO: Change this method
+                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
         }
