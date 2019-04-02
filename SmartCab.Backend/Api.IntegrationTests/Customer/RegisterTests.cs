@@ -22,16 +22,32 @@ namespace Api.IntegrationTests.Customer
     [TestFixture]
     public class RegisterTest : IntegrationSetup
     {
+
         [Test]
         public async Task Register_ValidRequest_StatusOk()
         {
             var request = getRegisterRequest();
 
             var response = await PostAsync("/api/customer/register", request);
-
-            var responseBodyAsText = await response.Content.ReadAsStringAsync();
-
+            
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task Register_ValidRequest_ElementExistInDatabase()
+        {
+            var request = getRegisterRequest();
+
+            var response = await PostAsync("/api/customer/register", request);
+
+
+            using (var context = _factory.CreateContext())
+            {
+                var entry = context.Customers.Where(x => x.Email == request.Email);
+                Assert.That(entry.Count, Is.EqualTo(1));
+            }
+
+           
         }
 
         [Test]
@@ -56,6 +72,8 @@ namespace Api.IntegrationTests.Customer
             var responseSecondRequest = await PostAsync("/api/customer/register", request);
 
             Assert.That(responseSecondRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+
+           
         }
 
         //See LoginRequestTest for full range. 

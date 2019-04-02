@@ -18,7 +18,7 @@ namespace SmartCabPoc.Integration.Test
     {
 
         private string _guid;
-
+        private ServiceProvider _serviceProvider;
         public InMemoryApplicationFactory(string guid)
         {
             _guid = guid;
@@ -42,11 +42,11 @@ namespace SmartCabPoc.Integration.Test
                     options.UseInternalServiceProvider(serviceProvider);
                 });
 
-                var sp = services.BuildServiceProvider();
+                _serviceProvider = services.BuildServiceProvider();
 
                 // Create a scope to obtain a reference to the database
                 // context (ApplicationDbContext).
-                using (var scope = sp.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     var scopedServices = scope.ServiceProvider;
                     var db = scopedServices.GetRequiredService<ApplicationContext>();
@@ -56,6 +56,15 @@ namespace SmartCabPoc.Integration.Test
                 }
             
         });
+        }
+
+        public ApplicationContext CreateContext()
+        {
+            var scope = _serviceProvider.CreateScope();
+           
+                var scopedServices = scope.ServiceProvider;
+                return scopedServices.GetRequiredService<ApplicationContext>();
+            
         }
     }
 }
