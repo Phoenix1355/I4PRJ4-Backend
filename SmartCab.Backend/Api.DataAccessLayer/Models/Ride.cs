@@ -37,5 +37,7 @@ namespace Api.DataAccessLayer.Models
         
         [Required]
         public Status Status { get; set; }
+
+        public virtual Customer Customer { get; set; }
     }
 }

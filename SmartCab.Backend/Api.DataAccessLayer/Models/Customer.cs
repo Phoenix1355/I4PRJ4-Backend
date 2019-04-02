@@ -14,6 +14,8 @@ namespace Api.DataAccessLayer.Models
         [Required]
         public string Name { get; set; }
 
-        public virtual List<CustomerRides> CustomerRides { get; set; }
+        //public virtual List<CustomerRides> CustomerRides { get; set; }
+
+        public virtual List<Ride> Rides { get; set; }
     }
 }

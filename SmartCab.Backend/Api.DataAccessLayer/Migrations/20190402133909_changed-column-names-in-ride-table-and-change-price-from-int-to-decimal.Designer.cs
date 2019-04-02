@@ -453,7 +453,7 @@ namespace Api.DataAccessLayer.Migrations
             modelBuilder.Entity("Api.DataAccessLayer.Models.SharedRide", b =>
                 {
                     b.HasOne("Api.DataAccessLayer.Models.MatchedRides")
-                        .WithMany("SharedOpenRides")
+                        .WithMany("SharedRides")
                         .HasForeignKey("MatchedRidesId");
                 });
 #pragma warning restore 612, 618

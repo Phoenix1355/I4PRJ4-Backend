@@ -14,9 +14,9 @@ namespace Api.DataAccessLayer
         public DbSet<Customer> Customers { get; set; }
         public DbSet<TaxiCompany> TaxiCompanies { get; set; }
 
-        public DbSet<CustomerRides> CustomerRides { get; set; }
+        //public DbSet<CustomerRides> CustomerRides { get; set; }
         public DbSet<MatchedRides> MatchedRides { get; set; }
-        public DbSet<SharedRide> SharedOpenRides { get; set; }
+        public DbSet<SharedRide> SharedRides { get; set; }
         public DbSet<Order> Orders { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> context) : base(context)

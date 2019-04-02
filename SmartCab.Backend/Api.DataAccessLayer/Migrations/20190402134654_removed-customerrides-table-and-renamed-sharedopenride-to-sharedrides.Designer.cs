@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190402131014_annotations-added-to-address")]
-    partial class annotationsaddedtoaddress
+    [Migration("20190402134654_removed-customerrides-table-and-renamed-sharedopenride-to-sharedrides")]
+    partial class removedcustomerridestableandrenamedsharedopenridetosharedrides
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,35 +20,6 @@ namespace Api.DataAccessLayer.Migrations
                 .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CustomerId");
-
-                    b.Property<string>("CustomerId1");
-
-                    b.Property<int>("RideId");
-
-                    b.Property<int>("TaxiCompanyId");
-
-                    b.Property<string>("TaxiCompanyId1");
-
-                    b.Property<string>("status");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId1");
-
-                    b.HasIndex("RideId");
-
-                    b.HasIndex("TaxiCompanyId1");
-
-                    b.ToTable("CustomerRides");
-                });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.MatchedRides", b =>
                 {
@@ -63,15 +34,36 @@ namespace Api.DataAccessLayer.Migrations
                     b.ToTable("MatchedRides");
                 });
 
+            modelBuilder.Entity("Api.DataAccessLayer.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("Price");
+
+                    b.Property<int>("Status");
+
+                    b.Property<string>("TaxiCompanyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaxiCompanyId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Api.DataAccessLayer.Models.Ride", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("PassengerCount");
+                    b.Property<DateTime>("ConfirmationDeadline");
 
                     b.Property<DateTime>("CreatedOn");
+
+                    b.Property<string>("CustomerId");
 
                     b.Property<DateTime>("DepartureTime");
 
@@ -80,15 +72,21 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<int>("EndDestinationId");
 
-                    b.Property<DateTime>("ConfirmationDeadline");
+                    b.Property<int?>("OrderId");
 
-                    b.Property<int>("Price");
+                    b.Property<int>("PassengerCount");
 
-                    b.Property<int>("Status");
+                    b.Property<decimal>("Price");
 
                     b.Property<int>("StartDestinationId");
 
+                    b.Property<int>("Status");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Rides");
 
@@ -265,7 +263,7 @@ namespace Api.DataAccessLayer.Migrations
                 {
                     b.HasBaseType("Api.DataAccessLayer.Models.Ride");
 
-                    b.Property<int>("MatchedRidesId");
+                    b.Property<int?>("MatchedRidesId");
 
                     b.HasIndex("MatchedRidesId");
 
@@ -300,24 +298,23 @@ namespace Api.DataAccessLayer.Migrations
                     b.HasDiscriminator().HasValue("TaxiCompany");
                 });
 
-            modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
+            modelBuilder.Entity("Api.DataAccessLayer.Models.Order", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
-                        .WithMany("CustomerRides")
-                        .HasForeignKey("CustomerId1");
-
-                    b.HasOne("Api.DataAccessLayer.Models.Ride", "Ride")
-                        .WithMany()
-                        .HasForeignKey("RideId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Api.DataAccessLayer.Models.TaxiCompany", "TaxiCompany")
-                        .WithMany("CustomerRides")
-                        .HasForeignKey("TaxiCompanyId1");
+                    b.HasOne("Api.DataAccessLayer.Models.TaxiCompany")
+                        .WithMany("Orders")
+                        .HasForeignKey("TaxiCompanyId");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.Ride", b =>
                 {
+                    b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
+                        .WithMany("Rides")
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("Api.DataAccessLayer.Models.Order")
+                        .WithMany("Rides")
+                        .HasForeignKey("OrderId");
+
                     b.OwnsOne("Api.DataAccessLayer.Models.Address", "EndDestination", b1 =>
                         {
                             b1.Property<int>("Id")
@@ -418,10 +415,9 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.SharedRide", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.MatchedRides", "MatchedRides")
-                        .WithMany("SharedRides")
-                        .HasForeignKey("MatchedRidesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("Api.DataAccessLayer.Models.MatchedRides")
+                        .WithMany("SharedOpenRides")
+                        .HasForeignKey("MatchedRidesId");
                 });
 #pragma warning restore 612, 618
         }
