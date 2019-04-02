@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitTests.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 
-namespace Api.DataAccessLayer.UnitTests.Repositories
+namespace Api.DataAccessLayer.UnitTests.Fakes
 {
     public class FakeSignInManager : SignInManager<IdentityUser>
     {

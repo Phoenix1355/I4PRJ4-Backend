@@ -14,5 +14,7 @@ namespace Api.DataAccessLayer.Interfaces
         Task<Ride> AddRideAsync(Ride ride);
         Task<Ride> UpdateRideAsync(Ride ride);
         Task<Ride> DeleteRideAsync(int id);
+        Task<List<SoloRide>> GetOpenSoloRidesAsync();
+        Task<List<MatchedRides>> GetOpenMatchedRidesAsync();
     }
 }

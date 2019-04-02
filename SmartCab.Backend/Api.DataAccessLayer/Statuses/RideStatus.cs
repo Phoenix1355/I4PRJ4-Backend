@@ -4,5 +4,12 @@ using System.Text;
 
 namespace Api.DataAccessLayer.Statuses
 {
-    public enum RideStatus { LOOKING_FOR_MATCH, WAITING_FOR_ACCEPT, ACCEPTED, DEBITED, EXPIRED}
+    public enum RideStatus
+    {
+        LookingForMatch,
+        WaitingForAccept,
+        Accepted,
+        Debited,
+        Expired
+    }
 }
