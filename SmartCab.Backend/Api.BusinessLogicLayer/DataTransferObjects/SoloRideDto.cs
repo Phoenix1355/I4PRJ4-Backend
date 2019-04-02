@@ -11,5 +11,7 @@ namespace Api.BusinessLogicLayer.DataTransferObjects
         public Address EndDestination { get; set; }
         public DateTime DepartureTime { get; set; }
         public decimal Price { get; set; }
+        public int PassengerCount { get; set; }
+        public DateTime ConfirmationDeadLine { get; set; }
     }
 }

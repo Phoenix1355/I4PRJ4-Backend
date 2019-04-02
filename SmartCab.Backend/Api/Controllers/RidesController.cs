@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using AutoMapper;
@@ -39,12 +40,12 @@ namespace Api.Controllers
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<SoloRideDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OpenRidesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Open([FromHeader] string authorization)
         {
             try
             {
-                var rides = await _rideService.GetAllOpenSoloRidesAsync();
+                var rides = await _rideService.GetAllOpenRidesAsync();
                 return Ok(rides);
             }
             catch (Exception e)
