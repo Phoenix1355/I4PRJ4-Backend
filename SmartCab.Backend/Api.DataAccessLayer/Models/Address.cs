@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Models
 {
@@ -8,9 +9,14 @@ namespace Api.DataAccessLayer.Models
     [Owned]
     public class Address
     {
+        public int Id { get; set; }
+        [Required]
         public string CityName { get; set; }
+        [Required]
         public int PostalCode { get; set; }
+        [Required]
         public string StreetName { get; set; }
+        [Required]
         public int StreetNumber { get; set; }
 
         public Address(string cityName, int postalCode, string streetName, int streetNumber)
