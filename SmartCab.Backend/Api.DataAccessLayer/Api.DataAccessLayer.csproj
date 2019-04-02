@@ -10,9 +10,12 @@
     <Compile Remove="Migrations\20190321141734_addedApplicationUserTable.cs" />
     <Compile Remove="Migrations\20190402132155_added-annotations-to-order-table.cs" />
     <Compile Remove="Migrations\20190402140415_renamed-status-enum-to-ridestatus.cs" />
+    <Compile Remove="Migrations\20190402143039_added-one-to-one-between-ride-and-address.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ErikEJ.EntityFrameworkCore.DgmlBuilder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.3" />

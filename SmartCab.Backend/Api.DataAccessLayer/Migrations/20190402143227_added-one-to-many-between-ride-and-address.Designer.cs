@@ -4,20 +4,43 @@ using Api.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190402143227_added-one-to-many-between-ride-and-address")]
+    partial class addedonetomanybetweenrideandaddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Api.DataAccessLayer.Models.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CityName")
+                        .IsRequired();
+
+                    b.Property<int>("PostalCode");
+
+                    b.Property<string>("StreetName")
+                        .IsRequired();
+
+                    b.Property<int>("StreetNumber");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Address");
+                });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.Order", b =>
                 {
@@ -55,11 +78,15 @@ namespace Api.DataAccessLayer.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
+                    b.Property<int?>("EndDestinationId");
+
                     b.Property<int?>("OrderId");
 
                     b.Property<int>("PassengerCount");
 
                     b.Property<decimal>("Price");
+
+                    b.Property<int?>("StartDestinationId");
 
                     b.Property<int>("Status");
 
@@ -67,7 +94,11 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasIndex("CustomerId");
 
+                    b.HasIndex("EndDestinationId");
+
                     b.HasIndex("OrderId");
+
+                    b.HasIndex("StartDestinationId");
 
                     b.ToTable("Rides");
 
@@ -288,61 +319,17 @@ namespace Api.DataAccessLayer.Migrations
                         .WithMany("Rides")
                         .HasForeignKey("CustomerId");
 
+                    b.HasOne("Api.DataAccessLayer.Models.Address", "EndDestination")
+                        .WithMany()
+                        .HasForeignKey("EndDestinationId");
+
                     b.HasOne("Api.DataAccessLayer.Models.Order")
                         .WithMany("Rides")
                         .HasForeignKey("OrderId");
 
-                    b.OwnsOne("Api.DataAccessLayer.Models.Address", "EndDestination", b1 =>
-                        {
-                            b1.Property<int>("RideId")
-                                .ValueGeneratedOnAdd()
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                            b1.Property<string>("CityName")
-                                .IsRequired();
-
-                            b1.Property<int>("PostalCode");
-
-                            b1.Property<string>("StreetName")
-                                .IsRequired();
-
-                            b1.Property<int>("StreetNumber");
-
-                            b1.HasKey("RideId");
-
-                            b1.ToTable("Rides");
-
-                            b1.HasOne("Api.DataAccessLayer.Models.Ride")
-                                .WithOne("EndDestination")
-                                .HasForeignKey("Api.DataAccessLayer.Models.Address", "RideId")
-                                .OnDelete(DeleteBehavior.Cascade);
-                        });
-
-                    b.OwnsOne("Api.DataAccessLayer.Models.Address", "StartDestination", b1 =>
-                        {
-                            b1.Property<int>("RideId")
-                                .ValueGeneratedOnAdd()
-                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                            b1.Property<string>("CityName")
-                                .IsRequired();
-
-                            b1.Property<int>("PostalCode");
-
-                            b1.Property<string>("StreetName")
-                                .IsRequired();
-
-                            b1.Property<int>("StreetNumber");
-
-                            b1.HasKey("RideId");
-
-                            b1.ToTable("Rides");
-
-                            b1.HasOne("Api.DataAccessLayer.Models.Ride")
-                                .WithOne("StartDestination")
-                                .HasForeignKey("Api.DataAccessLayer.Models.Address", "RideId")
-                                .OnDelete(DeleteBehavior.Cascade);
-                        });
+                    b.HasOne("Api.DataAccessLayer.Models.Address", "StartDestination")
+                        .WithMany()
+                        .HasForeignKey("StartDestinationId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
