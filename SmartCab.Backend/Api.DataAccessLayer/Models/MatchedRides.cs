@@ -10,8 +10,8 @@ namespace Api.DataAccessLayer.Models
     {
         public int Id { get; set; }
 
-        public virtual List<SharedOpenRide> SharedOpenRides { get; set; }
+        public virtual List<SharedRide> SharedOpenRides { get; set; }
 
-        public RideStatus RideStatus { get; set; }
+        public Status Status { get; set; }
     }
 }

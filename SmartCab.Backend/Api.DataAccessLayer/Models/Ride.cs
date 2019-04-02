@@ -24,18 +24,18 @@ namespace Api.DataAccessLayer.Models
         public virtual Address EndDestination { get; set; }
 
         [Required]
-        public DateTime LatestConfirmed { get; set; }
+        public DateTime ConfirmationDeadline { get; set; }
         
         [Required]
-        public int CountPassengers { get; set; }
+        public int PassengerCount { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public decimal Price { get; set; }
         
         [Required]
-        public RideStatus RideStatus { get; set; }
+        public Status Status { get; set; }
     }
 }

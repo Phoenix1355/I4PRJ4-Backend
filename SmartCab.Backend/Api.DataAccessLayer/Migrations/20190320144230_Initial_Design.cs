@@ -9,13 +9,13 @@ namespace Api.DataAccessLayer.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "CountPassengers",
+                name: "PassengerCount",
                 table: "Rides",
                 nullable: false,
                 defaultValue: 0);
 
             migrationBuilder.AddColumn<DateTime>(
-                name: "CreatedAt",
+                name: "CreatedOn",
                 table: "Rides",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
@@ -27,7 +27,7 @@ namespace Api.DataAccessLayer.Migrations
                 defaultValue: "");
 
             migrationBuilder.AddColumn<DateTime>(
-                name: "LatestConfirmed",
+                name: "ConfirmationDeadline",
                 table: "Rides",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
@@ -206,11 +206,11 @@ namespace Api.DataAccessLayer.Migrations
                 table: "Rides");
 
             migrationBuilder.DropColumn(
-                name: "CountPassengers",
+                name: "PassengerCount",
                 table: "Rides");
 
             migrationBuilder.DropColumn(
-                name: "CreatedAt",
+                name: "CreatedOn",
                 table: "Rides");
 
             migrationBuilder.DropColumn(
@@ -218,7 +218,7 @@ namespace Api.DataAccessLayer.Migrations
                 table: "Rides");
 
             migrationBuilder.DropColumn(
-                name: "LatestConfirmed",
+                name: "ConfirmationDeadline",
                 table: "Rides");
 
             migrationBuilder.DropColumn(

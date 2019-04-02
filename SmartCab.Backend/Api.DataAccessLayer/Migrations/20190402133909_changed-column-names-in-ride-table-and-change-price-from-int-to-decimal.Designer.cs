@@ -10,109 +10,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190320201324_InitialConstraintsAdded")]
-    partial class InitialConstraintsAdded
+    [Migration("20190402133909_changed-column-names-in-ride-table-and-change-price-from-int-to-decimal")]
+    partial class changedcolumnnamesinridetableandchangepricefrominttodecimal
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Api.DataAccessLayer.Models.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("CityName");
-
-                    b.Property<int>("PostalCode");
-
-                    b.Property<string>("StreetName");
-
-                    b.Property<int>("StreetNumber");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Address");
-                });
-
-            modelBuilder.Entity("Api.DataAccessLayer.Models.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256);
-
-                    b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("Api.DataAccessLayer.Models.Customer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired();
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId")
-                        .IsUnique();
-
-                    b.ToTable("Customers");
-                });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
                 {
@@ -122,19 +29,23 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<int>("CustomerId");
 
+                    b.Property<string>("CustomerId1");
+
                     b.Property<int>("RideId");
 
                     b.Property<int>("TaxiCompanyId");
+
+                    b.Property<string>("TaxiCompanyId1");
 
                     b.Property<string>("status");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId1");
 
                     b.HasIndex("RideId");
 
-                    b.HasIndex("TaxiCompanyId");
+                    b.HasIndex("TaxiCompanyId1");
 
                     b.ToTable("CustomerRides");
                 });
@@ -145,9 +56,30 @@ namespace Api.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("Status");
+
                     b.HasKey("Id");
 
                     b.ToTable("MatchedRides");
+                });
+
+            modelBuilder.Entity("Api.DataAccessLayer.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("Price");
+
+                    b.Property<int>("Status");
+
+                    b.Property<string>("TaxiCompanyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaxiCompanyId");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.Ride", b =>
@@ -156,7 +88,7 @@ namespace Api.DataAccessLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("PassengerCount");
+                    b.Property<DateTime>("ConfirmationDeadline");
 
                     b.Property<DateTime>("CreatedOn");
 
@@ -165,44 +97,25 @@ namespace Api.DataAccessLayer.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<DateTime>("ConfirmationDeadline");
+                    b.Property<int>("EndDestinationId");
 
-                    b.Property<int>("Price");
+                    b.Property<int?>("OrderId");
 
-                    b.Property<int?>("SlutDestinationId");
+                    b.Property<int>("PassengerCount");
 
-                    b.Property<int?>("StartDestinationId");
+                    b.Property<decimal>("Price");
+
+                    b.Property<int>("StartDestinationId");
+
+                    b.Property<int>("Status");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SlutDestinationId");
-
-                    b.HasIndex("StartDestinationId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Rides");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Ride");
-                });
-
-            modelBuilder.Entity("Api.DataAccessLayer.Models.TaxiCompany", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId")
-                        .IsUnique()
-                        .HasFilter("[ApplicationUserId] IS NOT NULL");
-
-                    b.ToTable("TaxiCompanies");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -247,6 +160,62 @@ namespace Api.DataAccessLayer.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccessFailedCount");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -319,7 +288,7 @@ namespace Api.DataAccessLayer.Migrations
                 {
                     b.HasBaseType("Api.DataAccessLayer.Models.Ride");
 
-                    b.Property<int>("MatchedRidesId");
+                    b.Property<int?>("MatchedRidesId");
 
                     b.HasIndex("MatchedRidesId");
 
@@ -335,18 +304,30 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.Customer", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("Customer")
-                        .HasForeignKey("Api.DataAccessLayer.Models.Customer", "ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasDiscriminator().HasValue("Customer");
+                });
+
+            modelBuilder.Entity("Api.DataAccessLayer.Models.TaxiCompany", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnName("TaxiCompany_Name");
+
+                    b.HasDiscriminator().HasValue("TaxiCompany");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.CustomerRides", b =>
                 {
                     b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
                         .WithMany("CustomerRides")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CustomerId1");
 
                     b.HasOne("Api.DataAccessLayer.Models.Ride", "Ride")
                         .WithMany()
@@ -354,27 +335,74 @@ namespace Api.DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Api.DataAccessLayer.Models.TaxiCompany", "TaxiCompany")
-                        .WithMany("CustomerRides")
-                        .HasForeignKey("TaxiCompanyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("TaxiCompanyId1");
+                });
+
+            modelBuilder.Entity("Api.DataAccessLayer.Models.Order", b =>
+                {
+                    b.HasOne("Api.DataAccessLayer.Models.TaxiCompany")
+                        .WithMany("Orders")
+                        .HasForeignKey("TaxiCompanyId");
                 });
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.Ride", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.Address", "SlutDestination")
-                        .WithMany()
-                        .HasForeignKey("SlutDestinationId");
+                    b.HasOne("Api.DataAccessLayer.Models.Order")
+                        .WithMany("Rides")
+                        .HasForeignKey("OrderId");
 
-                    b.HasOne("Api.DataAccessLayer.Models.Address", "StartDestination")
-                        .WithMany()
-                        .HasForeignKey("StartDestinationId");
-                });
+                    b.OwnsOne("Api.DataAccessLayer.Models.Address", "EndDestination", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Api.DataAccessLayer.Models.TaxiCompany", b =>
-                {
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("TaxiCompany")
-                        .HasForeignKey("Api.DataAccessLayer.Models.TaxiCompany", "ApplicationUserId");
+                            b1.Property<string>("CityName")
+                                .IsRequired();
+
+                            b1.Property<int>("PostalCode");
+
+                            b1.Property<string>("StreetName")
+                                .IsRequired();
+
+                            b1.Property<int>("StreetNumber");
+
+                            b1.HasKey("Id");
+
+                            b1.ToTable("Rides");
+
+                            b1.HasOne("Api.DataAccessLayer.Models.Ride")
+                                .WithOne("EndDestination")
+                                .HasForeignKey("Api.DataAccessLayer.Models.Address", "Id")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
+
+                    b.OwnsOne("Api.DataAccessLayer.Models.Address", "StartDestination", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("CityName")
+                                .IsRequired();
+
+                            b1.Property<int>("PostalCode");
+
+                            b1.Property<string>("StreetName")
+                                .IsRequired();
+
+                            b1.Property<int>("StreetNumber");
+
+                            b1.HasKey("Id");
+
+                            b1.ToTable("Rides");
+
+                            b1.HasOne("Api.DataAccessLayer.Models.Ride")
+                                .WithOne("StartDestination")
+                                .HasForeignKey("Api.DataAccessLayer.Models.Address", "Id")
+                                .OnDelete(DeleteBehavior.Cascade);
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -387,7 +415,7 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -395,7 +423,7 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -408,7 +436,7 @@ namespace Api.DataAccessLayer.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -416,7 +444,7 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.ApplicationUser")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -424,10 +452,9 @@ namespace Api.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Api.DataAccessLayer.Models.SharedRide", b =>
                 {
-                    b.HasOne("Api.DataAccessLayer.Models.MatchedRides", "MatchedRides")
+                    b.HasOne("Api.DataAccessLayer.Models.MatchedRides")
                         .WithMany("SharedOpenRides")
-                        .HasForeignKey("MatchedRidesId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MatchedRidesId");
                 });
 #pragma warning restore 612, 618
         }
