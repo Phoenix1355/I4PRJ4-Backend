@@ -103,6 +103,7 @@ namespace Api
                       .ReverseMap(); //Setup two way map for CreateRideRequest
 
                 mapper.CreateMap<Customer, CustomerDto>();
+                mapper.CreateMap<SoloRide, SoloRideDto>();
             });
         }
 

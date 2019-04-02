@@ -1,47 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using AutoMapper;
 
 namespace Api.BusinessLogicLayer.Services
 {
     /// <summary>
     /// This class contains business logic related to "Rides".
-    /// Fairly redundant at the moment, but its here to show the intent with the business logic layer.
     /// </summary>
     public class RideService : IRideService
     {
         private readonly IRideRepository _rideRepository;
+        private readonly IMapper _mapper;
 
-        public RideService(IRideRepository rideRepository)
+        public RideService(IRideRepository rideRepository, IMapper mapper)
         {
             _rideRepository = rideRepository;
+            _mapper = mapper;
         }
 
-        public async Task<List<Ride>> GetAllRidesAsync()
+        public async Task<List<SoloRideDto>> GetAllOpenSoloRidesAsync()
         {
-            return await _rideRepository.GetAllRidesAsync();
-        }
-
-        public async Task<Ride> GetRideByIdAsync(int id)
-        {
-            return await _rideRepository.GetRideByIdAsync(id);
-        }
-
-        public async Task<Ride> AddRideAsync(Ride ride)
-        {
-            return await _rideRepository.AddRideAsync(ride);
-        }
-
-        public async Task<Ride> UpdateRideAsync(Ride ride)
-        {
-            return await _rideRepository.UpdateRideAsync(ride);
-        }
-
-        public async Task<Ride> DeleteRideAsync(int id)
-        {
-            return await _rideRepository.DeleteRideAsync(id);
+            var openSoloRides = await _rideRepository.GetOpenSoloRidesAsync();
+            var openSoloRidesDtos = _mapper.Map <List<SoloRide>, List<SoloRideDto>>(openSoloRides);
+            return openSoloRidesDtos;
         }
     }
 }
