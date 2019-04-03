@@ -103,6 +103,11 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<Order> AddOrderFromRide(Ride ride)
         {
+            if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
+            {
+                throw new ArgumentException("Already an order for given ride. ");
+            }
+
             Order order = new Order()
             {
                 Price = ride.Price,
