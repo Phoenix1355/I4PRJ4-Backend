@@ -47,8 +47,7 @@ namespace Api.IntegrationTests.Customer
 
             var response = await PostAsync("/api/customer/login", loginRequest);
 
-            var responseObject =
-                JsonConvert.DeserializeObject<LoginResponse>(await response.Content.ReadAsStringAsync());
+            var responseObject = GetObject<LoginResponse>(response);
 
             Assert.That(responseObject.Customer.Email, Is.EqualTo(request.Email));
         }
