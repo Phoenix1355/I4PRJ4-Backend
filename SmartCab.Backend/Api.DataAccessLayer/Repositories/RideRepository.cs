@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
+using Api.DataAccessLayer.Migrations;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -39,18 +41,65 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
-        public async Task<Ride> GetRideByIdAsync(int id)
+        public async Task<Ride> CreateSoloRideAsync(Ride ride)
         {
-            var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                //Reserves amount
+                await ReservePriceFromCustomer(ride.CustomerId, ride.Price);
+
+                //adds SoloRide
+                ride = await AddRide(ride);
+
+                //Adds order
+                await AddOrderFromRide(ride);
+                
+                //Reserve from Customer
+                transaction.Commit();
+                return ride;
+            }
+        }
+
+        private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
+        {
+            var customer = await _context.Customers.FindAsync(CustomerId);
+            if ((customer.Balance - customer.ReservedAmount) > price)
+            {
+                customer.ReservedAmount -= price;
+                _context.Customers.Update(customer);
+                _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Not enough credit");
+            }
+        }
+
+        private async Task<Ride> AddRide(Ride ride)
+        {
+            _context.Rides.AddAsync(ride);
+            _context.SaveChangesAsync();
             return ride;
         }
 
-        public async Task<Ride> AddRideAsync(Ride ride)
+        private async Task<Order> AddOrderFromRide(Ride ride)
         {
-            await _context.Rides.AddAsync(ride);
-            await _context.SaveChangesAsync();
-            return ride;
+            Order order = new Order()
+            {
+                Price = ride.Price,
+                Rides = new List<Ride>(),
+                Status = OrderStatus.WaitingForAccept
+            };
+            order.Rides.Add(ride);
+
+            _context.Orders.AddAsync(order);
+            _context.SaveChangesAsync();
+            return order;
         }
+
+
+
+
 
         public async Task<Ride> UpdateRideAsync(Ride ride)
         {

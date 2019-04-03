@@ -26,7 +26,7 @@ namespace Api.BusinessLogicLayer.Services
 
         public async Task<Ride> GetRideByIdAsync(int id)
         {
-            return await _rideRepository.GetRideByIdAsync(id);
+            return await _rideRepository.CreateSoloRideAsync(id);
         }
 
         public async Task<Ride> AddRideAsync(Ride ride)
