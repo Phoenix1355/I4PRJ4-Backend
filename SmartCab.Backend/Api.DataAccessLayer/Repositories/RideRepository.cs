@@ -41,15 +41,25 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
+        public async Task<Ride> CreateSharedRideAsync(Ride ride)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                //Add ride and reserves amount.
+                ride = await AddRideAndReserveFundsForRide(ride);
+
+                //Reserve from Customer
+                transaction.Commit();
+                return ride;
+            }
+        }
+
         public async Task<Ride> CreateSoloRideAsync(Ride ride)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
-                //Reserves amount
-                await ReservePriceFromCustomer(ride.CustomerId, ride.Price);
-
-                //adds SoloRide
-                ride = await AddRide(ride);
+                //Add ride and reserves amount.
+                ride = await AddRideAndReserveFundsForRide(ride);
 
                 //Adds order
                 await AddOrderFromRide(ride);
@@ -58,6 +68,15 @@ namespace Api.DataAccessLayer.Repositories
                 transaction.Commit();
                 return ride;
             }
+        }
+
+        private async Task<Ride> AddRideAndReserveFundsForRide(Ride ride)
+        {
+            //Reserve funds. 
+            await ReservePriceFromCustomer(ride.CustomerId, ride.Price);
+
+            //adds SoloRide
+            return ride = await AddRide(ride);
         }
 
         private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
@@ -88,7 +107,7 @@ namespace Api.DataAccessLayer.Repositories
             {
                 Price = ride.Price,
                 Rides = new List<Ride>(),
-                Status = OrderStatus.WaitingForAccept
+                Status = OrderStatus.WaitingForAccept,
             };
             order.Rides.Add(ride);
 
