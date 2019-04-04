@@ -80,15 +80,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
         }
 
-        [Test]
-        public async Task CreateSoloRideAsync_ValidRideAndCustomerNotInDatabase_ThrowsError()
-        {
-           
-            Ride ride = CreateSoloRide("Invalid_String_Id");
-
-            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
-            
-        }
 
         [Test]
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_CustomerReservedRightAmount()
@@ -112,7 +103,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             ride = await _uut.AddSoloRideAsync((SoloRide)ride);
             ;
-            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<MultipleOrderException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -120,7 +111,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(0,0);
             Ride ride = CreateSoloRide(customer.Id);;
-            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<InsufficientFundsException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -136,7 +127,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(99, 0);
             Ride ride = CreateSoloRide(customer.Id); ;
-            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<InsufficientFundsException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
         #endregion
 

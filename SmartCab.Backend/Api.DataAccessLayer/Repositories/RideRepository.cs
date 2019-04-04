@@ -93,7 +93,7 @@ namespace Api.DataAccessLayer.Repositories
             }
             else
             {
-                throw new IdentityException("Not enough credit");
+                throw new InsufficientFundsException("Not enough credit");
             }
         }
 
@@ -114,7 +114,7 @@ namespace Api.DataAccessLayer.Repositories
         {
             if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
             {
-                throw new IdentityException("Already an order for given ride. ");
+                throw new MultipleOrderException("Already an order for given ride. ");
             }
 
             Order order = new Order()
