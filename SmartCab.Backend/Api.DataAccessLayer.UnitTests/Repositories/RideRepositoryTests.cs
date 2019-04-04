@@ -7,6 +7,7 @@ using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
+using CustomExceptions;
 using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
@@ -60,9 +61,25 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             using (var context = _factory.CreateContext())
             {
                 Assert.That(context.Orders.Count(o=>o.Rides.Contains(ride)), Is.EqualTo(1));
+                
+            }
+        }
+
+        [Test]
+        public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_OrderHasRightPrice()
+        {
+            var customer = SeedDatabaseWithCustomer();
+            Ride ride = CreateSoloRide(customer.Id);
+
+            ride = await _uut.AddSoloRideAsync((SoloRide)ride);
+
+            using (var context = _factory.CreateContext())
+            {
+                
                 Assert.That(context.Orders.Where(o => o.Rides.Contains(ride)).FirstOrDefault().Price, Is.EqualTo(ride.Price));
             }
         }
+
 
         [Test]
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_CustomerReservedRightAmount()
@@ -79,14 +96,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_ThrowsException()
+        public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFundsTwicesSameRide_ThrowsException()
         {
             var customer = SeedDatabaseWithCustomer();
             Ride ride = CreateSoloRide(customer.Id);
 
             ride = await _uut.AddSoloRideAsync((SoloRide)ride);
             ;
-            Assert.ThrowsAsync<ArgumentException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<MultipleOrderException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -94,7 +111,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(0,0);
             Ride ride = CreateSoloRide(customer.Id);;
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<InsufficientFundsException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -110,7 +127,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(99, 0);
             Ride ride = CreateSoloRide(customer.Id); ;
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<InsufficientFundsException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
         #endregion
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
@@ -8,6 +7,7 @@ using Api.DataAccessLayer.Migrations;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -37,7 +37,7 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x => x.Status == RideStatus.Expired) //TODO: Change this method
+                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
         }
@@ -65,7 +65,7 @@ namespace Api.DataAccessLayer.Repositories
 
                 //Adds order
                 await AddOrderFromRide(ride);
-
+                
                 //Reserve from Customer
                 transaction.Commit();
                 return ride;
@@ -81,33 +81,40 @@ namespace Api.DataAccessLayer.Repositories
             return await AddRide(ride);
         }
 
-        private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
+        private void ReservePriceFromCustomer(string customerId, decimal price)
         {
-            var customer = _context.Customers.Find(CustomerId);
+            var customer = FindsCustomerElseThrow(customerId);
+
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
                 customer.ReservedAmount += price;
                 _context.Customers.Update(customer);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Not enough credit");
+                throw new InsufficientFundsException("Not enough credit");
             }
+        }
+
+        private Customer FindsCustomerElseThrow(string customerId)
+        {
+            var customer = _context.Customers.Find(customerId);
+            return customer;
         }
 
         private async Task<SoloRide> AddRide(SoloRide ride)
         {
-            await _context.Rides.AddAsync(ride);
+            _context.Rides.Update(ride);
             await _context.SaveChangesAsync();
             return ride;
         }
 
         private async Task<Order> AddOrderFromRide(Ride ride)
         {
-            if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
+            if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
             {
-                throw new ArgumentException("Already an order for given ride. ");
+                throw new MultipleOrderException("Already an order for given ride. ");
             }
 
             Order order = new Order()
