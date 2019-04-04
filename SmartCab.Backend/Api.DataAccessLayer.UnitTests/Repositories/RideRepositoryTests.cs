@@ -7,6 +7,7 @@ using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
+using CustomExceptions;
 using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
@@ -80,6 +81,16 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
+        public async Task CreateSoloRideAsync_ValidRideAndCustomerNotInDatabase_ThrowsError()
+        {
+           
+            Ride ride = CreateSoloRide("Invalid_String_Id");
+
+            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            
+        }
+
+        [Test]
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_CustomerReservedRightAmount()
         {
             var customer = SeedDatabaseWithCustomer();
@@ -94,14 +105,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_ThrowsException()
+        public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFundsTwicesSameRide_ThrowsException()
         {
             var customer = SeedDatabaseWithCustomer();
             Ride ride = CreateSoloRide(customer.Id);
 
             ride = await _uut.AddSoloRideAsync((SoloRide)ride);
             ;
-            Assert.ThrowsAsync<ArgumentException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<RequestValidationFailedException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -109,7 +120,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(0,0);
             Ride ride = CreateSoloRide(customer.Id);;
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -125,7 +136,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(99, 0);
             Ride ride = CreateSoloRide(customer.Id); ;
-            Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
         #endregion
 

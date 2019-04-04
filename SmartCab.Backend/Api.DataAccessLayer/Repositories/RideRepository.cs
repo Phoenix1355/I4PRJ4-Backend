@@ -7,6 +7,7 @@ using Api.DataAccessLayer.Migrations;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -80,19 +81,31 @@ namespace Api.DataAccessLayer.Repositories
             return await AddRide(ride);
         }
 
-        private void ReservePriceFromCustomer(string CustomerId, decimal price)
+        private void ReservePriceFromCustomer(string customerId, decimal price)
         {
-            var customer = _context.Customers.Find(CustomerId);
+            var customer = FindsCustomerElseThrow(customerId);
+
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
                 customer.ReservedAmount += price;
                 _context.Customers.Update(customer);
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             else
             {
-                throw new ArgumentOutOfRangeException("Not enough credit");
+                throw new RequestValidationFailedException("Not enough credit");
             }
+        }
+
+        private Customer FindsCustomerElseThrow(string customerId)
+        {
+            var customer = _context.Customers.Find(customerId);
+            if (customer == null)
+            {
+                throw new RequestValidationFailedException("No customer with Id");
+            }
+
+            return customer;
         }
 
         private async Task<SoloRide> AddRide(SoloRide ride)
@@ -106,7 +119,7 @@ namespace Api.DataAccessLayer.Repositories
         {
             if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
             {
-                throw new ArgumentException("Already an order for given ride. ");
+                throw new RequestValidationFailedException("Already an order for given ride. ");
             }
 
             Order order = new Order()
@@ -117,8 +130,8 @@ namespace Api.DataAccessLayer.Repositories
             };
             order.Rides.Add(ride);
 
-            _context.Orders.AddAsync(order);
-            _context.SaveChangesAsync();
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
             return order;
         }
 
