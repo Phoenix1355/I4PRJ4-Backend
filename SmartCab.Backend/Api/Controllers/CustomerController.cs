@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -61,11 +63,15 @@ namespace Api.Controllers
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -87,13 +93,17 @@ namespace Api.Controllers
                 var response = await _customerService.LoginCustomerAsync(request);
                 return Ok(response);
             }
-            catch (ArgumentException e)
+            catch (ValidationException e)
             {
-                return BadRequest(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 

@@ -5,19 +5,19 @@ namespace CustomExceptions
     /// <summary>
     /// This exceptions is thrown whenever a JSON Web Token contains an invalid "UserId" claim.
     /// </summary>
-    public class UserIdInTokenInvalid : Exception
+    public class UserIdInvalidException : Exception
     {
-        public UserIdInTokenInvalid()
+        public UserIdInvalidException()
         {
             
         }
 
-        public UserIdInTokenInvalid(string message) : base(message)
+        public UserIdInvalidException(string message) : base(message)
         {
 
         }
 
-        public UserIdInTokenInvalid(string message, Exception inner) : base(message, inner)
+        public UserIdInvalidException(string message, Exception inner) : base(message, inner)
         {
 
         }

@@ -30,10 +30,33 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             configuration[JwtExpire].Returns(JwtExpireValue);
             var jwtService = new JwtService(configuration);
 
-            //We are not testing the role, so lets hard code it
+            //We are not testing the role and id, so lets hard code those
             var role = "Customer";
+            var id = "someId";
 
-            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
+            var serializedToken = jwtService.GenerateJwtToken(id, email, role);
+
+            var token = new JwtSecurityToken(serializedToken);
+            var emailInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            Assert.That(email, Is.EqualTo(emailInToken));
+        }
+
+        [TestCase("1")]
+        [TestCase("SomeId")]
+        [TestCase("guid123-guid123-guid123-guid123-guid123")]
+        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithASpecifiedUserId(string id)
+        {
+            //Create uut
+            var configuration = Substitute.For<IConfiguration>();
+            configuration[JwtSecret].Returns(JwtSecretValue);
+            configuration[JwtExpire].Returns(JwtExpireValue);
+            var jwtService = new JwtService(configuration);
+
+            //We are not testing the role and email, so lets hard code those
+            var role = "Customer";
+            var email = "test@gmail.com";
+
+            var serializedToken = jwtService.GenerateJwtToken(id, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var emailInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
@@ -43,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [TestCase("Customer")]
         [TestCase("TaxiCompany")]
         [TestCase("President")]
-        public void Method_Scenario_ExpectedResult(string role)
+        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithASpecifiedRole(string role)
         {
             //Create uut
             var configuration = Substitute.For<IConfiguration>();
@@ -51,10 +74,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             configuration[JwtExpire].Returns(JwtExpireValue);
             var jwtService = new JwtService(configuration);
 
-            //We are not testing the email, so lets hard code it
+            //We are not testing the email and id, so lets hard code those
             var email = "test@gmail.com";
+            var id = "someId";
 
-            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
+            var serializedToken = jwtService.GenerateJwtToken(id, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var roleInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
@@ -74,15 +98,16 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             configuration[JwtExpire].Returns(lengthInSeconds.ToString());
             var jwtService = new JwtService(configuration);
 
-            //We are not testing the email and role, so lets hard code those
+            //We are not testing the email, role or id, so lets hard code those
             var role = "Customer";
             var email = "test@gmail.com";
+            var id = "someId";
 
             //Create a datetime object and remove milliseconds. If milliseconds are not removed, all tests will fails
             var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
-            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
+            var serializedToken = jwtService.GenerateJwtToken(id, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var expirationDateTimeInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Expiration)?.Value;
@@ -102,14 +127,15 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             configuration[JwtExpire].Returns(lengthInSeconds.ToString());
             var jwtService = new JwtService(configuration);
 
-            //We are not testing the email and role, so lets hard code those
+            //We are not testing the email, role or id, so lets hard code those
             var role = "Customer";
             var email = "test@gmail.com";
+            var id = "someId";
 
             var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
-            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
+            var serializedToken = jwtService.GenerateJwtToken(id, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var expirationDateTimeInToken = DateTime.UnixEpoch.AddSeconds(token.Payload.Exp.Value).ToLocalTime(); //To local time to avoid errors because of winter/summer time

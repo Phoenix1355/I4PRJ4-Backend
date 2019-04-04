@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -50,13 +52,15 @@ namespace Api.Controllers
         {
             try
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("Not implemented yet");
                 //var rides = await _rideService.GetAllRidesAsync();
                 //return Ok(rides);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -79,29 +83,36 @@ namespace Api.Controllers
         {
             try
             {
+                throw new NotImplementedException("Not implemented yet");
                 var ride = new Ride(); //todo fetch details
                 return Ok(ride);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
-
         /// <summary>
-        /// Creates a new ride
+        /// Creates a new ride and ties the ride to the customer sending the request.
         /// </summary>
+        /// <remarks>
+        /// Required role: "Customer".
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">Information about the ride that should be updated.</param>
         /// <returns>The created ride.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [ProducesResponseType(typeof(CreateRideResponse), StatusCodes.Status200OK)]
         [Route("[action]")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateRideRequest request)
+        public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
             try
             {
@@ -109,40 +120,60 @@ namespace Api.Controllers
                 
                 if (string.IsNullOrEmpty(customerId))
                 {
-                    throw new UserIdInTokenInvalid(
+                    throw new UserIdInvalidException(
                         $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
                 }
 
                 var response = await _rideService.AddRideAsync(request, customerId);
                 return Ok(response);
             }
-            catch (UserIdInTokenInvalid e)
+            catch (UserIdInvalidException e)
             {
-                return Unauthorized(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return Unauthorized(response);
             }
-            catch (ArgumentException e)
+            catch (ValidationException e)
             {
-                return BadRequest(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
         /// <summary>
         /// Updates the ride with the supplied ID so it is accepted.
         /// </summary>
+        /// <remarks>
+        /// Required role: "TaxiCompany"
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="id">The id of the ride that should be accepted.</param>
         /// <returns></returns>
         /// <response code="400">Could mean that the ride was no longer in an "accepted" state when the request made it to the server</response>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
         [Route("{id}/[action]")]
+        [Produces("application/json")]
         [HttpPut]
         public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
         {
-            return Ok($"The ride with {id} is now successfully marked as accepted.");
+            try
+            {
+                throw new NotImplementedException("Not implemented yet");
+                return Ok($"The ride with {id} is now successfully marked as accepted.");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
     }
 }
