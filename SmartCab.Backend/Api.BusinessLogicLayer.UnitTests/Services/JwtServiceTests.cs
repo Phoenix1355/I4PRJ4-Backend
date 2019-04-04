@@ -33,7 +33,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             //We are not testing the role, so lets hard code it
             var role = "Customer";
 
-            var serializedToken = jwtService.GenerateJwtToken(email, role);
+            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var emailInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
@@ -54,7 +54,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             //We are not testing the email, so lets hard code it
             var email = "test@gmail.com";
 
-            var serializedToken = jwtService.GenerateJwtToken(email, role);
+            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var roleInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
@@ -82,7 +82,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
-            var serializedToken = jwtService.GenerateJwtToken(email, role);
+            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var expirationDateTimeInToken = token.Payload.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Expiration)?.Value;
@@ -109,7 +109,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
-            var serializedToken = jwtService.GenerateJwtToken(email, role);
+            var serializedToken = jwtService.GenerateJwtToken(null, email, role);
 
             var token = new JwtSecurityToken(serializedToken);
             var expirationDateTimeInToken = DateTime.UnixEpoch.AddSeconds(token.Payload.Exp.Value).ToLocalTime(); //To local time to avoid errors because of winter/summer time

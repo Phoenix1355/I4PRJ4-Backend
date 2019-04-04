@@ -46,6 +46,8 @@ namespace Api.Controllers
         /// </remarks>
         /// <param name="request">The data needed to create the customer</param>
         /// <returns>A valid JWT token that is tied to the created customer</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
@@ -72,6 +74,8 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="request">The email and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
@@ -99,7 +103,7 @@ namespace Api.Controllers
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">The data used to update the customer account</param>
         /// <returns></returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="401">If the customer was not logged in already</response>
         [Route("[action]")]
         [HttpPut]
         public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditCustomerRequest request)

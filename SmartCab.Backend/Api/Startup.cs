@@ -8,6 +8,8 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
 using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
@@ -103,6 +105,12 @@ namespace Api
                       .ReverseMap(); //Setup two way map for CreateRideRequest
 
                 mapper.CreateMap<Customer, CustomerDto>();
+                mapper.CreateMap<SoloRide, SoloRideDto>();
+                mapper.CreateMap<CreateRideRequest, SoloRide>();
+                mapper.CreateMap<CreateRideRequest, SharedRide>();
+                mapper.CreateMap<SoloRide, CreateRideResponse>();
+                mapper.CreateMap<SharedRide, CreateRideResponse>();
+                mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
             });
         }
 

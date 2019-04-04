@@ -1,11 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using AutoMapper;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using CustomExceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,18 +35,59 @@ namespace Api.Controllers
         /// <summary>
         /// Returns all open rides stored in the system.
         /// </summary>
-        /// <param name="authorization">A valid JWT token that is associated to a taxi company account</param>
+        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
         /// <returns>All open rides stored in the system</returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="401">
+        /// An invalid JWT token was provided in the authorization header.<br/>
+        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
+        /// </response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Ride>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OpenRidesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Open([FromHeader] string authorization)
         {
-            var rides = new List<Ride>(); //TODO make some call to service layer
-            return Ok(rides);
+            try
+            {
+                throw new NotImplementedException();
+                //var rides = await _rideService.GetAllRidesAsync();
+                //return Ok(rides);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+            }
         }
+
+        /// <summary>
+        /// Returns all available details about a specific ride.
+        /// </summary>
+        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
+        /// <param name="id">The id of the ride for which the details is returned.</param>
+        /// <returns>Details about a specific ride.</returns>
+        /// <response code="401">
+        /// An invalid JWT token was provided in the authorization header.<br/>
+        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
+        /// </response>
+        /// <response code="500">If an internal server error occured.</response>
+        [Produces("application/json")]
+        [Route("{id}/[action]")]
+        [HttpGet]
+        [ProducesResponseType(typeof(SoloRide), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Details([FromHeader] string authorization, int id)
+        {
+            try
+            {
+                var ride = new Ride(); //todo fetch details
+                return Ok(ride);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+            }
+        }
+
 
         /// <summary>
         /// Creates a new ride
@@ -47,14 +96,38 @@ namespace Api.Controllers
         /// <param name="request">Information about the ride that should be updated.</param>
         /// <returns>The created ride.</returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CreateRideResponse), StatusCodes.Status200OK)]
         [Route("[action]")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateRideRequest request)
         {
-            var ride = new Ride(); //TODO call service layer
-            return Ok(ride);
+            try
+            {
+                var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+                
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    throw new UserIdInTokenInvalid(
+                        $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+                }
+
+                var response = await _rideService.AddRideAsync(request, customerId);
+                return Ok(response);
+            }
+            catch (UserIdInTokenInvalid e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+            }
         }
 
         /// <summary>

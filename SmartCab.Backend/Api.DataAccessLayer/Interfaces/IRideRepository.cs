@@ -10,7 +10,7 @@ namespace Api.DataAccessLayer.Interfaces
     public interface IRideRepository
     {
         Task<List<Ride>> GetAllRidesAsync();
-        Task<Ride> CreateSoloRideAsync(Ride id);
+        Task<SoloRide> AddSoloRideAsync(SoloRide id);
         Task<Ride> UpdateRideAsync(Ride ride);
         Task<Ride> DeleteRideAsync(int id);
         Task<List<SoloRide>> GetOpenSoloRidesAsync();
