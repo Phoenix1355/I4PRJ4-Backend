@@ -53,13 +53,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_OrderIsCreated()
         {
             var customer = SeedDatabaseWithCustomer();
-            SoloRide ride = CreateSoloRide(customer.Id);
+            Ride ride = CreateSoloRide(customer.Id);
 
-            ride = await _uut.AddSoloRideAsync(ride);
+            ride = await _uut.AddSoloRideAsync((SoloRide)ride);
             
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Orders.Where(o=>o.Rides.Where(x=>x.Id == ride.Id).Count()==1).Count(), Is.EqualTo(1));
+                Assert.That(context.Orders.Count(o=>o.Rides.Contains(ride)), Is.EqualTo(1));
             }
         }
         #endregion
