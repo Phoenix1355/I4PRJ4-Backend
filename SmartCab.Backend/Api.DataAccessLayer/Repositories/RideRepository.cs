@@ -37,7 +37,7 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
+                .Where(x => x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
         }
@@ -60,22 +60,14 @@ namespace Api.DataAccessLayer.Repositories
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
-                try
-                {
-                    //Add ride and reserves amount.
-                    ride = await AddRideAndReserveFundsForRide(ride);
+                //Add ride and reserves amount.
+                ride = await AddRideAndReserveFundsForRide(ride);
 
-                    //Adds order
-                    await AddOrderFromRide(ride);
-                
-                    //Reserve from Customer
-                    transaction.Commit();
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e);
-                    throw;
-                }
+                //Adds order
+                await AddOrderFromRide(ride);
+
+                //Reserve from Customer
+                transaction.Commit();
                 return ride;
             }
         }
@@ -113,7 +105,7 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<Order> AddOrderFromRide(Ride ride)
         {
-            if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
+            if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
             {
                 throw new ArgumentException("Already an order for given ride. ");
             }

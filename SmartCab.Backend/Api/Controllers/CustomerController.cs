@@ -12,6 +12,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using Api.Responses;
+using CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -56,6 +57,7 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
+            throw new IdentityException("Mads er for vild");
             try
             {
                 var response = await _customerService.AddCustomerAsync(request);
