@@ -14,6 +14,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.Errorhandling;
 using Api.Requests;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
