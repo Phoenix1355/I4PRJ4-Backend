@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
@@ -18,47 +19,101 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor for this class.
+        /// </summary>
+        /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
+        /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         public RideService(IRideRepository rideRepository, IMapper mapper)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
         }
 
-        public async Task<OpenRidesResponse> GetAllOpenRidesAsync()
+        /// <summary>
+        /// Adds a ride to the database.
+        /// </summary>
+        /// <param name="request">The data used to create the ride.</param>
+        /// <param name="customerId">The id of the customer that has requested to create the ride.</param>
+        /// <returns>A response object containing information about the created ride.</returns>
+        public Task<CreateRideResponse> AddRideAsync(CreateRideRequest request, string customerId)
         {
-            throw new NotImplementedException();
-            ////Get solo and shared rides in parallel
-            //var openSoloRidesTask = GetAllOpenSoloRidesAsync();
-            //var openSharedRidesTask = GetAllOpenSharedRidesAsync();
-            //await Task.WhenAll(openSoloRidesTask, openSharedRidesTask);
+            if (request.IsShared)
+            {
+                return AddSharedRideAsync(request, customerId);
+            }
 
-            ////.Result is not blocking since both tasks completed using WhenAll (see above)
-            //var openSoloRides = openSoloRidesTask.Result;
-            //var openSharedRides = openSharedRidesTask.Result;
-
-            ////Map to dto's
-            //var openSoloRidesDtos = _mapper.Map<List<SoloRide>, List<SoloRideDto>>(openSoloRides);
-            ////Todo map shared rides to dto's
-
-            ////Wrap dto's in a response
-            //var response = new OpenRidesResponse
-            //{
-            //    OpenSoloRides = openSoloRidesDtos,
-            //    //OpenSharedRides = openSharedRides //TODO: Add shared ride dto's to the response
-            //};
-
-            //return response;
+            return AddSoloRideAsync(request, customerId);
         }
 
-        private Task<List<SoloRide>> GetAllOpenSoloRidesAsync()
+        /// <summary>
+        /// Adds a solo ride to the database.
+        /// </summary>
+        /// <param name="request">The data used to create the ride.</param>
+        /// <param name="customerId">The id of the customer that has requested to create the ride.</param>
+        /// <returns>A response object containing information about the created ride.</returns>
+        private async Task<CreateRideResponse> AddSoloRideAsync(CreateRideRequest request, string customerId)
         {
-            return _rideRepository.GetOpenSoloRidesAsync();
+            var ride = _mapper.Map<SoloRide>(request); //TODO: Should map to a solo ride
+            ride.Price = await CalculatePrice(ride.StartDestination, ride.EndDestination, request.IsShared);
+            ride.CustomerId = customerId;
+            ride = await _rideRepository.AddSoloRideAsync(ride);
+            var response = _mapper.Map<CreateRideResponse>(ride);
+            return response;
         }
 
-        //private Task<List<SharedOpenRide>> GetAllOpenSharedRidesAsync()
-        //{
-        //    //TODO: Replace with a call to a repository method
-        //    return Task.Run(() => new List<SharedOpenRide>());
-        //}
+        /// <summary>
+        /// Adds a shared ride to the database.
+        /// </summary>
+        /// <param name="request">The data used to create the ride.</param>
+        /// <param name="customerId">The id of the customer that has requested to create the ride.</param>
+        /// <returns>A response object containing information about the created ride.</returns>
+        private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
+        {
+            throw new NotImplementedException("Not currently implemented.");
+            //Follows the same flow as when creating a solo ride.
+            //The match is made by the system later on and not in this method
+            //The match should be done by the system continuously 
+        }
+
+        /// <summary>
+        /// Calculates the distance between two addresses by using the Google Map API and returns the distance.
+        /// </summary>
+        /// <param name="first">The first address.</param>
+        /// <param name="second">The second address.</param>
+        /// <returns>The distance between the two addresses.</returns>
+        private Task<decimal> GetDistanceAsync(Address first, Address second)
+        {
+            //TODO: Implement the use of Google's API
+            var distance = Task.Run(() => Convert.ToDecimal(10.5));
+            return distance;
+        }
+
+        /// <summary>
+        /// Calculates the price of a ride between two addresses.
+        /// <remarks>
+        /// The algorithm deducts a discount if the ride is shared.<br/>
+        /// A solo ride costs the full price.
+        /// </remarks>
+        /// </summary>
+        /// <param name="first">The first address</param>
+        /// <param name="second">The second address</param>
+        /// <param name="isShared">True if it is a shared ride, false if it is a solo ride.</param>
+        /// <returns>The price of the ride.</returns>
+        public async Task<decimal> CalculatePrice(Address first, Address second, bool isShared)
+        {
+            const decimal multiplier = 10;
+            const decimal discount = (decimal) 0.75;
+
+            var distance = await GetDistanceAsync(first, second);
+            var price = distance * multiplier;
+
+            if (isShared)
+            {
+                price *= discount;
+            }
+
+            return price;
+        }
     }
 }

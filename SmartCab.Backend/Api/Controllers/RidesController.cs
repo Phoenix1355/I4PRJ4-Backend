@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using AutoMapper;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+using CustomExceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,8 +50,9 @@ namespace Api.Controllers
         {
             try
             {
-                var rides = await _rideService.GetAllOpenRidesAsync();
-                return Ok(rides);
+                throw new NotImplementedException();
+                //var rides = await _rideService.GetAllRidesAsync();
+                //return Ok(rides);
             }
             catch (Exception e)
             {
@@ -90,14 +96,38 @@ namespace Api.Controllers
         /// <param name="request">Information about the ride that should be updated.</param>
         /// <returns>The created ride.</returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CreateRideResponse), StatusCodes.Status200OK)]
         [Route("[action]")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateRideRequest request)
         {
-            var ride = new Ride(); //TODO call service layer
-            return Ok(ride);
+            try
+            {
+                var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+                
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    throw new UserIdInTokenInvalid(
+                        $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+                }
+
+                var response = await _rideService.AddRideAsync(request, customerId);
+                return Ok(response);
+            }
+            catch (UserIdInTokenInvalid e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ArgumentException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+            }
         }
 
         /// <summary>

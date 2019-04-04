@@ -41,20 +41,21 @@ namespace Api.DataAccessLayer.Repositories
             return rides;
         }
 
-        public async Task<Ride> CreateSharedRideAsync(Ride ride)
+        public async Task<SharedRide> CreateSharedRideAsync(SharedRide ride)
         {
+            throw new NotImplementedException();
             using (var transaction = _context.Database.BeginTransaction())
             {
                 //Add ride and reserves amount.
-                ride = await AddRideAndReserveFundsForRide(ride);
+                //ride = await AddRideAndReserveFundsForRide(ride);
 
-                //Reserve from Customer
-                transaction.Commit();
-                return ride;
+                ////Reserve from Customer
+                //transaction.Commit();
+                //return ride;
             }
         }
 
-        public async Task<Ride> CreateSoloRideAsync(Ride ride)
+        public async Task<SoloRide> AddSoloRideAsync(SoloRide ride)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -70,13 +71,13 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        private async Task<Ride> AddRideAndReserveFundsForRide(Ride ride)
+        private async Task<SoloRide> AddRideAndReserveFundsForRide(SoloRide ride)
         {
             //Reserve funds. 
             await ReservePriceFromCustomer(ride.CustomerId, ride.Price);
 
             //adds SoloRide
-            return ride = await AddRide(ride);
+            return await AddRide(ride);
         }
 
         private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
@@ -94,7 +95,7 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        private async Task<Ride> AddRide(Ride ride)
+        private async Task<SoloRide> AddRide(SoloRide ride)
         {
             _context.Rides.AddAsync(ride);
             _context.SaveChangesAsync();
@@ -120,10 +121,6 @@ namespace Api.DataAccessLayer.Repositories
             _context.SaveChangesAsync();
             return order;
         }
-
-
-
-
 
         public async Task<Ride> UpdateRideAsync(Ride ride)
         {

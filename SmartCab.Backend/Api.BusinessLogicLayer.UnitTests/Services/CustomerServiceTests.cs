@@ -59,7 +59,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs("TheGeneratedToken");
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _customerService.AddCustomerAsync(request);
 
@@ -116,7 +116,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             var token = "Token";
             _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customerDto = new CustomerDto
             {
@@ -142,7 +142,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             var token = "Token";
             _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customerDto = new CustomerDto
             {
