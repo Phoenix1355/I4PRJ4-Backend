@@ -57,24 +57,8 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            throw new IdentityException("Mads er for vild");
-            try
-            {
-                var response = await _customerService.AddCustomerAsync(request);
-                return Ok(response);
-            }
-            catch (ArgumentException e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse(e.Message);
-                return BadRequest(response);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
+            var response = await _customerService.AddCustomerAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
@@ -90,23 +74,8 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            try
-            {
-                var response = await _customerService.LoginCustomerAsync(request);
-                return Ok(response);
-            }
-            catch (ValidationException e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse(e.Message);
-                return BadRequest(response);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
+            var response = await _customerService.LoginCustomerAsync(request);
+            return Ok(response);
         }
 
         /// <summary>

@@ -44,12 +44,7 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(config =>
-            {
-                config.Filters.Add(typeof(CustomExceptionFilter));
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-                
+            AddMvcAndExceptionHandling(services);
             AddAutoMapper(services);
             AddDbContext(services);
             AddIdentityFramework(services);
@@ -57,7 +52,6 @@ namespace Api
             AddDependencyInjection(services);
             AddSwagger(services);
         }
-
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -94,9 +88,28 @@ namespace Api
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
             //dbContext.Database.Migrate();
-            dbContext.Database.EnsureCreated() ;
+            dbContext.Database.EnsureCreated();
 
             CreateRoles(services).Wait();
+        }
+
+        /// <summary>
+        /// Configures the use of MVC and adds an exception filter to the middleware.
+        /// </summary>
+        /// <remarks>
+        /// The filter makes it possible to avoid lots of try/catch clauses<br/>
+        /// in the code (more specifically in the controllers).<br/>
+        /// Source: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/filters?view=aspnetcore-2.2 <br/>
+        /// Source: https://www.talkingdotnet.com/global-exception-handling-in-aspnet-core-webapi/
+        /// </remarks>
+        /// <param name="services">The container to register to.</param>
+        private void AddMvcAndExceptionHandling(IServiceCollection services)
+        {
+            services.AddMvc(config =>
+                    {
+                        config.Filters.Add(typeof(CustomExceptionFilter));
+                    })
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         /// <summary>
@@ -151,7 +164,7 @@ namespace Api
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
-                
+
             });
         }
 

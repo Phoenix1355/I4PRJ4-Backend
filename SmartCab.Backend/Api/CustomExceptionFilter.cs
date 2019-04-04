@@ -1,4 +1,5 @@
-﻿using Api.BusinessLogicLayer.Responses;
+﻿using System.Diagnostics;
+using Api.BusinessLogicLayer.Responses;
 using CustomExceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -16,15 +17,28 @@ namespace Api
         {
             var response = context.HttpContext.Response;
             var exceptionType = context.Exception.GetType();
-            var message = context.Exception.Message;
-            var error = new ErrorResponse(message);
+            var exceptionMessage = context.Exception.Message;
 
-            if (exceptionType == typeof(IdentityException))
+            //Contains a generic description --> no sensitive information
+            var error = new ErrorResponse();
+
+            //If the exception is a custom exception, then set the errorResponse
+            //to the exception message (it will be stripped of sensitive information.
+            if (exceptionType == typeof(IdentityException) ||
+                exceptionType == typeof(InsufficientFundsException) ||
+                exceptionType == typeof(MultipleOrderException) ||
+                exceptionType == typeof(UserIdInvalidException))
             {
-                response.ContentType = "application/json";
-                var json = JsonConvert.SerializeObject(error);
-                response.WriteAsync(json);
+                error = new ErrorResponse(exceptionMessage);
             }
+
+            //Write error to response
+            response.ContentType = "application/json";
+            var json = JsonConvert.SerializeObject(error);
+            response.WriteAsync(json);
+
+            //Finally write to the debugger
+            Debug.WriteLine(exceptionMessage);
         }
     }
 }
