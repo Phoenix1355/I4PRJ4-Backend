@@ -29,6 +29,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 
+
 namespace Api
 {
     public class Startup
@@ -43,7 +44,12 @@ namespace Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(config =>
+            {
+                config.Filters.Add(typeof(CustomExceptionFilter));
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                
             AddAutoMapper(services);
             AddDbContext(services);
             AddIdentityFramework(services);
