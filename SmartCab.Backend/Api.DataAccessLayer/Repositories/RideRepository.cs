@@ -100,11 +100,6 @@ namespace Api.DataAccessLayer.Repositories
         private Customer FindsCustomerElseThrow(string customerId)
         {
             var customer = _context.Customers.Find(customerId);
-            if (customer == null)
-            {
-                throw new IdentityException("No customer with Id");
-            }
-
             return customer;
         }
 
