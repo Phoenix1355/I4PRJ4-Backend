@@ -93,7 +93,7 @@ namespace Api.DataAccessLayer.Repositories
             }
             else
             {
-                throw new RequestValidationFailedException("Not enough credit");
+                throw new IdentityException("Not enough credit");
             }
         }
 
@@ -102,7 +102,7 @@ namespace Api.DataAccessLayer.Repositories
             var customer = _context.Customers.Find(customerId);
             if (customer == null)
             {
-                throw new RequestValidationFailedException("No customer with Id");
+                throw new IdentityException("No customer with Id");
             }
 
             return customer;
@@ -110,8 +110,8 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<SoloRide> AddRide(SoloRide ride)
         {
-            _context.Rides.AddAsync(ride);
-            _context.SaveChangesAsync();
+            _context.Rides.Update(ride);
+            await _context.SaveChangesAsync();
             return ride;
         }
 
@@ -119,7 +119,7 @@ namespace Api.DataAccessLayer.Repositories
         {
             if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
             {
-                throw new RequestValidationFailedException("Already an order for given ride. ");
+                throw new IdentityException("Already an order for given ride. ");
             }
 
             Order order = new Order()

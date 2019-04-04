@@ -86,7 +86,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
            
             Ride ride = CreateSoloRide("Invalid_String_Id");
 
-            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
             
         }
 
@@ -112,7 +112,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             ride = await _uut.AddSoloRideAsync((SoloRide)ride);
             ;
-            Assert.ThrowsAsync<RequestValidationFailedException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(0,0);
             Ride ride = CreateSoloRide(customer.Id);;
-            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var customer = SeedDatabaseWithCustomer(99, 0);
             Ride ride = CreateSoloRide(customer.Id); ;
-            Assert.ThrowsAsync<RequestValidationFailedException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddSoloRideAsync((SoloRide)ride));
         }
         #endregion
 
