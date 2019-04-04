@@ -59,7 +59,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Orders.Where(o=>o.Rides.Contains(ride)).Count, Is.EqualTo(1));
+                Assert.That(context.Orders.Where(o=>o.Rides.Where(x=>x.Id == ride.Id).Count()==1).Count(), Is.EqualTo(1));
             }
         }
         #endregion
