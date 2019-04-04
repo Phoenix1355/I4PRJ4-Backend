@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
@@ -8,6 +10,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -82,11 +85,17 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="first">The first address.</param>
         /// <param name="second">The second address.</param>
         /// <returns>The distance between the two addresses.</returns>
-        private Task<decimal> GetDistanceAsync(Address first, Address second)
+        private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
         {
-            //TODO: Implement the use of Google's API
-            var distance = Task.Run(() => Convert.ToDecimal(10.5));
-            return distance;
+            string[] originAddresses = { $"{first.CityName} {first.PostalCode} {first.StreetName} {first.StreetNumber}" };
+            string[] destinationAddresses = { $"{second.CityName} {second.PostalCode} {second.StreetName} {second.StreetNumber}" };
+
+            var googleApi = new GoogleDistanceMatrixService(originAddresses, destinationAddresses);
+            var response = await googleApi.GetResponse();
+
+            var distanceInKm = Convert.ToDecimal(response.Rows.FirstOrDefault()?.Elements.FirstOrDefault()?.Distance.Value/1000.0);
+
+            return distanceInKm;
         }
 
         /// <summary>
@@ -105,7 +114,7 @@ namespace Api.BusinessLogicLayer.Services
             const decimal multiplier = 10;
             const decimal discount = (decimal) 0.75;
 
-            var distance = await GetDistanceAsync(first, second);
+            var distance = await GetDistanceInKilometersAsync(first, second);
             var price = distance * multiplier;
 
             if (isShared)
