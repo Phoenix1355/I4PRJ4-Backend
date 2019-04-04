@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -50,13 +52,15 @@ namespace Api.Controllers
         {
             try
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("Not implemented yet");
                 //var rides = await _rideService.GetAllRidesAsync();
                 //return Ok(rides);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -79,12 +83,15 @@ namespace Api.Controllers
         {
             try
             {
+                throw new NotImplementedException("Not implemented yet");
                 var ride = new Ride(); //todo fetch details
                 return Ok(ride);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -113,25 +120,28 @@ namespace Api.Controllers
                 
                 if (string.IsNullOrEmpty(customerId))
                 {
-                    throw new UserIdInTokenInvalid(
+                    throw new UserIdInvalidException(
                         $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
                 }
 
                 var response = await _rideService.AddRideAsync(request, customerId);
                 return Ok(response);
             }
-            catch (UserIdInTokenInvalid e)
+            catch (UserIdInvalidException e)
             {
+                Debug.WriteLine(e.Message);
                 var response = new ErrorResponse(e.Message);
                 return Unauthorized(response);
             }
-            catch (ArgumentException e)
+            catch (ValidationException e)
             {
+                Debug.WriteLine(e.Message);
                 var response = new ErrorResponse(e.Message);
                 return BadRequest(response);
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 var response = new ErrorResponse();
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
@@ -149,10 +159,21 @@ namespace Api.Controllers
         /// <response code="400">Could mean that the ride was no longer in an "accepted" state when the request made it to the server</response>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
         [Route("{id}/[action]")]
+        [Produces("application/json")]
         [HttpPut]
         public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
         {
-            return Ok($"The ride with {id} is now successfully marked as accepted.");
+            try
+            {
+                throw new NotImplementedException("Not implemented yet");
+                return Ok($"The ride with {id} is now successfully marked as accepted.");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
+            }
         }
     }
 }
