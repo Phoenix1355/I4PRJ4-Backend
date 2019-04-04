@@ -61,11 +61,13 @@ namespace Api.Controllers
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -89,11 +91,13 @@ namespace Api.Controllers
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 

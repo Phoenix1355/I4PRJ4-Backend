@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
@@ -59,14 +60,22 @@ namespace Api.DataAccessLayer.Repositories
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
-                //Add ride and reserves amount.
-                ride = await AddRideAndReserveFundsForRide(ride);
+                try
+                {
+                    //Add ride and reserves amount.
+                    ride = await AddRideAndReserveFundsForRide(ride);
 
-                //Adds order
-                await AddOrderFromRide(ride);
+                    //Adds order
+                    await AddOrderFromRide(ride);
                 
-                //Reserve from Customer
-                transaction.Commit();
+                    //Reserve from Customer
+                    transaction.Commit();
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                    throw;
+                }
                 return ride;
             }
         }
@@ -80,14 +89,14 @@ namespace Api.DataAccessLayer.Repositories
             return await AddRide(ride);
         }
 
-        private void ReservePriceFromCustomer(string CustomerId, decimal price)
+        private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
         {
             var customer = _context.Customers.Find(CustomerId);
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
                 customer.ReservedAmount += price;
                 _context.Customers.Update(customer);
-                _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             else
             {
@@ -97,8 +106,8 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<SoloRide> AddRide(SoloRide ride)
         {
-            _context.Rides.AddAsync(ride);
-            _context.SaveChangesAsync();
+            await _context.Rides.AddAsync(ride);
+            await _context.SaveChangesAsync();
             return ride;
         }
 
@@ -117,8 +126,8 @@ namespace Api.DataAccessLayer.Repositories
             };
             order.Rides.Add(ride);
 
-            _context.Orders.AddAsync(order);
-            _context.SaveChangesAsync();
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();
             return order;
         }
 

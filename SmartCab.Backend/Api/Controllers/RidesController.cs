@@ -88,20 +88,24 @@ namespace Api.Controllers
             }
         }
 
-
         /// <summary>
-        /// Creates a new ride
+        /// Creates a new ride and ties the ride to the customer sending the request.
         /// </summary>
+        /// <remarks>
+        /// Required role: "Customer".
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">Information about the ride that should be updated.</param>
         /// <returns>The created ride.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [ProducesResponseType(typeof(CreateRideResponse), StatusCodes.Status200OK)]
         [Route("[action]")]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateRideRequest request)
+        public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
             try
             {
@@ -118,21 +122,27 @@ namespace Api.Controllers
             }
             catch (UserIdInTokenInvalid e)
             {
-                return Unauthorized(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return Unauthorized(response);
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
         /// <summary>
         /// Updates the ride with the supplied ID so it is accepted.
         /// </summary>
+        /// <remarks>
+        /// Required role: "TaxiCompany"
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="id">The id of the ride that should be accepted.</param>
         /// <returns></returns>

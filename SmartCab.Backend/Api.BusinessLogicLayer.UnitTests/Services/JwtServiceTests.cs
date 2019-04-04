@@ -63,7 +63,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             Assert.That(email, Is.EqualTo(emailInToken));
         }
 
-
         [TestCase("Customer")]
         [TestCase("TaxiCompany")]
         [TestCase("President")]
