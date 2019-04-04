@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Api.DataAccessLayer\Api.DataAccessLayer.csproj" />
     <ProjectReference Include="..\Api\Api.csproj" />
+    <ProjectReference Include="..\CustomExceptions\CustomExceptions.csproj" />
   </ItemGroup>
 
 </Project>

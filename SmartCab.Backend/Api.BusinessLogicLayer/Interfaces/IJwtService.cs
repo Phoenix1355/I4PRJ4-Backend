@@ -8,6 +8,6 @@ namespace Api.BusinessLogicLayer.Interfaces
     /// </summary>
     public interface IJwtService
     {
-        string GenerateJwtToken(string email, string role);
+        string GenerateJwtToken(string userId, string email, string role);
     }
 }

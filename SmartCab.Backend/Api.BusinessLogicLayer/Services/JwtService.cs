@@ -34,10 +34,11 @@ namespace Api.BusinessLogicLayer.Services
         /// <summary>
         /// Generates a Json Web Tokens and returns it.
         /// </summary>
-        /// <param name="email">Emails for the account that the token should be issued to.</param>
+        /// <param name="id">The ID for the account that the token should be issued to.</param>
+        /// <param name="email">The email for the account that the token should be issued to.</param>
         /// <param name="role">The role the token should apply to</param>
         /// <returns>A token that is tied to the specified user.</returns>
-        public string GenerateJwtToken(string email, string role)
+        public string GenerateJwtToken(string id, string email, string role)
         {
             //Source: https://medium.com/@ozgurgul/asp-net-core-2-0-webapi-jwt-authentication-with-identity-mysql-3698eeba6ff8
             //Generate key used to verify the token when using it later on
@@ -45,11 +46,12 @@ namespace Api.BusinessLogicLayer.Services
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             //Set the expiration datetime 
-            var expirationDate = DateTime.Now.AddSeconds(Convert.ToDouble(_configuration["JwtExpireSeconds"])); //TODO: Change from seconds to eg. days
+            var expirationDate = DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["JwtExpireSeconds"])); //TODO: Change from seconds to eg. days
 
             //Set claims for the token. These can be accessed later on
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Email, email));
+            claims.Add(new Claim(Constants.UserIdClaim, id));
             claims.Add(new Claim(ClaimTypes.Role, role));
             claims.Add(new Claim(ClaimTypes.Expiration, expirationDate.ToString(CultureInfo.InvariantCulture)));
 

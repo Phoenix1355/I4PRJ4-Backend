@@ -65,7 +65,7 @@ namespace Api.BusinessLogicLayer.Services
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
-            var token = _jwtService.GenerateJwtToken(request.Email, nameof(Customer));
+            var token = _jwtService.GenerateJwtToken(customer.Id, customer.Email, nameof(Customer));
             var response = new RegisterResponse
             {
                 Token = token,
@@ -94,7 +94,7 @@ namespace Api.BusinessLogicLayer.Services
                 var customer = await _customerRepository.GetCustomerAsync(request.Email);
 
                 //All good, now generate the token and return it
-                var token = _jwtService.GenerateJwtToken(request.Email, nameof(Customer));
+                var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
                 var customerDto = _mapper.Map<CustomerDto>(customer);
                 var response = new LoginResponse
                 {

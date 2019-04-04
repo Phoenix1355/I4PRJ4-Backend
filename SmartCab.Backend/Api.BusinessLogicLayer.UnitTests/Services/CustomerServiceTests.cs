@@ -59,7 +59,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs("TheGeneratedToken");
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _customerService.AddCustomerAsync(request);
 
@@ -108,6 +108,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [Test]
         public async Task LoginCustomerAsync_LoginSucceeds_ReturnsLoginResponseThatContainsTheExpectedToken()
         {
+            //Arrange
             var request = new LoginRequest
             {
                 Email = "test@domain.com",
@@ -116,7 +117,15 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             var token = "Token";
             _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
+
+            var customer = new Customer
+            {
+                Id = "SomeId",
+                Email = request.Email
+            };
+
+            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
 
             var customerDto = new CustomerDto
             {
@@ -126,14 +135,17 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
             _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
 
+            //Act
             var response = await _customerService.LoginCustomerAsync(request);
 
+            //Assert
             Assert.That(response.Token, Is.EqualTo(token));
         }
 
         [Test]
         public async Task LoginCustomerAsync_LoginSucceeds_ReturnsLoginResponseThatContainsTheExpectedCustomerDto()
         {
+            //Arrange
             var request = new LoginRequest
             {
                 Email = "test@domain.com",
@@ -142,7 +154,15 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             var token = "Token";
             _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
-            _jwtService.GenerateJwtToken(null, null).ReturnsForAnyArgs(token);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
+
+            var customer = new Customer
+            {
+                Id = "SomeId",
+                Email = request.Email
+            };
+
+            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
 
             var customerDto = new CustomerDto
             {
@@ -152,8 +172,10 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
             _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
 
+            //Act
             var response = await _customerService.LoginCustomerAsync(request);
 
+            //Assert
             Assert.That(response.Customer, Is.EqualTo(customerDto));
         }
 

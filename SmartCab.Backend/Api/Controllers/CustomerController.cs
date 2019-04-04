@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
 using Api.Requests;
 using Api.Responses;
+using CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -46,12 +49,15 @@ namespace Api.Controllers
         /// </remarks>
         /// <param name="request">The data needed to create the customer</param>
         /// <returns>A valid JWT token that is tied to the created customer</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
+            throw new IdentityException("Mads er for vild");
             try
             {
                 var response = await _customerService.AddCustomerAsync(request);
@@ -59,11 +65,15 @@ namespace Api.Controllers
             }
             catch (ArgumentException e)
             {
-                return BadRequest(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -72,6 +82,8 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="request">The email and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
@@ -83,13 +95,17 @@ namespace Api.Controllers
                 var response = await _customerService.LoginCustomerAsync(request);
                 return Ok(response);
             }
-            catch (ArgumentException e)
+            catch (ValidationException e)
             {
-                return BadRequest(e.Message);
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse(e.Message);
+                return BadRequest(response);
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server.");
+                Debug.WriteLine(e.Message);
+                var response = new ErrorResponse();
+                return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
 
@@ -99,7 +115,7 @@ namespace Api.Controllers
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">The data used to update the customer account</param>
         /// <returns></returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="401">If the customer was not logged in already</response>
         [Route("[action]")]
         [HttpPut]
         public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditCustomerRequest request)
