@@ -74,18 +74,18 @@ namespace Api.DataAccessLayer.Repositories
         private async Task<SoloRide> AddRideAndReserveFundsForRide(SoloRide ride)
         {
             //Reserve funds. 
-            await ReservePriceFromCustomer(ride.CustomerId, ride.Price);
+            ReservePriceFromCustomer(ride.CustomerId, ride.Price);
 
             //adds SoloRide
             return await AddRide(ride);
         }
 
-        private async Task ReservePriceFromCustomer(string CustomerId, decimal price)
+        private void ReservePriceFromCustomer(string CustomerId, decimal price)
         {
-            var customer = await _context.Customers.FindAsync(CustomerId);
-            if ((customer.Balance - customer.ReservedAmount) > price)
+            var customer = _context.Customers.Find(CustomerId);
+            if ((customer.Balance - customer.ReservedAmount) >= price)
             {
-                customer.ReservedAmount -= price;
+                customer.ReservedAmount += price;
                 _context.Customers.Update(customer);
                 _context.SaveChangesAsync();
             }
