@@ -19,5 +19,7 @@ namespace Api.DataAccessLayer.Models
         public virtual List<Ride> Rides { get; set; }
         [Required]
         public decimal Price { get; set; }
+
+        public virtual TaxiCompany TaxiCompany { get; set; }
     }
 }

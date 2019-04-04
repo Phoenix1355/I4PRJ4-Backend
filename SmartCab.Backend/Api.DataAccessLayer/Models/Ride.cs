@@ -18,6 +18,9 @@ namespace Api.DataAccessLayer.Models
         public virtual Customer Customer { get; set; }
 
         [Required]
+        public string CustomerId { get; set; }
+
+        [Required]
         public DateTime DepartureTime { get; set; }
 
         [Required]

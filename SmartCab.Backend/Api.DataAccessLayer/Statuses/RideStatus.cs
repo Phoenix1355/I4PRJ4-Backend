@@ -8,6 +8,8 @@ namespace Api.DataAccessLayer.Statuses
     {
         LookingForMatch,
         Debited,
-        Expired
+        Expired,
+        WaitingForAccept,
+        Accepted
     }
 }

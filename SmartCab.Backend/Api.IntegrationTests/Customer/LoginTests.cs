@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -32,8 +33,23 @@ namespace Api.IntegrationTests.Customer
             var loginRequest = getLoginRequest();
 
             var response = await PostAsync("/api/customer/login", loginRequest);
-
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task Login_UserExists_LogsInAndReturnsCustomerWithCorrectEmail()
+        {
+            //Using client to create customer. 
+            var request = getRegisterRequest();
+            await PostAsync("/api/customer/register", request);
+
+            var loginRequest = getLoginRequest();
+
+            var response = await PostAsync("/api/customer/login", loginRequest);
+
+            var responseObject = GetObject<LoginResponse>(response);
+
+            Assert.That(responseObject.Customer.Email, Is.EqualTo(request.Email));
         }
 
         [Test]

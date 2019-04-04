@@ -4,5 +4,6 @@
     {
         WaitingForAccept,
         Accepted,
+        Expired
     }
 }

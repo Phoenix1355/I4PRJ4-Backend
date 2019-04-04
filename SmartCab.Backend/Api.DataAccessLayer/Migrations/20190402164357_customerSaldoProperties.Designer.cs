@@ -4,14 +4,16 @@ using Api.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Api.DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190402164357_customerSaldoProperties")]
+    partial class customerSaldoProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,9 +50,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<DateTime>("CreatedOn");
 
-                    b.Property<int>("CustomerId");
-
-                    b.Property<string>("CustomerId1");
+                    b.Property<string>("CustomerId");
 
                     b.Property<DateTime>("DepartureTime");
 
@@ -67,7 +67,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId1");
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("OrderId");
 
@@ -292,7 +292,7 @@ namespace Api.DataAccessLayer.Migrations
                 {
                     b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
                         .WithMany("Rides")
-                        .HasForeignKey("CustomerId1");
+                        .HasForeignKey("CustomerId");
 
                     b.HasOne("Api.DataAccessLayer.Models.Order")
                         .WithMany("Rides")

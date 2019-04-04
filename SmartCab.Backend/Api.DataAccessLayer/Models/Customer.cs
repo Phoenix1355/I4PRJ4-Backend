@@ -18,5 +18,9 @@ namespace Api.DataAccessLayer.Models
         public string Name { get; set; }
 
         public virtual List<Ride> Rides { get; set; }
+
+        public decimal Balance { get; set; }
+
+        public decimal ReservedAmount { get; set; }
     }
 }
