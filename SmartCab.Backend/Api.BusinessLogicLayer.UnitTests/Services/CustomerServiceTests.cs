@@ -7,6 +7,7 @@ using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using AutoMapper;
+using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -180,7 +181,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         [Test]
-        public void LoginCustomerAsync_EmailAndPasswordCombinationNotFound_ThrowsArgumentException()
+        public void LoginCustomerAsync_EmailAndPasswordCombinationNotFound_ThrowsIdentityException()
         {
             var request = new LoginRequest
             {
@@ -191,7 +192,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var signinResult = SignInResult.Failed;
             _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signinResult);
 
-            Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<ArgumentException>());
+            Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<IdentityException>());
         }
 
         #endregion

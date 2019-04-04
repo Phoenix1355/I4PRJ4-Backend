@@ -33,7 +33,7 @@ namespace Api.Errorhandling
             //to the exception message (it will be stripped of sensitive information.
             if (exceptionType == typeof(IdentityException))
             {
-                status = StatusCodes.Status401Unauthorized;
+                status = StatusCodes.Status400BadRequest;
                 error = new ErrorMessage(exceptionMessage);
             }
 
@@ -60,6 +60,7 @@ namespace Api.Errorhandling
                 status = StatusCodes.Status400BadRequest;
                 error = new ErrorMessage(exceptionMessage);
             }
+            context.ExceptionHandled = true;
 
             //Write error to response
             response.StatusCode = status;
