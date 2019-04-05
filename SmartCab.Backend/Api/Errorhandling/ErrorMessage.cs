@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Api.Errorhandling
+namespace Api.ErrorHandling
 {
     /// <summary>
     /// This class is used to return custom error in a uniform way to the clients.

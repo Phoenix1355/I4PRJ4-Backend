@@ -14,7 +14,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
-using Api.Errorhandling;
+using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -204,6 +204,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
+            services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
             services.AddScoped<IJwtService, JwtService>();
