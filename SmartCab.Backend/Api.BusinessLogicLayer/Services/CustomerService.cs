@@ -8,6 +8,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using AutoMapper;
+using CustomExceptions;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -105,7 +106,7 @@ namespace Api.BusinessLogicLayer.Services
             }
 
             //Log in failed
-            throw new ArgumentException("Login failed. Credentials was not found in the database.");
+            throw new IdentityException("Login failed. Credentials was not found in the database.");
         }
     }
 }

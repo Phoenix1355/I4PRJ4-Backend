@@ -104,7 +104,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var id = "someId";
 
             //Create a datetime object and remove milliseconds. If milliseconds are not removed, all tests will fails
-            var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
+            var expectedExpirationDateTime = DateTime.Now.AddMinutes(lengthInSeconds);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
             var serializedToken = jwtService.GenerateJwtToken(id, email, role);
@@ -118,13 +118,13 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [TestCase(10)]
         [TestCase(100)]
         [TestCase(1000)]
-        [TestCase(10000000)]
-        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpirationStoredOutsideClaims(int lengthInSeconds)
+        [TestCase(1000000)]
+        public void GenerateJwtToken_WhenCalled_ReturnsATokenWithTheSpecifiedExpirationStoredOutsideClaims(int lengthInMinutes)
         {
             //Create uut
             var configuration = Substitute.For<IConfiguration>();
             configuration[JwtSecret].Returns(JwtSecretValue);
-            configuration[JwtExpire].Returns(lengthInSeconds.ToString());
+            configuration[JwtExpire].Returns(lengthInMinutes.ToString());
             var jwtService = new JwtService(configuration);
 
             //We are not testing the email, role or id, so lets hard code those
@@ -132,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var email = "test@gmail.com";
             var id = "someId";
 
-            var expectedExpirationDateTime = DateTime.Now.AddSeconds(lengthInSeconds);
+            var expectedExpirationDateTime = DateTime.Now.AddMinutes(lengthInMinutes);
             expectedExpirationDateTime = DateTime.ParseExact(expectedExpirationDateTime.ToString("yyyy-MM-dd HH:mm:ss"), "yyyy-MM-dd HH:mm:ss", null);
 
             var serializedToken = jwtService.GenerateJwtToken(id, email, role);

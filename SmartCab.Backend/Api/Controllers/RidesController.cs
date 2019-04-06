@@ -11,6 +11,7 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
+using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
@@ -59,7 +60,7 @@ namespace Api.Controllers
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
+                var response = new ErrorMessage();
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
@@ -90,7 +91,7 @@ namespace Api.Controllers
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
+                var response = new ErrorMessage();
                 return StatusCode(StatusCodes.Status500InternalServerError, response);
             }
         }
@@ -114,37 +115,17 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
-            try
-            {
-                var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
-                
-                if (string.IsNullOrEmpty(customerId))
-                {
-                    throw new UserIdInvalidException(
-                        $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
-                }
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
 
-                var response = await _rideService.AddRideAsync(request, customerId);
-                return Ok(response);
-            }
-            catch (UserIdInvalidException e)
+            if (string.IsNullOrEmpty(customerId))
             {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse(e.Message);
-                return Unauthorized(response);
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
             }
-            catch (ValidationException e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse(e.Message);
-                return BadRequest(response);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
+
+            var response = await _rideService.AddRideAsync(request, customerId);
+            return Ok(response);
+
         }
 
         /// <summary>
@@ -163,17 +144,8 @@ namespace Api.Controllers
         [HttpPut]
         public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
         {
-            try
-            {
-                throw new NotImplementedException("Not implemented yet");
-                return Ok($"The ride with {id} is now successfully marked as accepted.");
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorResponse();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
+            throw new NotImplementedException("Not implemented yet");
+            return Ok($"The ride with {id} is now successfully marked as accepted.");
         }
     }
 }

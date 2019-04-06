@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -54,7 +55,7 @@ namespace Api.DataAccessLayer.Repositories
                 transaction.Rollback();
 
                 var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new ArgumentException(error);
+                throw new IdentityException(error);
             }
         }
 
@@ -70,7 +71,7 @@ namespace Api.DataAccessLayer.Repositories
 
             if (customer == null)
             {
-                throw new ArgumentNullException("Customer does not exist.");
+                throw new UserIdInvalidException("Customer does not exist.");
             }
 
             return customer;

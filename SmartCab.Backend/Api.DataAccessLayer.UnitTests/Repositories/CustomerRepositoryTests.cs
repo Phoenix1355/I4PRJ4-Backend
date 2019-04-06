@@ -8,6 +8,7 @@ using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
+using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -88,7 +89,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            Assert.ThrowsAsync<ArgumentException>(()=>_uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<IdentityException>(()=>_uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
@@ -115,7 +116,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<ArgumentNullException>( () =>  _uut.GetCustomerAsync("NoEmail@mail.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>( () =>  _uut.GetCustomerAsync("NoEmail@mail.com"));
         }
 
         [Test]

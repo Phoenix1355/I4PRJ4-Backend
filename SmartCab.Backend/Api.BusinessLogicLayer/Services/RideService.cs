@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
@@ -8,6 +10,8 @@ using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using AutoMapper;
+using CustomExceptions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -18,16 +22,18 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
+        private readonly IGoogleMapsApiService _googleMapsApiService;
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
         /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
-        public RideService(IRideRepository rideRepository, IMapper mapper)
+        public RideService(IRideRepository rideRepository, IMapper mapper, IGoogleMapsApiService googleMapsApiService)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
+            _googleMapsApiService = googleMapsApiService;
         }
 
         /// <summary>
@@ -77,19 +83,6 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
-        /// Calculates the distance between two addresses by using the Google Map API and returns the distance.
-        /// </summary>
-        /// <param name="first">The first address.</param>
-        /// <param name="second">The second address.</param>
-        /// <returns>The distance between the two addresses.</returns>
-        private Task<decimal> GetDistanceAsync(Address first, Address second)
-        {
-            //TODO: Implement the use of Google's API
-            var distance = Task.Run(() => Convert.ToDecimal(10.5));
-            return distance;
-        }
-
-        /// <summary>
         /// Calculates the price of a ride between two addresses.
         /// <remarks>
         /// The algorithm deducts a discount if the ride is shared.<br/>
@@ -103,9 +96,9 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<decimal> CalculatePrice(Address first, Address second, bool isShared)
         {
             const decimal multiplier = 10;
-            const decimal discount = (decimal) 0.75;
+            const decimal discount = (decimal)0.75;
 
-            var distance = await GetDistanceAsync(first, second);
+            var distance = await GetDistanceInKilometersAsync(first, second);
             var price = distance * multiplier;
 
             if (isShared)
@@ -114,6 +107,30 @@ namespace Api.BusinessLogicLayer.Services
             }
 
             return price;
+        }
+
+        /// <summary>
+        /// Calculates the distance between two addresses by using the Google Map API and returns the distance.
+        /// </summary>
+        /// <param name="first">The first address.</param>
+        /// <param name="second">The second address.</param>
+        /// <returns>The distance between the two addresses.</returns>
+        private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
+        {
+            string[] originAddresses = { $"{first.CityName} {first.PostalCode} {first.StreetName} {first.StreetNumber}" + " Denmark" };
+            string[] destinationAddresses = { $"{second.CityName} {second.PostalCode} {second.StreetName} {second.StreetNumber}" + " Denmark" };
+
+            var response = await _googleMapsApiService.GetDistance(originAddresses, destinationAddresses);
+
+            //Distance is returned in meters, so we divide with 1000 to get the result in kilometers
+            var distanceInKm = Convert.ToDecimal(response.Rows.FirstOrDefault()?.Elements.FirstOrDefault()?.Distance.Value/1000.0);
+
+            if (response.Status != "OK" || distanceInKm <= 0)
+            {
+                throw new GoogleMapsApiException("A route between the provided addresses could not be calculated.");
+            }
+
+            return distanceInKm;
         }
     }
 }
