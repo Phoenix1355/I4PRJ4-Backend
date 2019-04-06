@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Api.IntegrationTests.Ride
 {
-    class CreateTests
+    class CreateTests : IntegrationSetup
     {
+
+
     }
 }
