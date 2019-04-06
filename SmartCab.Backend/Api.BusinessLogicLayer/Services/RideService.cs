@@ -119,17 +119,18 @@ namespace Api.BusinessLogicLayer.Services
         {
             string[] originAddresses = { $"{first.CityName} {first.PostalCode} {first.StreetName} {first.StreetNumber}" + " Denmark" };
             string[] destinationAddresses = { $"{second.CityName} {second.PostalCode} {second.StreetName} {second.StreetNumber}" + " Denmark" };
-
+            /*
             var response = await _googleMapsApiService.GetDistance(originAddresses, destinationAddresses);
 
             //Distance is returned in meters, so we divide with 1000 to get the result in kilometers
             var distanceInKm = Convert.ToDecimal(response.Rows.FirstOrDefault()?.Elements.FirstOrDefault()?.Distance.Value/1000.0);
-
+            distanceInKm = 10;
             if (response.Status != "OK" || distanceInKm <= 0)
             {
                 throw new GoogleMapsApiException("A route between the provided addresses could not be calculated.");
             }
-
+            */
+            var distanceInKm = 10;
             return distanceInKm;
         }
     }
