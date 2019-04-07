@@ -117,13 +117,15 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>The distance between the two addresses.</returns>
         private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
         {
+            /*
             var validateOrigin = _googleMapsApiService.ValidateAddress(first.ToString());
             var validateDestination = _googleMapsApiService.ValidateAddress(second.ToString());
             await Task.WhenAll(validateOrigin, validateDestination); //Throws exception if validation fails
 
             var distanceInKm = await _googleMapsApiService.GetDistanceInKm(first.ToString(), second.ToString());
+            */
 
-            return distanceInKm;
+            return 10;
         }
     }
 }
