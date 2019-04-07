@@ -31,12 +31,22 @@ namespace Api.Integration.Test.Fakes
             _apiKey = config["GoogleMapsApiKey"];
         }
 
-        public async Task<decimal> GetDistanceInKm(string origin, string destination)
+        //public async Task<decimal> GetDistanceInKm(string origin, string destination)
+        //{
+        //    return 10;
+        //}
+
+        //public async Task ValidateAddress(string address)
+        //{
+        //    return;
+        //}
+
+        public Task<decimal> GetDistanceInKmAsync(string origin, string destination)
         {
-            return 10;
+            return Task.Run(() => (decimal)10);
         }
 
-        public async Task ValidateAddress(string address)
+        public async Task ValidateAddressAsync(string address)
         {
             return;
         }
