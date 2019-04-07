@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Api;
+using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.UnitTests.Factories;
+using Api.Integration.Test.Fakes;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -42,7 +46,6 @@ namespace SmartCabPoc.Integration.Test
                     options.UseInternalServiceProvider(serviceProvider);
                 });
 
-
                 _serviceProvider = services.BuildServiceProvider();
 
                 // Create a scope to obtain a reference to the database
@@ -56,8 +59,16 @@ namespace SmartCabPoc.Integration.Test
                     db.Database.EnsureCreated();
                 }
             
-        });
+            });
+
+            //To overwrite services add them here. 
+            builder.ConfigureTestServices(services =>
+            {
+               services.AddScoped<IGoogleMapsApiService, FakeGoogleMapsApiService>();
+            });
         }
+
+
 
         public ApplicationContext CreateContext()
         {
