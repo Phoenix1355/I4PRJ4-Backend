@@ -42,6 +42,7 @@ namespace SmartCabPoc.Integration.Test
                     options.UseInternalServiceProvider(serviceProvider);
                 });
 
+
                 _serviceProvider = services.BuildServiceProvider();
 
                 // Create a scope to obtain a reference to the database

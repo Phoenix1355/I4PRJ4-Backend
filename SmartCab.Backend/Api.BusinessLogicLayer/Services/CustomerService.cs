@@ -109,5 +109,21 @@ namespace Api.BusinessLogicLayer.Services
             //Log in failed
             throw new IdentityException("Login failed. Credentials was not found in the database.");
         }
+
+
+        /// <summary>
+        /// Deposits amount.
+        /// </summary>
+        /// <param name="request">The request containing the amount to deposit.</param>
+        /// /// <param name="customerId">Id of the customer to deposit to.</param>
+        /// <returns>A customer wrapped in a responseobject.</returns>
+        public async Task DepositAsync(DepositRequest request, string customerId)
+        {
+            //Amount to deposit
+            int DepositAmount = request.Deposit;
+
+            //Deposits
+            var customer = await _customerRepository.DepositAsync(customerId, DepositAmount);
+        }
     }
 }

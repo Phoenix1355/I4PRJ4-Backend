@@ -16,34 +16,38 @@ namespace Api.IntegrationTests.Ride
     class CreateTests : IntegrationSetup
     {
         [Test]
-        public async Task Create_WhenAuthorizedUserCallCreateWithValidRequest_RideIsCreated()
+        public async Task Create_WhenAuthorizedUserCallCreateWithValidRequest_ReturnedStatusOk()
         {
-            //Create customer
-            var registerRequest = getRegisterRequest();
-            await PostAsync("/api/customer/register", registerRequest);
 
-            //Login on customer
-            var loginRequest = getLoginRequest();
-            var loginResponse = await PostAsync("/api/customer/login", loginRequest);
-
-            //Map login returned to object
-            var loginResponseObject = GetObject<LoginResponse>(loginResponse);
-
-            //Get Token
-            var token = loginResponseObject.Token;
+            await LoginOnCustomerAccount();
 
             //Create Ride Request
             var request = getCreateRideRequest();
 
-            //Default header authentication setup.
-            _client.DefaultRequestHeaders.Add("authorization", "Bearer "+token);
+            //Make request
+            var response = await PostAsync("api/rides/create", request);
 
-            //Make response
-           var response = await PostAsync("api/rides/create", request);
-
-           Console.WriteLine(await response.Content.ReadAsStringAsync() + "hejhej");
            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
+
+        [Test]
+        public async Task Create_WhenAuthorizedUserCallCreateWithValidRequest_RideIsCreated()
+        {
+
+            await LoginOnCustomerAccount();
+
+            //Create Ride Request
+            var request = getCreateRideRequest();
+
+            //Make request
+            var response = await PostAsync("api/rides/create", request);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Rides.ToList().Count, Is.EqualTo(1));
+            }
+        }
+
 
 
         [Test]
@@ -70,7 +74,15 @@ namespace Api.IntegrationTests.Ride
         [Test]
         public async Task Create_WhenAuthorizedUserCallCreateWithValidRequestButInsufficientFunds_RideIsNotCreated()
         {
+            await LoginOnCustomerAccount();
 
+            //Create Ride Request
+            var request = getCreateRideRequest();
+
+            //Make request
+            var response = await PostAsync("api/rides/create", request);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
@@ -108,6 +120,27 @@ namespace Api.IntegrationTests.Ride
                 IsShared = false,
                 PassengerCount = 2
             };
+        }
+
+
+        private async Task LoginOnCustomerAccount()
+        {
+            //Create customer
+            var registerRequest = getRegisterRequest();
+            await PostAsync("/api/customer/register", registerRequest);
+
+            //Login on customer
+            var loginRequest = getLoginRequest();
+            var loginResponse = await PostAsync("/api/customer/login", loginRequest);
+
+            //Map login returned to object
+            var loginResponseObject = GetObject<LoginResponse>(loginResponse);
+
+            //Get Token
+            var token = loginResponseObject.Token;
+
+            //Default header authentication setup.
+            _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="customer">The customer to add</param>
         /// <param name="password">The users password </param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="IdentityException"></exception>
         public async Task<Customer> AddCustomerAsync(Customer customer, string password)
         {
             using (var transaction = _context.Database.BeginTransaction())
@@ -64,7 +64,7 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">Customer does not exist.</exception>
+        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
         public async Task<Customer> GetCustomerAsync(string email)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
@@ -73,6 +73,29 @@ namespace Api.DataAccessLayer.Repositories
             {
                 throw new UserIdInvalidException("Customer does not exist.");
             }
+
+            return customer;
+        }
+
+        /// <summary>
+        /// Deposit amount to customer
+        /// </summary>
+        /// <param name="customerId">The customers id</param>
+        /// /// <param name="deposit">The amount to deposit</param>
+        /// <returns></returns>
+        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+        public async Task<Customer> DepositAsync(string customerId, int deposit)
+        {
+            var customer = await _context.Customers.FindAsync(customerId);
+
+            if (customer == null)
+            {
+                throw new UserIdInvalidException("Customer does not exist.");
+            }
+            
+            //Update customer
+            customer.Balance += deposit;
+            await _context.SaveChangesAsync();
 
             return customer;
         }

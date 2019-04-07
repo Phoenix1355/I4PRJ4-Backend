@@ -13,5 +13,13 @@ namespace Api.BusinessLogicLayer.Interfaces
     {
         Task<RegisterResponse> AddCustomerAsync(RegisterRequest request);
         Task<LoginResponse> LoginCustomerAsync(LoginRequest request);
+
+        /// <summary>
+        /// Deposits amount.
+        /// </summary>
+        /// <param name="request">The request containing the amount to deposit.</param>
+        /// /// <param name="customerId">Id of the customer to deposit to.</param>
+        /// <returns>A customer wrapped in a responseobject.</returns>
+        Task DepositAsync(DepositRequest request, string customerId);
     }
 }
