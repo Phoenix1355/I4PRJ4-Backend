@@ -11,6 +11,7 @@ namespace Api.BusinessLogicLayer.Interfaces
         //Task<List<Ride>> GetAllRidesAsync();
         //Task<Ride> GetRideByIdAsync(int id);
         Task<CreateRideResponse> AddRideAsync(CreateRideRequest request, string customerId);
+        Task<decimal> CalculatePriceAsync(Address first, Address second, bool isShared);
         //Task<Ride> UpdateRideAsync(Ride ride);
         //Task<Ride> DeleteRideAsync(int id);
     }
