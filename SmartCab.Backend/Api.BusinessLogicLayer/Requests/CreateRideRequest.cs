@@ -1,27 +1,31 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Api.BusinessLogicLayer.CustomDataAnnotations;
 using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.Requests
 {
     public class CreateRideRequest
     {
-        //[Required]
+        [Required]
         public bool IsShared { get; set; }
 
-        //[Required]
+        [Required]
+        [GreaterThanCurrentDateTime(ErrorMessage = "The departure time must be greater than the current datetime.")]
         public DateTime DepartureTime { get; set; }
 
-        //[Required]
+        [Required]
+        [GreaterThanCurrentDateTime(ErrorMessage = "The confirmation time must be greater than the current datetime.")]
         public DateTime ConfirmationDeadline { get; set; }
 
-        //[Required]
+        [Required]
+        [Range(1, 4, ErrorMessage = "The passenger count must be between 1 and 4.")]
         public int PassengerCount { get; set; }
 
-        //[Required]
+        [Required]
         public Address StartDestination { get; set; }
 
-        //[Required]
+        [Required]
         public Address EndDestination { get; set; }
     }
 }
