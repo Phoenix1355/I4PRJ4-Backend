@@ -60,6 +60,13 @@ namespace Api.IntegrationTests
             return response;
         }
 
+        protected async Task<HttpResponseMessage> PutAsync(string endPointUrl, object data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var response = await _client.PutAsync(endPointUrl, new StringContent(json, Encoding.UTF8, "application/json"));
+            return response;
+        }
+
         protected T GetObject<T>(HttpResponseMessage response)
         {
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);

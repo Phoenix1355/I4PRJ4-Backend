@@ -21,6 +21,8 @@ namespace Api.IntegrationTests.Ride
 
             await LoginOnCustomerAccount();
 
+            await DepositToCustomer(1000);
+
             //Create Ride Request
             var request = getCreateRideRequest();
 
@@ -36,11 +38,14 @@ namespace Api.IntegrationTests.Ride
 
             await LoginOnCustomerAccount();
 
+            await DepositToCustomer(1000);
+
             //Create Ride Request
             var request = getCreateRideRequest();
 
             //Make request
             var response = await PostAsync("api/rides/create", request);
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
 
             using (var context = _factory.CreateContext())
             {
@@ -141,6 +146,16 @@ namespace Api.IntegrationTests.Ride
 
             //Default header authentication setup.
             _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
+        }
+
+        private async Task DepositToCustomer(int amount)
+        {
+            DepositRequest request = new DepositRequest()
+            {
+                Deposit = amount
+            };
+            
+            await PutAsync("/api/customer/deposit", request);
         }
     }
 }
