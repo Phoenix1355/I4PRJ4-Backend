@@ -117,20 +117,12 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>The distance between the two addresses.</returns>
         private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
         {
-            string[] originAddresses = { $"{first.CityName} {first.PostalCode} {first.StreetName} {first.StreetNumber}" + " Denmark" };
-            string[] destinationAddresses = { $"{second.CityName} {second.PostalCode} {second.StreetName} {second.StreetNumber}" + " Denmark" };
-            /*
-            var response = await _googleMapsApiService.GetDistance(originAddresses, destinationAddresses);
+            var validateOrigin = _googleMapsApiService.ValidateAddress(first.ToString());
+            var validateDestination = _googleMapsApiService.ValidateAddress(second.ToString());
+            await Task.WhenAll(validateOrigin, validateDestination); //Throws exception if validation fails
 
-            //Distance is returned in meters, so we divide with 1000 to get the result in kilometers
-            var distanceInKm = Convert.ToDecimal(response.Rows.FirstOrDefault()?.Elements.FirstOrDefault()?.Distance.Value/1000.0);
-            distanceInKm = 10;
-            if (response.Status != "OK" || distanceInKm <= 0)
-            {
-                throw new GoogleMapsApiException("A route between the provided addresses could not be calculated.");
-            }
-            */
-            var distanceInKm = 10;
+            var distanceInKm = await _googleMapsApiService.GetDistanceInKm(first.ToString(), second.ToString());
+
             return distanceInKm;
         }
     }

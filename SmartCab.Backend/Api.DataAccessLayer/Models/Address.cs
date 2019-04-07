@@ -32,5 +32,10 @@ namespace Api.DataAccessLayer.Models
             StreetName = streetName;
             StreetNumber = streetNumber;
         }
+
+        public override string ToString()
+        {
+            return $"{StreetName} {StreetNumber} {CityName} {PostalCode}";
+        }
     }
 }
