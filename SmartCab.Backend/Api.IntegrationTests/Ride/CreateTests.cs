@@ -36,10 +36,12 @@ namespace Api.IntegrationTests.Ride
             var request = getCreateRideRequest();
 
             //Default header authentication setup.
-            _client.DefaultRequestHeaders.Add("authorization", token);
-            
+            _client.DefaultRequestHeaders.Add("authorization", "Bearer "+token);
+
             //Make response
            var response = await PostAsync("api/rides/create", request);
+
+           Console.WriteLine(await response.Content.ReadAsStringAsync() + "hejhej");
            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
@@ -101,8 +103,8 @@ namespace Api.IntegrationTests.Ride
             {
                 ConfirmationDeadline = DateTime.Now,
                 DepartureTime = DateTime.Now,
-                StartDestination = new Address("City", 0000, "Street", 21),
-                EndDestination = new Address("City", 0000, "Street", 21),
+                StartDestination = new Address("City", 8000, "Street", 21),
+                EndDestination = new Address("City", 8000, "Street", 21),
                 IsShared = false,
                 PassengerCount = 2
             };
