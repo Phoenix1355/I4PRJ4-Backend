@@ -95,6 +95,7 @@ namespace Api.DataAccessLayer.Repositories
             
             //Update customer
             customer.Balance += deposit;
+            _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
         }
 
