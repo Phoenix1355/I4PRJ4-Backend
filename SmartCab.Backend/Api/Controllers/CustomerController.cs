@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -114,6 +115,30 @@ namespace Api.Controllers
                 Email = email,
                 Expiration = expiration
             });
+        }
+
+        /// <summary>
+        /// Deposit amount in request to the customer associated with the supplied JWT token.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
+        [Route("[action]")]
+        [HttpPut]
+        [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Deposit([FromHeader] string authorization, [FromBody] DepositRequest request)
+        {
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            await _customerService.DepositAsync(request, customerId);
+
+            return Ok();
         }
     }
 }
