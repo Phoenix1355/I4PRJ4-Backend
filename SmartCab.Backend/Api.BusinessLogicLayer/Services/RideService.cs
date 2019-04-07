@@ -29,6 +29,7 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
+        /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
         public RideService(IRideRepository rideRepository, IMapper mapper, IGoogleMapsApiService googleMapsApiService)
         {
             _rideRepository = rideRepository;
