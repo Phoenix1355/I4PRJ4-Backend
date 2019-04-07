@@ -123,7 +123,6 @@ namespace Api.Controllers
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
         [Authorize(Roles = nameof(Customer))]
-        [Produces("application/json")]
         [Route("[action]")]
         [HttpPut]
         [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
