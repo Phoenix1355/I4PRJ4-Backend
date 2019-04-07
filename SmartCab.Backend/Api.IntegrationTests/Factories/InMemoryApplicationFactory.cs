@@ -58,7 +58,6 @@ namespace SmartCabPoc.Integration.Test
                     // Ensure the database is created.
                     db.Database.EnsureCreated();
                 }
-            
             });
 
             //To overwrite services add them here. 

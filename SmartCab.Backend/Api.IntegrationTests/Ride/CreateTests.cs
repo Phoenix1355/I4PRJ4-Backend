@@ -275,6 +275,27 @@ namespace Api.IntegrationTests.Ride
             }
         }
 
+        [Test]
+        public async Task Create_WhenAuthorizedUserCreatesUntilRunsOutOfFunds_LastOneFails()
+        {
+            await LoginOnCustomerAccount();
+
+            await DepositToCustomer(1000);
+
+            //Create Ride Request
+            var request = getCreateRideRequest();
+
+            //Make request
+            for (int x = 0; x < 10; x++)
+            {
+                await PostAsync("api/rides/create", request);
+            }
+            //No more funds, everything reserved. 
+
+            var response  = await PostAsync("api/rides/create", request);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
         private CreateRideRequest getCreateRideRequest()
         {
             return new CreateRideRequest()
