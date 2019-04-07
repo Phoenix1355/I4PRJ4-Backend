@@ -60,8 +60,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         private async Task<CreateRideResponse> AddSoloRideAsync(CreateRideRequest request, string customerId)
         {
-            var ride = _mapper.Map<SoloRide>(request); //TODO: Should map to a solo ride
-            ride.Price = await CalculatePrice(ride.StartDestination, ride.EndDestination, request.IsShared);
+            var ride = _mapper.Map<SoloRide>(request);
+            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, false);
             ride.CustomerId = customerId;
             ride = await _rideRepository.AddSoloRideAsync(ride);
             var response = _mapper.Map<CreateRideResponse>(ride);
@@ -93,9 +93,12 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="second">The second address</param>
         /// <param name="isShared">True if it is a shared ride, false if it is a solo ride.</param>
         /// <returns>The price of the ride.</returns>
-        public async Task<decimal> CalculatePrice(Address first, Address second, bool isShared)
+        public async Task<decimal> CalculatePriceAsync(Address first, Address second, bool isShared)
         {
+            //Business rule: Price should be 10x the distance in kilometers
             const decimal multiplier = 10;
+
+            //Business rule: A shared ride gives the customer a discount of 25%
             const decimal discount = (decimal)0.75;
 
             var distance = await GetDistanceInKilometersAsync(first, second);
@@ -110,18 +113,20 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
-        /// Calculates the distance between two addresses by using the Google Map API and returns the distance.
+        /// Calculates the distance between two addresses and returns the distance.
         /// </summary>
         /// <param name="first">The first address.</param>
         /// <param name="second">The second address.</param>
         /// <returns>The distance between the two addresses.</returns>
         private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
         {
+            //Validate the addresses
             var validateOrigin = _googleMapsApiService.ValidateAddress(first.ToString());
             var validateDestination = _googleMapsApiService.ValidateAddress(second.ToString());
-            await Task.WhenAll(validateOrigin, validateDestination); //Throws exception if validation fails
+            await Task.WhenAll(validateOrigin, validateDestination); 
 
-            var distanceInKm = await _googleMapsApiService.GetDistanceInKm(first.ToString(), second.ToString());
+            //Validation ok (otherwise an exception would be thrown above)
+            var distanceInKm = await _googleMapsApiService.GetDistanceInKmAsync(first.ToString(), second.ToString());
 
             return distanceInKm;
         }

@@ -115,8 +115,10 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
+            //Get the customerId that is stored as a claim in the token
             var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
 
+            //This should never happen, but better safe than sorry
             if (string.IsNullOrEmpty(customerId))
             {
                 throw new UserIdInvalidException(

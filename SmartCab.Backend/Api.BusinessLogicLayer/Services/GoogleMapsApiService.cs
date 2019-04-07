@@ -16,27 +16,44 @@ using Newtonsoft.Json;
 namespace Api.BusinessLogicLayer.Services
 {
     /// <summary>
-    /// Source: https://dujushi.github.io/2016/01/12/Google-Distance-Matrix-API-with-HttpClient-and-Json-NET/
+    /// This class is used to send requests to the Google Maps Api.
     /// </summary>
+    /// <remarks>
+    /// Two services are used:<br/>
+    ///     Distance Matrix<br/>
+    ///     Geocoding<br/>
+    /// A secret api key must be used to be allowed to make requests to those endpoint.<br/>
+    /// This api key is stored in Azure under the key "GoogleMapsApiKey".<br/>
+    /// Inspiration gotten from: https://dujushi.github.io/2016/01/12/Google-Distance-Matrix-API-with-HttpClient-and-Json-NET/
+    /// </remarks>
     public class GoogleMapsApiService : IGoogleMapsApiService
     {
         private readonly string _distanceMatrixUrl;
         private readonly string _geocodingUrl;
         private readonly string _apiKey;
 
+        /// <summary>
+        /// Constructor for this class.
+        /// </summary>
+        /// <param name="config">The application configuration.</param>
         public GoogleMapsApiService(IConfiguration config)
         {
             _distanceMatrixUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
             _geocodingUrl = "https://maps.googleapis.com/maps/api/geocode/json";
-            _apiKey = config["GoogleMapsApiKey"];
+            _apiKey = config["GoogleMapsApiKey"]; //when run locally, secrets.json will be used
         }
 
-        public async Task<decimal> GetDistanceInKm(string origin, string destination)
+        /// <summary>
+        /// Sends a request to google maps api's distance matrix endpoint and returns the distance between two addresses.
+        /// </summary>
+        /// <param name="origin">The origin</param>
+        /// <param name="destination">The destination</param>
+        /// <returns>The distance between origin and destination in kilometers.</returns>
+        public async Task<decimal> GetDistanceInKmAsync(string origin, string destination)
         {
             using(var client = new HttpClient())
             {
                 var uri = new Uri(GetDistanceMatrixRequestUrl(origin, destination));
-
                 var response = await client.GetAsync(uri);
                 if (!response.IsSuccessStatusCode)
                 {
@@ -62,6 +79,14 @@ namespace Api.BusinessLogicLayer.Services
             }
         }
 
+        /// <summary>
+        /// Validates an address. Throws a GoogleMapsApiException if validation fails.
+        /// </summary>
+        /// <remarks>
+        /// Validation fails if the precision of the address was not down to street level.<br/>
+        /// The validation will for example fail if the street number is missing.
+        /// </remarks>
+        /// <param name="address">The address that should be validated.</param>
         public async Task ValidateAddress(string address)
         {
             using (var client = new HttpClient())
@@ -91,11 +116,22 @@ namespace Api.BusinessLogicLayer.Services
             }
         }
 
+        /// <summary>
+        /// Returns an url for the distance matrix endpoint.
+        /// </summary>
+        /// <param name="origin">The origin</param>
+        /// <param name="destination">The destination</param>
+        /// <returns>The url.</returns>
         private string GetDistanceMatrixRequestUrl(string origin, string destination)
         {
             return $"{_distanceMatrixUrl}?origins={origin}&destinations={destination}&region=dk&key={_apiKey}";
         }
 
+        /// <summary>
+        /// Returns an url for the geocoding endpoint.
+        /// </summary>
+        /// <param name="address">An address</param>
+        /// <returns>The url.</returns>
         private string GetGeocodingRequestUrl(string address)
         {
             return $"{_geocodingUrl}?address={address}&key={_apiKey}";
