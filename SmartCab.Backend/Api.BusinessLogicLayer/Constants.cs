@@ -12,5 +12,9 @@
 
         //============================ Related to JWT claims ==========================================
         public const string UserIdClaim = "UserId";
+
+        //============================ Related to Deposits ============================================
+        public const decimal MinDepositAmount = (decimal)0.01;
+        public const decimal MaxDepositAmount = 1000000;
     }
 }

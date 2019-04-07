@@ -47,7 +47,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 Password = ValidPassword,
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         //Remember: The data annotations set on the password property is only checking if it is set.
@@ -63,21 +63,9 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 Password = password,
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
-        /// <summary>
-        /// Source: https://stackoverflow.com/questions/2167811/unit-testing-asp-net-dataannotations-validation
-        /// Validates an object based on the data annotations set on the object's properties and returns the validation result.
-        /// </summary>
-        /// <param name="model">The object to validate</param>
-        /// <returns>The validation result for the object.</returns>
-        private IList<ValidationResult> ValidateModel(object model)
-        {
-            var validationResults = new List<ValidationResult>();
-            var ctx = new ValidationContext(model, null, null);
-            Validator.TryValidateObject(model, ctx, validationResults, true);
-            return validationResults;
-        }
+        
     }
 }

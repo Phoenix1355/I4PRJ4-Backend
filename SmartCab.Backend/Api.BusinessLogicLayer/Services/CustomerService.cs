@@ -119,7 +119,7 @@ namespace Api.BusinessLogicLayer.Services
         public async Task DepositAsync(DepositRequest request, string customerId)
         {
             //Amount to deposit
-            int depositAmount = request.Deposit;
+            var depositAmount = request.Deposit;
 
             //Deposits
             await _customerRepository.DepositAsync(customerId, depositAmount);
