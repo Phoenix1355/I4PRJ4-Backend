@@ -125,7 +125,7 @@ namespace Api.Controllers
         [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
-        [HttpGet]
+        [HttpPut]
         [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Deposit([FromHeader] string authorization, [FromBody] DepositRequest request)
         {
