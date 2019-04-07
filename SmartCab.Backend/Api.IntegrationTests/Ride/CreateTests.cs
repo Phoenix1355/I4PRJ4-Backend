@@ -12,9 +12,16 @@ using NUnit.Framework;
 
 namespace Api.IntegrationTests.Ride
 {
+
     [TestFixture]
     class CreateTests : IntegrationSetup
     {
+        //-----------------------------------------INFO--------------------------------
+        //   All rides cost 100 kr, no matter what adresses they contain. 
+        //-----------------------------------------Info end --------------------------
+
+
+
         [Test]
         public async Task Create_WhenAuthorizedUserCallCreateWithValidRequest_ReturnedStatusOk()
         {
