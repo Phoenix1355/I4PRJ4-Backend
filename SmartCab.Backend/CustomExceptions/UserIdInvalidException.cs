@@ -7,17 +7,7 @@ namespace CustomExceptions
     /// </summary>
     public class UserIdInvalidException : Exception
     {
-        public UserIdInvalidException()
-        {
-            
-        }
-
         public UserIdInvalidException(string message) : base(message)
-        {
-
-        }
-
-        public UserIdInvalidException(string message, Exception inner) : base(message, inner)
         {
 
         }

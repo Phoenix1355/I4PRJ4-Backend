@@ -307,8 +307,8 @@ namespace Api.IntegrationTests.Ride
         {
             return new CreateRideRequest()
             {
-                ConfirmationDeadline = DateTime.Now,
-                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now.AddSeconds(1), //added one second because those dates must be in the future
+                DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
                 IsShared = false,

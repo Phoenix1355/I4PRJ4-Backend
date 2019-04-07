@@ -5,7 +5,7 @@ namespace Api.BusinessLogicLayer.Interfaces
 {
     public interface IGoogleMapsApiService
     {
-        Task<decimal> GetDistanceInKm(string origin, string destination);
-        Task ValidateAddress(string address);
+        Task<decimal> GetDistanceInKmAsync(string origin, string destination);
+        Task ValidateAddressAsync(string address);
     }
 }

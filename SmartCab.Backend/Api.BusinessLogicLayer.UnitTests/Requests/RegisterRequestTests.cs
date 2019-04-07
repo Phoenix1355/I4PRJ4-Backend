@@ -53,7 +53,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 PhoneNumber = ValidPhoneNumber
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         //Remember: The data annotations set on the two password attributes is only checking if the passwords are present and equal
@@ -74,7 +74,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 PhoneNumber = ValidPhoneNumber
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         [TestCase(0, 1)]
@@ -99,7 +99,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 PhoneNumber = ValidPhoneNumber
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         
@@ -116,7 +116,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 PhoneNumber = ValidPhoneNumber
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         [TestCase("01234567", 1)]
@@ -143,21 +143,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 PhoneNumber = phoneNumber
             };
 
-            Assert.That(ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
-        }
-
-        /// <summary>
-        /// Source: https://stackoverflow.com/questions/2167811/unit-testing-asp-net-dataannotations-validation
-        /// Validates an object based on the data annotations set on the object's properties and returns the validation result.
-        /// </summary>
-        /// <param name="model">The object to validate</param>
-        /// <returns>The validation result for the object.</returns>
-        private IList<ValidationResult> ValidateModel(object model)
-        {
-            var validationResults = new List<ValidationResult>();
-            var ctx = new ValidationContext(model, null, null);
-            Validator.TryValidateObject(model, ctx, validationResults, true);
-            return validationResults;
+            Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
         /// <summary>
