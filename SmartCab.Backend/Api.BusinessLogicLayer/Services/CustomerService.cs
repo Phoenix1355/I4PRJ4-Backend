@@ -58,8 +58,7 @@ namespace Api.BusinessLogicLayer.Services
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber,
                 UserName = request.Email,
-                Email = request.Email,
-                Balance = 1000
+                Email = request.Email
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
