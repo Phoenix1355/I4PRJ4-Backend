@@ -84,7 +84,7 @@ namespace Api.DataAccessLayer.Repositories
         /// /// <param name="deposit">The amount to deposit</param>
         /// <returns></returns>
         /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<Customer> DepositAsync(string customerId, int deposit)
+        public async Task DepositAsync(string customerId, int deposit)
         {
             var customer = await _context.Customers.FindAsync(customerId);
 
@@ -96,8 +96,6 @@ namespace Api.DataAccessLayer.Repositories
             //Update customer
             customer.Balance += deposit;
             await _context.SaveChangesAsync();
-
-            return customer;
         }
 
         #region IDisposable implementation
