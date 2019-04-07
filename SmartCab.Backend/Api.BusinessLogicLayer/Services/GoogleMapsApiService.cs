@@ -87,7 +87,7 @@ namespace Api.BusinessLogicLayer.Services
         /// The validation will for example fail if the street number is missing.
         /// </remarks>
         /// <param name="address">The address that should be validated.</param>
-        public async Task ValidateAddress(string address)
+        public async Task ValidateAddressAsync(string address)
         {
             using (var client = new HttpClient())
             {

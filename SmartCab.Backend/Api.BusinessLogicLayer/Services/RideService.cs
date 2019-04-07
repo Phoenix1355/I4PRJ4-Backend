@@ -121,12 +121,14 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<decimal> GetDistanceInKilometersAsync(Address first, Address second)
         {
             //Validate the addresses
-            var validateOrigin = _googleMapsApiService.ValidateAddress(first.ToString());
-            var validateDestination = _googleMapsApiService.ValidateAddress(second.ToString());
+            var firstAsString = first.ToString();
+            var secondAsString = second.ToString();
+            var validateOrigin = _googleMapsApiService.ValidateAddressAsync(firstAsString);
+            var validateDestination = _googleMapsApiService.ValidateAddressAsync(firstAsString);
             await Task.WhenAll(validateOrigin, validateDestination); 
 
             //Validation ok (otherwise an exception would be thrown above)
-            var distanceInKm = await _googleMapsApiService.GetDistanceInKmAsync(first.ToString(), second.ToString());
+            var distanceInKm = await _googleMapsApiService.GetDistanceInKmAsync(firstAsString, secondAsString);
 
             return distanceInKm;
         }
