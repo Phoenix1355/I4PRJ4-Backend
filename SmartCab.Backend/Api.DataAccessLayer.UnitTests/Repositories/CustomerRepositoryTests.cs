@@ -117,7 +117,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("NoEmail@mail.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             try
             {
-                await _uut.GetCustomerAsync("NoEmail@mail.com");
+                await _uut.GetCustomerAsync("Not valid Id");
 
             }
             catch (UserIdInvalidException e)
@@ -140,7 +140,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             try
             {
-                await _uut.DepositAsync("NoEmail@mail.com", 0);
+                await _uut.DepositAsync("Not valid Id", 1);
 
             }
             catch (UserIdInvalidException e)
@@ -154,12 +154,10 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void DepositAsync_NoCustomer_ThrowsUserIdInvalidException()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("NoEmail@mail.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
 
         [TestCase(1)]
-        [TestCase(0)]
-        [TestCase(-100)]
         [TestCase(100)]
         [TestCase(100000)]
         public async Task DepositAsync_DepositAmounts_CustomerAccountHasReceivedExpectedBalanace(decimal deposit)
@@ -183,6 +181,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
             }
+        }
+
+        [TestCase(0)]
+        [TestCase(-100)]
+        [TestCase(-100000)]
+        public async Task DepositAsync_DepositAmountsNegativeAmount_ThrowsNegativeDepositException(decimal deposit)
+        {
+            Assert.ThrowsAsync<NegativeDepositException>(async () => await _uut.DepositAsync("No Id as validation occurs first", deposit));
         }
 
         [Test]

@@ -2,9 +2,9 @@
 
 namespace CustomExceptions
 {
-    public class MultipleOrderException : Exception
+    public class NegativeDepositException : Exception
     {
-        public MultipleOrderException(string message) : base(message)
+        public NegativeDepositException(string message) : base(message)
         {
 
         }
