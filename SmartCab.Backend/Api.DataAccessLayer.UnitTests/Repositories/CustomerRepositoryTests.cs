@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
@@ -43,7 +44,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
+        public async Task AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
         {
             Customer customer = new Customer
             {
@@ -58,7 +59,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            _uut.AddCustomerAsync(customer, "Qwer111!").Wait();
+            await _uut.AddCustomerAsync(customer, "Qwer111!");
 
 
 
@@ -89,11 +90,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            Assert.ThrowsAsync<IdentityException>(()=>_uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
-        public void GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
             Customer customerAddedToDatabase = new Customer
             {
@@ -109,28 +110,70 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            var customerReturned = _uut.GetCustomerAsync(customerAddedToDatabase.Email).Result;
+            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
             Assert.That(customerReturned.Name, Is.EqualTo("Name"));
         }
 
         [Test]
         public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>( () =>  _uut.GetCustomerAsync("NoEmail@mail.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("NoEmail@mail.com"));
         }
 
         [Test]
-        public void GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
+        public async Task GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
         {
             try
             {
-                _uut.GetCustomerAsync("NoEmail@mail.com");
+                await _uut.GetCustomerAsync("NoEmail@mail.com");
 
             }
-            catch (ArgumentNullException e)
+            catch (UserIdInvalidException e)
             {
                 Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
             }
+        }
+
+
+        [Test]
+        public async Task DepositAsync_NoCustomer_ThrowsContainsMessage()
+        {
+            try
+            {
+                await _uut.DepositAsync("NoEmail@mail.com", 0);
+
+            }
+            catch (UserIdInvalidException e)
+            {
+                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
+            }
+
+        }
+
+
+        [Test]
+        public void DepositAsync_NoCustomer_ThrowsUserIdInvalidException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("NoEmail@mail.com"));
+        }
+
+        [Test]
+        public async Task DepositAsync_DepositAmounts_CustomerAccountHasReceivedExpectedBalanace(decimal deposit)
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            using (var content = _factory.CreateContext())
+            {
+                content.Customers.Add(customerAddedToDatabase);
+                content.SaveChanges();
+            }
+
+            await _uut.DepositAsync("NoEmail@mail.com", deposit);
         }
 
         [Test]
