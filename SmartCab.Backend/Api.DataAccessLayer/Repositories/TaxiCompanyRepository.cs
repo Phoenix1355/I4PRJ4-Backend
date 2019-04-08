@@ -33,37 +33,7 @@ namespace Api.DataAccessLayer.Repositories
             _identityUserRepository = identityUserRepository;
         }
 
-        /*
-        /// <summary>
-        /// Adds the taxiCompany asynchronous in a transaction
-        /// </summary>
-        /// <param name="taxicompany">The taxiCompany to add</param>
-        /// <param name="password">The users password </param>
-        /// <returns></returns>
-        /// <exception cref="IdentityException"></exception>
-        public async Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxiCompany, string password)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                var identityResult = await _identityUserRepository.AddIdentityUserAsync(taxiCompany, password);
-                if (identityResult.Succeeded)
-                {
-                    string role = nameof(TaxiCompany);
-                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(taxiCompany, role);
-                    if (resultAddRole.Succeeded)
-                    {
-                        transaction.Commit();
-                        return taxiCompany;
-                    }
-                }
-                transaction.Rollback();
-
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }
-            */
-
-
+        
         /// <summary>
         /// Gets the taxiCompany asynchronous based on the email. Throws if taxiCompany doesn't exist. 
         /// </summary>
@@ -98,19 +68,14 @@ namespace Api.DataAccessLayer.Repositories
             _context?.Dispose();
         }
 
-
-        #endregion
-
-        #region Temp throw Exception
-        public Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxiCompany, string password)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task DepositAsync(string customerId, decimal deposit)
         {
             throw new NotImplementedException();
         }
+
+
         #endregion
+
+
     }
 }
