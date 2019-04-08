@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
@@ -31,19 +32,16 @@ namespace Api.BusinessLogicLayer.Services
         private readonly string _distanceMatrixUrl;
         private readonly string _geocodingUrl;
         private readonly string _apiKey;
-        private readonly IHttpClient _client;
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
         /// <param name="config">The application configuration.</param>
-        /// <param name="client">The http client used to send requests to the Google Maps Api.</param>
-        public GoogleMapsApiService(IConfiguration config, IHttpClient client)
+        public GoogleMapsApiService(IConfiguration config)
         {
-            _distanceMatrixUrl = config["DistanceMatrixUrl"];
-            _geocodingUrl = config["GeocodingUrl"];
+            _distanceMatrixUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
+            _geocodingUrl = "https://maps.googleapis.com/maps/api/geocode/json";
             _apiKey = config["GoogleMapsApiKey"]; //when run locally, secrets.json will be used
-            _client = client;
         }
 
         /// <summary>
@@ -54,30 +52,32 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>The distance between origin and destination in kilometers.</returns>
         public async Task<decimal> GetDistanceInKmAsync(string origin, string destination)
         {
-
-            var uri = new Uri(GetDistanceMatrixRequestUrl(origin, destination));
-            var response = await _client.GetAsync(uri);
-            if (!response.IsSuccessStatusCode)
+            using(var client = new HttpClient())
             {
-                throw new Exception("GoogleDistanceMatrixApi failed with status code: " + response.StatusCode);
+                var uri = new Uri(GetDistanceMatrixRequestUrl(origin, destination));
+                var response = await client.GetAsync(uri);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("GoogleDistanceMatrixApi failed with status code: " + response.StatusCode);
+                }
+
+                var content = await response.Content.ReadAsStringAsync();
+                var distanceMatrix = JsonConvert.DeserializeObject<GoogleDistanceMatrixResponse>(content);
+                
+                //Distance is returned in meters, so we divide with 1000 to get the result in kilometers
+                var distanceInKm = Convert.ToDecimal(distanceMatrix
+                                                     .Rows
+                                                     .FirstOrDefault()?
+                                                     .Elements.FirstOrDefault()?
+                                                     .Distance.Value / 1000.0);
+
+                if (distanceMatrix.Status != "OK" || distanceInKm <= 0)
+                {
+                    throw new GoogleMapsApiException("A route between the provided addresses could not be calculated.");
+                }
+
+                return distanceInKm;
             }
-
-            var content = await response.Content.ReadAsStringAsync();
-            var distanceMatrix = JsonConvert.DeserializeObject<GoogleDistanceMatrixResponse>(content);
-
-            //Distance is returned in meters, so we divide with 1000 to get the result in kilometers
-            var distanceInKm = Convert.ToDecimal(distanceMatrix
-                                                 .Rows
-                                                 .FirstOrDefault()?
-                                                 .Elements.FirstOrDefault()?
-                                                 .Distance.Value / 1000.0);
-
-            if (distanceMatrix.Status != "OK" || distanceInKm <= 0)
-            {
-                throw new GoogleMapsApiException("A route between the provided addresses could not be calculated.");
-            }
-
-            return distanceInKm;
         }
 
         /// <summary>
@@ -90,27 +90,38 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="address">The address that should be validated.</param>
         public async Task ValidateAddressAsync(string address)
         {
-            var uri = new Uri(GetGeocodingRequestUrl(address));
-            var response = await _client.GetAsync(uri);
-            if (!response.IsSuccessStatusCode)
+            using (var client = new HttpClient())
             {
-                throw new Exception("GoogleDistanceMatrixApi failed with status code: " + response.StatusCode);
-            }
+                var uri = new Uri(GetGeocodingRequestUrl(address));
+                var response = await client.GetAsync(uri);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception("GoogleDistanceMatrixApi failed with status code: " + response.StatusCode);
+                }
 
-            var content = await response.Content.ReadAsStringAsync();
-            var geocodingResponse = JsonConvert.DeserializeObject<GoogleGeocodingResponse>(content);
-            var locationType = geocodingResponse
-                               .Results.FirstOrDefault()?
-                               .Geometry
-                               .LocationType;
+                var content = await response.Content.ReadAsStringAsync();
+                var geocodingResponse = JsonConvert.DeserializeObject<GoogleGeocodingResponse>(content);
 
-            //"ROOFTOP" indicates the address is precise down to street level
-            //"RANGE_INTERPOLATED" indicates the result reflects an approximation (usually on a road)
-            //interpolated between two precise points (such as intersections). This is good enough
-            //https://developers.google.com/maps/documentation/geocoding/intro#reverse-restricted
-            if (locationType != "ROOFTOP" && locationType != "RANGE_INTERPOLATED")
-            {
-                throw new GoogleMapsApiException($"The address \"{address}\" is not valid.");
+                if (geocodingResponse.Status != "OK")
+                {
+                    Debug.WriteLine("The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                    throw new Exception(
+                        "The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                }
+
+                var locationType = geocodingResponse
+                                   .Results.FirstOrDefault()?
+                                   .Geometry
+                                   .LocationType;
+
+                //"ROOFTOP" indicates the address is precise down to street level
+                //"RANGE_INTERPOLATED" indicates the result reflects an approximation (usually on a road)
+                //interpolated between two precise points (such as intersections). This is good enough
+                //https://developers.google.com/maps/documentation/geocoding/intro#reverse-restricted
+                if (locationType != "ROOFTOP" && locationType != "RANGE_INTERPOLATED")
+                {
+                    throw new GoogleMapsApiException($"The address \"{address}\" is not valid.");
+                }
             }
         }
 

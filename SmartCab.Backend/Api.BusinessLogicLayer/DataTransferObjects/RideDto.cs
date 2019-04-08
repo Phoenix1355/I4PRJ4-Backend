@@ -13,6 +13,6 @@ namespace Api.BusinessLogicLayer.DataTransferObjects
         public virtual Address EndDestination { get; set; }
         public DateTime ConfirmationDeadline { get; set; }
         public int PassengerCount { get; set; }
-        public int Price { get; set; }
+        public decimal Price { get; set; }
     }
 }
