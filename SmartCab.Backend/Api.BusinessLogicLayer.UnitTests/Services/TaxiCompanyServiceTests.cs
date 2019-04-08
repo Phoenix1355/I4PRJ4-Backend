@@ -78,6 +78,44 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             Assert.That(response.Token, Is.EqualTo(token));
         }
 
+        [Test]
+        public async Task LoginTaxiCompanyAsync_LoginSucceeds_ReturnsLoginResponseThatContainsTheExpectedTaxiCompanyDto()
+        {
+            // Arrange
+            var request = new LoginRequest
+            {
+                Email = "test@domain.com",
+                Password = "Password1!"
+            };
+
+            var token = "Token";
+            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
+
+            var taxiCompany = new TaxiCompany
+            {
+                Id = "Some Id",
+                Email = request.Email
+            };
+
+            _taxiCompanyRepository.GetTaxiCompanyAsync(null).ReturnsForAnyArgs(taxiCompany);
+
+            var taxiCompanyDto = new TaxiCompanyDto
+            {
+                Email = request.Email,
+                Name = "Some Name",
+                PhoneNumber = "123456789"
+            };
+
+            _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);
+
+            // Act
+            var response = await _taxiCompanyService.LoginTaxiCompanyAsync(request);
+
+            // Assert
+            Assert.That(response.TaxiCompany, Is.EqualTo(taxiCompanyDto));
+        }
+
         #endregion
     }
 }
