@@ -206,9 +206,9 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
-            services.AddScoped<IHttpClient, TestableHttpClient>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IHttpClient, TestableHttpClient>();
             services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
