@@ -67,15 +67,6 @@ namespace Api.DataAccessLayer.Repositories
         {
             _context?.Dispose();
         }
-
-        public Task DepositAsync(string customerId, decimal deposit)
-        {
-            throw new NotImplementedException();
-        }
-
-
         #endregion
-
-
     }
 }

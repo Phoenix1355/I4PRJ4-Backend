@@ -4,9 +4,11 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.Interfaces
 {
+    /// <summary>
+    /// Interface for Taxi Company
+    /// </summary>
     public interface ITaxiCompanyRepository
     {
         Task<TaxiCompany> GetTaxiCompanyAsync(string email);
-        Task DepositAsync(string customerId, decimal deposit);
     }
 }
