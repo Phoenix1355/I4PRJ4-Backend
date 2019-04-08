@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Reflection;
@@ -131,6 +132,7 @@ namespace Api
                 mapper.CreateMap<SoloRide, CreateRideResponse>();
                 mapper.CreateMap<SharedRide, CreateRideResponse>();
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
+                mapper.CreateMap<Ride, RideDto>();
             });
         }
 
@@ -204,6 +206,8 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
