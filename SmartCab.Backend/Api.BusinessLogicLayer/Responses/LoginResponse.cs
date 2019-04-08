@@ -6,5 +6,6 @@ namespace Api.BusinessLogicLayer.Responses
     {
         public string Token { get; set; }
         public CustomerDto Customer { get; set; }
+        public TaxiCompanyDto TaxiCompany { get; set; }
     }
 }
