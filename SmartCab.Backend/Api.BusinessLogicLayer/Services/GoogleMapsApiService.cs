@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
@@ -97,12 +98,20 @@ namespace Api.BusinessLogicLayer.Services
                 throw new Exception("GoogleDistanceMatrixApi failed with status code: " + response.StatusCode);
             }
 
-            var content = await response.Content.ReadAsStringAsync();
-            var geocodingResponse = JsonConvert.DeserializeObject<GoogleGeocodingResponse>(content);
-            var locationType = geocodingResponse
-                               .Results.FirstOrDefault()?
-                               .Geometry
-                               .LocationType;
+                var content = await response.Content.ReadAsStringAsync();
+                var geocodingResponse = JsonConvert.DeserializeObject<GoogleGeocodingResponse>(content);
+
+                if (geocodingResponse.Status != "OK")
+                {
+                    Debug.WriteLine("The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                    throw new Exception(
+                        "The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                }
+
+                var locationType = geocodingResponse
+                                   .Results.FirstOrDefault()?
+                                   .Geometry
+                                   .LocationType;
 
             //"ROOFTOP" indicates the address is precise down to street level
             //"RANGE_INTERPOLATED" indicates the result reflects an approximation (usually on a road)
