@@ -39,12 +39,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _uut = new TaxiCompanyRepository(_factory.CreateContext(), identityUserRepository);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _factory.Dispose();
-        }
-
         [Test]
         public void GetTaxiCompanyAsync_TaxiCompanyInDatabase_ReturnsTaxiCompany()
         {
@@ -76,7 +70,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
             catch(ArgumentException e)
             {
-                Assert.That(e.Message, Is.EqualTo("The Taxi Company you are looking for are not here"));
+                Assert.That(e.Message, Is.EqualTo("TaxiCompany does not exist."));
             }
         }
 
@@ -90,6 +84,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         public void Dispose_DisposeOfObject_Disposes()
         {
             _uut.Dispose();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _factory.Dispose();
         }
     }
 }
