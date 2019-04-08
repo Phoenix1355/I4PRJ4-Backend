@@ -39,8 +39,31 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _uut = new TaxiCompanyRepository(_factory.CreateContext(), identityUserRepository);
         }
 
+        // Testing Taxi Company Name
         [Test]
-        public void GetTaxiCompanyAsync_TaxiCompanyInDatabase_ReturnsTaxiCompany()
+        public void GetTaxiCompanyAsync_TaxiCompanyNameInDatabase_ReturnsTaxiCompanyName()
+        {
+            TaxiCompany taxicompanyAddedToDatabase = new TaxiCompany
+            {
+                Email = "valid@email.com",
+                Name = "DanTaxi",
+                PhoneNumber = "45612378",
+            };
+
+            using (var content = _factory.CreateContext())
+            {
+                content.TaxiCompanies.Add(taxicompanyAddedToDatabase);
+                content.SaveChanges();
+            }
+
+
+            var taxicompanyReturned = _uut.GetTaxiCompanyAsync(taxicompanyAddedToDatabase.Email).Result;
+            Assert.That(taxicompanyReturned.Name, Is.EqualTo("DanTaxi"));
+        }
+
+        // Testing Taxi Company Email
+        [Test]
+        public void GetTaxiCompanyAsync_TaxiCompanyEmail_ReturnsTaxiCompanyEmail()
         {
             TaxiCompany taxicompanyAddedToDatabase = new TaxiCompany
             {
@@ -57,7 +80,35 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
             var taxicompanyReturned = _uut.GetTaxiCompanyAsync(taxicompanyAddedToDatabase.Email).Result;
-            Assert.That(taxicompanyReturned.Name, Is.EqualTo("TaxiCompanyName"));
+            Assert.That(taxicompanyReturned.Email, Is.EqualTo("valid@email.com"));
+        }
+
+        //Testing Taxi Company Number
+        [Test]
+        public void GetTaxiCompanyAsync_TaxiCompanyPhoneNumber_ReturnsTaxiCompanyPhoneNumber()
+        {
+            TaxiCompany taxicompanyAddedToDatabase = new TaxiCompany
+            {
+                Email = "valid@email.com",
+                Name = "TaxiCompanyName",
+                PhoneNumber = "45612378",
+            };
+
+            using (var content = _factory.CreateContext())
+            {
+                content.TaxiCompanies.Add(taxicompanyAddedToDatabase);
+                content.SaveChanges();
+            }
+
+
+            var taxicompanyReturned = _uut.GetTaxiCompanyAsync(taxicompanyAddedToDatabase.Email).Result;
+            Assert.That(taxicompanyReturned.PhoneNumber, Is.EqualTo("45612378"));
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _factory.Dispose();
         }
 
         [Test]
@@ -84,12 +135,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         public void Dispose_DisposeOfObject_Disposes()
         {
             _uut.Dispose();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            _factory.Dispose();
         }
     }
 }
