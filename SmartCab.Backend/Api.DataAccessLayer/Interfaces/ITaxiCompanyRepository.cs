@@ -6,8 +6,8 @@ namespace Api.DataAccessLayer.Interfaces
 {
     public interface ITaxiCompanyRepository
     {
-        Task<TaxiCompany> AddCustomerAsync(Customer customer, string password);
-        Task<TaxiCompany> GetCustomerAsync(string email);
+        //Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxiCompany, string password);
+        Task<TaxiCompany> GetTaxiCompanyAsync(string email);
         Task DepositAsync(string customerId, decimal deposit);
     }
 }

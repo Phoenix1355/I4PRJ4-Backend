@@ -25,7 +25,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Initializes a new instance of the <see cref="TaxiCompanyRepository"/> class.
         /// </summary>
-        /// <param name="context">The context - Autoinjected</param>
+        /// <param name="context">The context - Autoinjected </param>
         /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
         public TaxiCompanyRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
@@ -35,9 +35,9 @@ namespace Api.DataAccessLayer.Repositories
 
         /*
         /// <summary>
-        /// Adds the customer asynchronous in a transaction
+        /// Adds the taxiCompany asynchronous in a transaction
         /// </summary>
-        /// <param name="taxicompany">The customer to add</param>
+        /// <param name="taxicompany">The taxiCompany to add</param>
         /// <param name="password">The users password </param>
         /// <returns></returns>
         /// <exception cref="IdentityException"></exception>
@@ -63,13 +63,14 @@ namespace Api.DataAccessLayer.Repositories
             }
             */
 
+
         /// <summary>
-        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
+        /// Gets the taxiCompany asynchronous based on the email. Throws if taxiCompany doesn't exist. 
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<TaxiCompany> GetCustomerAsync(string email)
+        /// <exception cref="UserIdInvalidException"> taxiCompany does not exist.</exception>
+        public async Task<TaxiCompany> GetTaxiCompanyAsync(string email)
         {
             var taxiCompany = await _context.TaxiCompanies.FirstOrDefaultAsync(c => c.Email == email);
 
@@ -97,6 +98,19 @@ namespace Api.DataAccessLayer.Repositories
             _context?.Dispose();
         }
 
+
+        #endregion
+
+        #region Temp throw Exception
+        public Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxiCompany, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DepositAsync(string customerId, decimal deposit)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }
