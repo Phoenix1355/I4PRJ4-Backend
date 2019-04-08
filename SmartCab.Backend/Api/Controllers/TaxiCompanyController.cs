@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.Requests;
@@ -15,6 +16,12 @@ namespace Api.Controllers
     [ApiController]
     public class TaxiCompanyController : ControllerBase
     {
+        private readonly ITaxiCompanyService _taxiCompanyService;
+
+        public TaxiCompanyController(ITaxiCompanyService taxiCompanyService)
+        {
+            _taxiCompanyService = taxiCompanyService;
+        }
         /// <summary>
         /// Registers a new taxi company account and returns the username for the created account.
         /// </summary>
@@ -40,16 +47,18 @@ namespace Api.Controllers
         /// <summary>
         /// Validates the user credentials and returns a JWT token if validation is successful.
         /// </summary>
-        /// <param name="model">The username and password that will be validated.</param>
+        /// <param name="request">The username and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Login(LoginRequest model)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
-            //check credentials logic
-            return Ok(new LoginResponse { Token = "Some generated token" });
+            var response = await _taxiCompanyService.LoginTaxiCompanyAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
