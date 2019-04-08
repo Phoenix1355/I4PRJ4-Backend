@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.ComTypes;
@@ -100,6 +101,14 @@ namespace Api.BusinessLogicLayer.Services
 
                 var content = await response.Content.ReadAsStringAsync();
                 var geocodingResponse = JsonConvert.DeserializeObject<GoogleGeocodingResponse>(content);
+
+                if (geocodingResponse.Status != "OK")
+                {
+                    Debug.WriteLine("The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                    throw new Exception(
+                        "The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
+                }
+
                 var locationType = geocodingResponse
                                    .Results.FirstOrDefault()?
                                    .Geometry
