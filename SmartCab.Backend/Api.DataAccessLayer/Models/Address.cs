@@ -16,12 +16,16 @@ namespace Api.DataAccessLayer.Models
     [Owned]
     public class Address
     {
+
         [Required]
         public string CityName { get; set; }
+
         [Required]
         public int PostalCode { get; set; }
+
         [Required]
         public string StreetName { get; set; }
+
         [Required]
         public int StreetNumber { get; set; }
 
