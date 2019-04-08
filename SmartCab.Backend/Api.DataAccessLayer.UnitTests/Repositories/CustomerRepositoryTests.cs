@@ -83,10 +83,10 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
 
-            using (var content = _factory.CreateContext())
+            using (var context = _factory.CreateContext())
             {
-                content.Customers.Add(customerToAddToDatabase);
-                content.SaveChanges();
+                context.Customers.Add(customerToAddToDatabase);
+                context.SaveChanges();
             }
 
 
@@ -103,10 +103,10 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 PhoneNumber = "12345678",
             };
 
-            using (var content = _factory.CreateContext())
+            using (var context = _factory.CreateContext())
             {
-                content.Customers.Add(customerAddedToDatabase);
-                content.SaveChanges();
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
             }
 
 
@@ -157,7 +157,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("NoEmail@mail.com"));
         }
 
-        [Test]
+        [TestCase(1)]
+        [TestCase(0)]
+        [TestCase(-100)]
+        [TestCase(100)]
+        [TestCase(100000)]
         public async Task DepositAsync_DepositAmounts_CustomerAccountHasReceivedExpectedBalanace(decimal deposit)
         {
             Customer customerAddedToDatabase = new Customer
@@ -167,13 +171,43 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 PhoneNumber = "12345678",
             };
 
-            using (var content = _factory.CreateContext())
+            using (var context = _factory.CreateContext())
             {
-                content.Customers.Add(customerAddedToDatabase);
-                content.SaveChanges();
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
             }
 
-            await _uut.DepositAsync("NoEmail@mail.com", deposit);
+            await _uut.DepositAsync(customerAddedToDatabase.Id, deposit);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
+            }
+        }
+
+        [Test]
+        public async Task DepositAsync_DepositAmountTwice_CustomerAccountHasReceivedExpectedAmount()
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
+            }
+
+            await _uut.DepositAsync(customerAddedToDatabase.Id, 100);
+            await _uut.DepositAsync(customerAddedToDatabase.Id, 200);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.Find(customerAddedToDatabase.Id).Balance, Is.EqualTo(300));
+            }
         }
 
         [Test]
