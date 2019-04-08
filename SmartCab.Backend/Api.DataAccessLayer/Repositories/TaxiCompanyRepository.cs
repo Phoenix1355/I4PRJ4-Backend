@@ -10,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
-
-
     /// <summary>
     /// TaxiCompanyRepository with autoinjection of context and identityUserRepository. 
     /// </summary>
@@ -66,11 +64,6 @@ namespace Api.DataAccessLayer.Repositories
         protected virtual void Dispose(bool disposing)
         {
             _context?.Dispose();
-        }
-
-        public Task DepositAsync(string customerId, decimal deposit)
-        {
-            throw new NotImplementedException();
         }
 
 
