@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
+using CustomExceptions;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -47,6 +48,20 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var endDest = "Another address";
 
             Assert.That(()=>_googleMapsApiService.GetDistanceInKmAsync(startDest, endDest), Throws.TypeOf<Exception>());
+        }
+
+        [Test]
+        public void GetDistanceInKmAsync_DistanceMatrixNotOk_ThrowsGoogleMapsApiException()
+        {
+            var distanceMatrixStatus = "Something else than 'OK'";
+            var response = new HttpResponseMessage { StatusCode = HttpStatusCode.OK };
+            response.Content = new StringContent("{\n   \"destination_addresses\" : [ \"Ridderstræde 1, 8000 Aarhus, Denmark\" ],\n   \"origin_addresses\" : [ \"Lundbyesgade 8, 8000 Aarhus, Denmark\" ],\n   \"rows\" : [\n      {\n         \"elements\" : [\n            {\n               \"distance\" : {\n                  \"text\" : \"2.0 km\",\n                  \"value\" : 1950\n               },\n               \"duration\" : {\n                  \"text\" : \"9 mins\",\n                  \"value\" : 528\n               },\n               \"status\" : \"OK\"\n            }\n         ]\n      }\n   ],\n   \"status\" : \"" + distanceMatrixStatus + "\"\n}\n");
+
+            _client.GetAsync(null).ReturnsForAnyArgs(response);
+            var startDest = "Some address";
+            var endDest = "Another address";
+
+            Assert.That(() => _googleMapsApiService.GetDistanceInKmAsync(startDest, endDest), Throws.TypeOf<GoogleMapsApiException>());
         }
     }
 }
