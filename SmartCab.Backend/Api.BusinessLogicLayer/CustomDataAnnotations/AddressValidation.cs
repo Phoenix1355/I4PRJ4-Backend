@@ -1,20 +1,42 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.CustomDataAnnotations
 {
-    public class GreaterThanCurrentDateTime : ValidationAttribute
+    public class AddressValidation : ValidationAttribute
     {
         public override bool IsValid(object value)
         {
-            var dateTime = (DateTime) value;
+            var address = (Address)value;
 
-            if (dateTime >= DateTime.Now)
+            //Post nummer
+            if (address.PostalCode < 1000 || address.PostalCode > 9999)
             {
-                return true;
+                return false;
             }
 
-            return false;
+            //By
+            if (Regex.IsMatch(address.CityName, @"[^a-zA-Zæøå ]"))
+            {
+                return false;
+            }
+
+            //Gade
+            if (Regex.IsMatch(address.StreetName, @"[^a-zA-Zæøå ]"))
+            {
+                return false;
+            }
+
+            //Nummer
+            if (address.StreetNumber < 1)
+            {
+                return false;
+            }
+
+            return true;
         }
+
     }
 }

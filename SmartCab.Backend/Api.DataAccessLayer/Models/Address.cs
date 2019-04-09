@@ -18,6 +18,7 @@ namespace Api.DataAccessLayer.Models
     {
 
         [Required]
+        [RegularExpression()]
         public string CityName { get; set; }
 
         [Required]

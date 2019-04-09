@@ -7,37 +7,18 @@ using Api.DataAccessLayer.Models;
 namespace Api.BusinessLogicLayer.CustomDataAnnotations
 {
     //Inspiration and taken from https://stackoverflow.com/questions/11757013/regular-expressions-for-city-name
-    public class AddressValidation : ValidationAttribute
+    public class GreaterThanCurrentDateTime : ValidationAttribute
     {
         public override bool IsValid(object value)
         {
-            var address = (Address) value;
+            var dateTime = (DateTime)value;
 
-            //Post nummer
-            if (address.PostalCode<1000 || address.PostalCode>9999)
+            if (dateTime >= DateTime.Now)
             {
-                return false;
+                return true;
             }
 
-            //By
-            if (Regex.IsMatch(address.CityName, @"[^a-zA-Zæøå ]"))
-            {
-                return false;
-            }
-
-            //Gade
-            if (Regex.IsMatch(address.StreetName, @"[^a-zA-Zæøå ]"))
-            {
-                return false;
-            }
-
-            //Nummer
-            if (address.StreetNumber < 1)
-            {
-                return false;
-            }
-
-            return true;
+            return false;
         }
     }
 }
