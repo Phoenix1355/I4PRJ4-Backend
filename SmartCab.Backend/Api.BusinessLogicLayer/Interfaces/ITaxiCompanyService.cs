@@ -11,6 +11,6 @@ namespace Api.BusinessLogicLayer.Interfaces
     /// </summary>
     public interface ITaxiCompanyService
     {
-        Task<LoginResponse> LoginTaxiCompanyAsync(LoginRequest request);
+        Task<LoginResponseTaxiCompany> LoginTaxiCompanyAsync(LoginRequest request);
     }
 }

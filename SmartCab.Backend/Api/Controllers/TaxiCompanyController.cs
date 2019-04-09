@@ -54,7 +54,7 @@ namespace Api.Controllers
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
-        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LoginResponseTaxiCompany), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             var response = await _taxiCompanyService.LoginTaxiCompanyAsync(request);
