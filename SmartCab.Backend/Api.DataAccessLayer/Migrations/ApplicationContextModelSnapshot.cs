@@ -48,9 +48,8 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.Property<DateTime>("CreatedOn");
 
-                    b.Property<int>("CustomerId");
-
-                    b.Property<string>("CustomerId1");
+                    b.Property<string>("CustomerId")
+                        .IsRequired();
 
                     b.Property<DateTime>("DepartureTime");
 
@@ -67,7 +66,7 @@ namespace Api.DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId1");
+                    b.HasIndex("CustomerId");
 
                     b.HasIndex("OrderId");
 
@@ -292,7 +291,8 @@ namespace Api.DataAccessLayer.Migrations
                 {
                     b.HasOne("Api.DataAccessLayer.Models.Customer", "Customer")
                         .WithMany("Rides")
-                        .HasForeignKey("CustomerId1");
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Api.DataAccessLayer.Models.Order")
                         .WithMany("Rides")
