@@ -2,6 +2,9 @@
 using System.Net;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Responses;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NSubstitute.Extensions;
 using NUnit.Framework;
 
 namespace Api.IntegrationTests.TaxiCompany
@@ -14,20 +17,17 @@ namespace Api.IntegrationTests.TaxiCompany
         {
 
             // Using client to create taxi company
-            var request = getRegisterRequest();
+            var request = getRegisterRequest(email: "test4@gmail.com");
             await PostAsync("/api/customer/register", request);
-
 
             using (var context = _factory.CreateContext())
             {
                 var customer = context.Customers.First();
                 var customerId = customer.Id;
                 
-                
-
                 var role = context.Roles.Where(x => x.Name == "TaxiCompany").First();
                 var roleId = role.Id;
-
+                
                 var customerRole = context.UserRoles.Where(x => x.UserId == customerId).First();
                 context.UserRoles.Remove(customerRole);
                 context.SaveChanges();
@@ -54,7 +54,7 @@ namespace Api.IntegrationTests.TaxiCompany
 
             var response = await PostAsync("/api/taxicompany/login", loginRequest);
 
-            var responseObject = GetObject<LoginResponse>(response);
+            var responseObject = GetObject<LoginResponseTaxiCompany>(response);
             
             Assert.That(responseObject.TaxiCompany.Email, Is.EqualTo(request.Email));
         }
