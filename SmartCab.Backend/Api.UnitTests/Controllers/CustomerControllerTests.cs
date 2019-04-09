@@ -77,9 +77,9 @@ namespace Api.UnitTests.Controllers
                 }
             };
             //Act and Assert
-            var response = await _customerController.Deposit(null, null) as ObjectResult;
+            var response = await _customerController.Deposit(null, null) as NoContentResult;
 
-            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status204NoContent));
         }
 
         [Test]
