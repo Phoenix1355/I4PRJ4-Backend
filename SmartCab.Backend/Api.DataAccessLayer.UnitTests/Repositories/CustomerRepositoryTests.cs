@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
@@ -43,7 +44,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
+        public async Task AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
         {
             Customer customer = new Customer
             {
@@ -58,7 +59,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            _uut.AddCustomerAsync(customer, "Qwer111!").Wait();
+            await _uut.AddCustomerAsync(customer, "Qwer111!");
 
 
 
@@ -82,18 +83,18 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
 
-            using (var content = _factory.CreateContext())
+            using (var context = _factory.CreateContext())
             {
-                content.Customers.Add(customerToAddToDatabase);
-                content.SaveChanges();
+                context.Customers.Add(customerToAddToDatabase);
+                context.SaveChanges();
             }
 
 
-            Assert.ThrowsAsync<IdentityException>(()=>_uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
-        public void GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
             Customer customerAddedToDatabase = new Customer
             {
@@ -102,34 +103,116 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 PhoneNumber = "12345678",
             };
 
-            using (var content = _factory.CreateContext())
+            using (var context = _factory.CreateContext())
             {
-                content.Customers.Add(customerAddedToDatabase);
-                content.SaveChanges();
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
             }
 
 
-            var customerReturned = _uut.GetCustomerAsync(customerAddedToDatabase.Email).Result;
+            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
             Assert.That(customerReturned.Name, Is.EqualTo("Name"));
         }
 
         [Test]
         public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>( () =>  _uut.GetCustomerAsync("NoEmail@mail.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
 
         [Test]
-        public void GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
+        public async Task GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
         {
             try
             {
-                _uut.GetCustomerAsync("NoEmail@mail.com");
+                await _uut.GetCustomerAsync("Not valid Id");
 
             }
-            catch (ArgumentNullException e)
+            catch (UserIdInvalidException e)
             {
                 Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
+            }
+        }
+
+
+        [Test]
+        public async Task DepositAsync_NoCustomer_ThrowsContainsMessage()
+        {
+            try
+            {
+                await _uut.DepositAsync("Not valid Id", 1);
+
+            }
+            catch (UserIdInvalidException e)
+            {
+                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
+            }
+
+        }
+
+
+        [Test]
+        public void DepositAsync_NoCustomer_ThrowsUserIdInvalidException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("Not valid Id"));
+        }
+
+        [TestCase(1)]
+        [TestCase(100)]
+        [TestCase(100000)]
+        public async Task DepositAsync_DepositAmounts_CustomerAccountHasReceivedExpectedBalanace(decimal deposit)
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
+            }
+
+            await _uut.DepositAsync(customerAddedToDatabase.Id, deposit);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
+            }
+        }
+
+        [TestCase(0)]
+        [TestCase(-100)]
+        [TestCase(-100000)]
+        public async Task DepositAsync_DepositAmountsNegativeAmount_ThrowsNegativeDepositException(decimal deposit)
+        {
+            Assert.ThrowsAsync<NegativeDepositException>(async () => await _uut.DepositAsync("No Id as validation occurs first", deposit));
+        }
+
+        [Test]
+        public async Task DepositAsync_DepositAmountTwice_CustomerAccountHasReceivedExpectedAmount()
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
+            }
+
+            await _uut.DepositAsync(customerAddedToDatabase.Id, 100);
+            await _uut.DepositAsync(customerAddedToDatabase.Id, 200);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.Find(customerAddedToDatabase.Id).Balance, Is.EqualTo(300));
             }
         }
 
