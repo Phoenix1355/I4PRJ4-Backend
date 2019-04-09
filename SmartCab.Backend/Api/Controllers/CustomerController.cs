@@ -138,7 +138,7 @@ namespace Api.Controllers
 
             await _customerService.DepositAsync(request, customerId);
 
-            return Ok();
+            return Ok("Gracefully deposits amount to customer");
         }
     }
 }
