@@ -31,7 +31,7 @@ namespace Api.DataAccessLayer.Models
         public string StreetName { get; set; }
 
         [Required]
-        [Range(0, Int32.MaxValue)]
+        [Range(1, Int32.MaxValue)]
         public int StreetNumber { get; set; }
 
         public Address(string cityName, int postalCode, string streetName, int streetNumber)
