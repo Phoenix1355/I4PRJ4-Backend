@@ -22,11 +22,9 @@ namespace Api.BusinessLogicLayer.Requests
         [Range(1, 4, ErrorMessage = "The passenger count must be between 1 and 4.")]
         public int PassengerCount { get; set; }
 
-        [AddressValidation]
         [Required]
         public Address StartDestination { get; set; }
 
-        [AddressValidation]
         [Required]
         public Address EndDestination { get; set; }
     }

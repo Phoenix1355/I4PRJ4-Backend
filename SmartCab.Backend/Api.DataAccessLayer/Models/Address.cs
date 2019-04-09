@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,16 +19,19 @@ namespace Api.DataAccessLayer.Models
     {
 
         [Required]
-        [RegularExpression()]
+        [RegularExpression(@"^[a-zA-ZæøåÆØÅ ]+$")]
         public string CityName { get; set; }
 
         [Required]
+        [Range(1000,9999)]
         public int PostalCode { get; set; }
 
         [Required]
+        [RegularExpression(@"^[a-zA-ZæøåÆØÅ ]+$")]
         public string StreetName { get; set; }
 
         [Required]
+        [Range(0, Int32.MaxValue)]
         public int StreetNumber { get; set; }
 
         public Address(string cityName, int postalCode, string streetName, int streetNumber)
