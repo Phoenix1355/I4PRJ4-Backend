@@ -11,6 +11,19 @@ namespace Api.IntegrationTests.TaxiCompany
         [Test]
         public async Task Login_TaxiCompanyExists_LogsInAndReturnsTaxiCompany()
         {
+            var taxiCompany = new DataAccessLayer.Models.TaxiCompany
+            {
+                Email = "test@domain.com",
+                Name = "Some Name",
+                PhoneNumber = "12345679",
+                Id = "Some Id",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true
+            };
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+            }
             // Using client to create taxi company
             var request = getRegisterRequest();
             await PostAsync("/api/taxicompany/register", request);
