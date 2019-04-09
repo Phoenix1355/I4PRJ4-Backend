@@ -2,9 +2,9 @@
 
 namespace Api.BusinessLogicLayer.Responses
 {
-    public class LoginResponse
+    public class LoginResponseTaxiCompany
     {
         public string Token { get; set; }
-        public CustomerDto Customer { get; set; }
+        public TaxiCompanyDto TaxiCompany { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="request">The email and password used to login.</param>
         /// <returns>A JWT token and certain information about the logged in taxi company.</returns>
-        public async Task<LoginResponse> LoginTaxiCompanyAsync(LoginRequest request)
+        public async Task<LoginResponseTaxiCompany> LoginTaxiCompanyAsync(LoginRequest request)
         {
             // Check if it's possible to log in
             var result = await _identityUserRepository.SignInAsync(request.Email, request.Password);
@@ -62,7 +62,7 @@ namespace Api.BusinessLogicLayer.Services
                 // Generate the token and return it
                 var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));
                 var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
-                var response = new LoginResponse
+                var response = new LoginResponseTaxiCompany()
                 {
                     Token = token,
                     TaxiCompany = taxiCompanyDto
