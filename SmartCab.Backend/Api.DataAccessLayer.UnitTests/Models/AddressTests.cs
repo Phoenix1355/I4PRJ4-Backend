@@ -20,7 +20,7 @@ namespace Api.DataAccessLayer.UnitTests.Models
         [TestCase(5000, 0)]
         [TestCase(0, 1)]
         [TestCase(-1000, 1)]
-        public void StartDestination_WhenPostalCodeIsSet_ValidationFailsWhenInvalid(int postalCode, int numberOfErrors)
+        public void Address_WhenPostalCodeIsSet_ValidationFailsWhenInvalid(int postalCode, int numberOfErrors)
         {
             var address = new Address("City", postalCode, "Street", 1);
 
@@ -44,7 +44,7 @@ namespace Api.DataAccessLayer.UnitTests.Models
         [TestCase("Invalid char is £")]
         [TestCase("Invalid char is $")]
         [TestCase("Invalid char is €")]
-        public void StartDestination_WhenCityNameInvalid_ModelIsInvalid(string cityName)
+        public void Address_WhenCityNameInvalid_ModelIsInvalid(string cityName)
         {
             var address = new Address(cityName, 8210, "Street", 1);
 
@@ -67,7 +67,7 @@ namespace Api.DataAccessLayer.UnitTests.Models
         [TestCase("Invalid char is £")]
         [TestCase("Invalid char is $")]
         [TestCase("Invalid char is €")]
-        public void StartDestination_WhenStreetNameInvalid_ModelIsInvalid(string streetName)
+        public void Address_WhenStreetNameInvalid_ModelIsInvalid(string streetName)
         {
             var address = new Address("City", 8210, streetName, 1);
 
@@ -81,7 +81,7 @@ namespace Api.DataAccessLayer.UnitTests.Models
         [TestCase(1, 0)]
         [TestCase(-0, 1)]
         [TestCase(-1230, 1)]
-        public void StartDestination_WhenStreetIsSet_ValidationFailsWhenInvalid(int streetNumber, int numberOfErrors)
+        public void Address_WhenStreetIsSet_ValidationFailsWhenInvalid(int streetNumber, int numberOfErrors)
         {
             var address = new Address("City", 8210, "Street", streetNumber);
 
