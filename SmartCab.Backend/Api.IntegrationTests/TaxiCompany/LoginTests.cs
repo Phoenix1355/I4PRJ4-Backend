@@ -22,6 +22,8 @@ namespace Api.IntegrationTests.TaxiCompany
             {
                 var customer = context.Customers.First();
                 var customerId = customer.Id;
+                
+                
 
                 var role = context.Roles.Where(x => x.Name == "TaxiCompany").First();
                 var roleId = role.Id;
