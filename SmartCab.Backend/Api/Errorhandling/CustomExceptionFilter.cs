@@ -39,7 +39,8 @@ namespace Api.ErrorHandling
                 exceptionType == typeof(IdentityException) ||
                 exceptionType == typeof(InsufficientFundsException) ||
                 exceptionType == typeof(ValidationException) ||
-                exceptionType == typeof(MultipleOrderException))
+                exceptionType == typeof(MultipleOrderException) ||
+                exceptionType == typeof(NegativeDepositException))
             {
                 status = StatusCodes.Status400BadRequest;
                 error = new ErrorMessage(exceptionMessage);
