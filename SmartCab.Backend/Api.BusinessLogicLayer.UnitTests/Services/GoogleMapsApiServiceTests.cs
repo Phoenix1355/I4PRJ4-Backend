@@ -34,7 +34,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             configuration[GeocodingUrl].Returns(GeocodingUrlValue);
             configuration[GoogleMapsApiKey].Returns(GoogleMapsApiKeyValue);
             _client = Substitute.For<IHttpClient>();
-            _googleMapsApiService = new GoogleMapsApiService(configuration, _client);
+            _googleMapsApiService = new GoogleMapsApiService(configuration);
         }
 
         [Test]
