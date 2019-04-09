@@ -66,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Email = request.Email,
                 Name = "Some Name",
-                PhoneNumber = "123456789"
+                PhoneNumber = "12345678"
             };
 
             _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);
@@ -104,7 +104,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Email = request.Email,
                 Name = "Some Name",
-                PhoneNumber = "123456789"
+                PhoneNumber = "12345678"
             };
 
             _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Responses;
 using NUnit.Framework;
@@ -11,22 +12,28 @@ namespace Api.IntegrationTests.TaxiCompany
         [Test]
         public async Task Login_TaxiCompanyExists_LogsInAndReturnsTaxiCompany()
         {
-            var taxiCompany = new DataAccessLayer.Models.TaxiCompany
-            {
-                Email = "test@domain.com",
-                Name = "Some Name",
-                PhoneNumber = "12345679",
-                Id = "Some Id",
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            };
-            using (var context = _factory.CreateContext())
-            {
-                context.TaxiCompanies.Add(taxiCompany);
-            }
+
             // Using client to create taxi company
             var request = getRegisterRequest();
-            await PostAsync("/api/taxicompany/register", request);
+            await PostAsync("/api/customer/register", request);
+
+
+            using (var context = _factory.CreateContext())
+            {
+                var customer = context.Customers.First();
+                var customerId = customer.Id;
+
+                var role = context.Roles.Where(x => x.Name == "TaxiCompany").First();
+                var roleId = role.Id;
+
+                var customerRole = context.UserRoles.Where(x => x.UserId == customerId).First();
+                context.UserRoles.Remove(customerRole);
+                context.SaveChanges();
+
+                customerRole.RoleId = roleId;
+                context.UserRoles.Add(customerRole);
+                context.SaveChanges();
+            }
 
             var loginRequest = getLoginRequest();
 
