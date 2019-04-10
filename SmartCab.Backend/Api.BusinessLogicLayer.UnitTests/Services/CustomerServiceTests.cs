@@ -197,27 +197,17 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<IdentityException>());
         }
 
-
         [Test]
-        public void GetCustomerRidesAsync_CustomerHaveNoRides_ReturnsEmptyList()
+        public async Task GetCustomerRidesAsync_ReturnedNull_DoesNotThrow()
         {
-            _customerRepository.GetCustomerRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(new List<Ride>());
-
-             var response = _customerService.GetCustomerRidesAsync(null).Result;
-
-             Assert.That(response.Rides,Is.Empty);
-        }
-
-        [Test]
-        public void GetCustomerRidesAsync_ReturnedNull_DoesNotThrow()
-        {
-            Assert.DoesNotThrow(async ()=> await _customerService.GetCustomerRidesAsync(null));
+            Assert.DoesNotThrowAsync(async () =>  await _customerService.GetCustomerRidesAsync(null)
+        );
         }
 
         [Test]
         public void DepositAsync_ReturnedNull_DoesNotThrow()
         {
-            Assert.DoesNotThrow(async () => await _customerService.GetCustomerRidesAsync(null));
+            Assert.DoesNotThrowAsync(async () => await _customerService.GetCustomerRidesAsync(null));
         }
 
 
