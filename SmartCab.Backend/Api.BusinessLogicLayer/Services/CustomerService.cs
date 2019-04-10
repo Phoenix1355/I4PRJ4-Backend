@@ -7,6 +7,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
 
@@ -123,6 +124,11 @@ namespace Api.BusinessLogicLayer.Services
 
             //Deposits
             await _customerRepository.DepositAsync(customerId, depositAmount);
+        }
+
+        public Task<CustomerRidesResponse> GetCustomerRidesAsync(string customerId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
