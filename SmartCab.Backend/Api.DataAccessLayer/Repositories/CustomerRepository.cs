@@ -105,9 +105,15 @@ namespace Api.DataAccessLayer.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task<List<Ride>> GetCustomerRidesAsync(string customerId)
+        public async Task<List<Ride>> GetCustomerRidesAsync(string customerId)
         {
-            throw new NotImplementedException();
+            var customer = await _context.Customers.FindAsync(customerId);
+            if (customer == null)
+            {
+                throw new UserIdInvalidException("Customer does not exist.");
+            }
+
+            return customer.Rides;
         }
 
         #region IDisposable implementation
