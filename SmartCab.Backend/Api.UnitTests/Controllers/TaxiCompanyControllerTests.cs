@@ -31,7 +31,7 @@ namespace Api.UnitTests.Controllers
         [Test]
         public async Task Login_Success_ReturnOkResponse()
         {
-            _taxiCompanyService.LoginTaxiCompanyAsync(null).ReturnsForAnyArgs(new LoginResponse());
+            _taxiCompanyService.LoginTaxiCompanyAsync(null).ReturnsForAnyArgs(new LoginResponseTaxiCompany());
 
             var response = await _taxiCompanyController.Login(null) as ObjectResult;
 
