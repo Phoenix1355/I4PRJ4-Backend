@@ -108,6 +108,7 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<List<Ride>> GetCustomerRidesAsync(string customerId)
         {
             var customer = await _context.Customers.FindAsync(customerId);
+
             if (customer == null)
             {
                 throw new UserIdInvalidException("Customer does not exist.");

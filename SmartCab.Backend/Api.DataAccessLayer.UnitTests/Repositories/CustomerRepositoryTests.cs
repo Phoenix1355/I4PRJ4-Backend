@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
@@ -214,6 +215,191 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Assert.That(context.Customers.Find(customerAddedToDatabase.Id).Balance, Is.EqualTo(300));
             }
+        }
+
+        [Test]
+        public async Task GetCustomerRidesAsync_ParamterNull_ThrowsException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(()=>_uut.GetCustomerRidesAsync(null));
+        }
+
+
+        [Test]
+        public async Task GetCustomerRidesAsync_ParameterEmpty_ThrowsException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(() => _uut.GetCustomerRidesAsync(""));
+        }
+
+        [Test]
+        public async Task GetCustomerRidesAsync_CustomerExistButNoRides_ReturnsEmptyList()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            using (var context = _factory.CreateContext())
+            {
+
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            Assert.That(response,Is.Empty);
+        }
+
+        [Test]
+        public async Task GetCustomerRidesAsync_CustomerExistButNoRides_ReturnsListWithOne()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            Assert.That(response.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetCustomerRidesAsync_TwoCustomerExistWithRides_ReturnExpectedCustomer()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "ExpectedCustomer",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 200,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            var customer2 = new Customer
+            {
+                Email = "valid2@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            customer2.Rides = new List<Ride>();
+            customer.Rides = new List<Ride>();
+            var soloRide2 = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            customer2.Rides.Add(soloRide2);
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Customers.Add(customer2);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            Assert.That(response.First().Customer.Name, Is.EqualTo("ExpectedCustomer"));
+        }
+
+        [Test]
+        public async Task GetCustomerRidesAsync_TwoCustomerExistWithRides_ReturnsListWithOneForRightCustomer()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "ExpectedCustomer",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 200,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            var customer2 = new Customer
+            {
+                Email = "valid2@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            customer2.Rides = new List<Ride>();
+            customer.Rides = new List<Ride>();
+            var soloRide2 = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            customer2.Rides.Add(soloRide2);
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Customers.Add(customer2);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            Assert.That(response.Count, Is.EqualTo(1));
         }
 
         [Test]
