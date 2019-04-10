@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -102,6 +103,11 @@ namespace Api.DataAccessLayer.Repositories
             customer.Balance += deposit;
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
+        }
+
+        public Task<List<Ride>> GetCustomerRidesAsync(string customerId)
+        {
+            throw new NotImplementedException();
         }
 
         #region IDisposable implementation
