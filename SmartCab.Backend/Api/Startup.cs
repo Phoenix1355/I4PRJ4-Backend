@@ -133,6 +133,7 @@ namespace Api
                 mapper.CreateMap<SharedRide, CreateRideResponse>();
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
                 mapper.CreateMap<Ride, RideDto>();
+                mapper.CreateMap<TaxiCompany, TaxiCompanyDto>();
             });
         }
 
@@ -216,6 +217,8 @@ namespace Api
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IIdentityUserRepository, IdentityUserRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
+            services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
         }
 
         /// <summary>
