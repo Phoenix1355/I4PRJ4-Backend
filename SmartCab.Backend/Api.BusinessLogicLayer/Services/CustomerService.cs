@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
@@ -126,9 +127,15 @@ namespace Api.BusinessLogicLayer.Services
             await _customerRepository.DepositAsync(customerId, depositAmount);
         }
 
-        public Task<CustomerRidesResponse> GetCustomerRidesAsync(string customerId)
+        public async Task<CustomerRidesResponse> GetCustomerRidesAsync(string customerId)
         {
-            throw new NotImplementedException();
+            var customerRides = await _customerRepository.GetCustomerRidesAsync(customerId);
+            var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
+            var response = new CustomerRidesResponse
+            {
+                Rides = customerRidesDto
+            };
+            return response;
         }
     }
 }
