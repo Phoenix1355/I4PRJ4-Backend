@@ -130,11 +130,5 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             Assert.ThrowsAsync<UserIdInvalidException>(() => _uut.GetTaxiCompanyAsync("DanTaxi@mail.com"));
         }
-
-        [Test]
-        public void Dispose_DisposeOfObject_Disposes()
-        {
-            _uut.Dispose();
-        }
     }
 }
