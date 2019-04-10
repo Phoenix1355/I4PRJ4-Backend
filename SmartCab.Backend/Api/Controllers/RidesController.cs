@@ -27,12 +27,10 @@ namespace Api.Controllers
     public class RidesController : ControllerBase
     {
         private readonly IRideService _rideService;
-        private readonly IMapper _mapper;
 
-        public RidesController(IRideService rideService, IMapper mapper)
+        public RidesController(IRideService rideService)
         {
             _rideService = rideService;
-            _mapper = mapper;
         }
 
         /// <summary>
