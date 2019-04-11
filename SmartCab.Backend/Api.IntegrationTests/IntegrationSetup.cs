@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Requests;
@@ -88,14 +89,14 @@ namespace Api.IntegrationTests
         }
 
 
-        protected async Task LoginOnCustomerAccount()
+        protected async Task LoginOnCustomerAccount(string email = "test12@gmail.com")
         {
             //Create customer
-            var registerRequest = getRegisterRequest();
+            var registerRequest = getRegisterRequest(email);
             await PostAsync("/api/customer/register", registerRequest);
 
             //Login on customer
-            var loginRequest = getLoginRequest();
+            var loginRequest = getLoginRequest(email);
             var loginResponse = await PostAsync("/api/customer/login", loginRequest);
 
             //Map login returned to object
@@ -105,7 +106,9 @@ namespace Api.IntegrationTests
             var token = loginResponseObject.Token;
 
             //Default header authentication setup.
-            _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
+            
+            
+           _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
         }
 
         protected async Task DepositToCustomer(int amount)

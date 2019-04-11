@@ -57,13 +57,28 @@ namespace Api.IntegrationTests.Customer
         public async Task Rides_CustomerExistWithRide_ReturnsListContaining1Ridet()
         {
             await CreateRideWithLogin();
-
             var response = await _client.GetAsync("api/customer/rides");
             var responseObject = GetObject<CustomerRidesResponse>(response);
 
             Assert.That(responseObject.Rides.Count, Is.EqualTo(1));
         }
 
+        [Test]
+        public async Task Rides_RideExistOnOtherCustomer_ReturnsEmptyList()
+        {
+            await CreateRideWithLogin();
+
+            //Clear previous token
+            _client.DefaultRequestHeaders.Clear();
+
+            //Login on other account
+            await LoginOnCustomerAccount("test13@gmail.com");
+
+            var response = await _client.GetAsync("api/customer/rides");
+            var responseObject = GetObject<CustomerRidesResponse>(response);
+
+            Assert.That(responseObject.Rides.Count, Is.EqualTo(0));
+        }
 
     }
 }
