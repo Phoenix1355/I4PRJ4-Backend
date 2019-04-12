@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Api.BusinessLogicLayer.Requests;
 using Api.DataAccessLayer.Models;
 using NUnit.Framework;
@@ -10,7 +12,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
     {
         private readonly DateTime _validDepartureTime = DateTime.Now.AddHours(1);
         private readonly DateTime _validConfirmationTime = DateTime.Now.AddHours(1);
-        private readonly Address _validAddress = new Address("City", 1, "Street", 1);
+        private readonly Address _validAddress = new Address("City", 8210, "Street", 1);
         private readonly int _validPassengerCount = 2;
         private readonly bool _validIsShared = false;
         
@@ -182,9 +184,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
                 StartDestination = _validAddress,
-                EndDestination = null
+                EndDestination = new Address("City", 8210, "Street2", 1)
             };
-
             Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(1));
         }
     }

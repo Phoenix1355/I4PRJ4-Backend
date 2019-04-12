@@ -209,6 +209,7 @@ namespace Api
         {
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IHttpClient, TestableHttpClient>();
             services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();

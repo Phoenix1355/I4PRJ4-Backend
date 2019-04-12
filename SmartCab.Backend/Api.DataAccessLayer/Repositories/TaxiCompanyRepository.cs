@@ -15,7 +15,7 @@ namespace Api.DataAccessLayer.Repositories
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ITaxiCompanyRepository" />
     /// <seealso cref="System.IDisposable" />
-    public class TaxiCompanyRepository : ITaxiCompanyRepository, IDisposable
+    public class TaxiCompanyRepository : ITaxiCompanyRepository
     {
         private readonly ApplicationContext _context;
         private readonly IIdentityUserRepository _identityUserRepository;
@@ -49,26 +49,5 @@ namespace Api.DataAccessLayer.Repositories
 
             return taxiCompany;
         }
-
-        #region IDisposable implementation
-        //Dispose pattern:
-        //https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose#basic_pattern
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _context?.Dispose();
-        }
-
-
-        #endregion
-
-
     }
 }
