@@ -10,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
-
-
     /// <summary>
     /// TaxiCompanyRepository with autoinjection of context and identityUserRepository. 
     /// </summary>
