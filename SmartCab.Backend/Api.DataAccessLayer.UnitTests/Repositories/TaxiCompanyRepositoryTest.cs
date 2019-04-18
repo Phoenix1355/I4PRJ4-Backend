@@ -21,6 +21,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         private FakeUserManager _mockUserManager;
         private FakeSignInManager _mockSignManager;
 
+        #region SetUp
+
         [SetUp]
         public void SetUp()
         {
@@ -30,6 +32,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager, _mockSignManager);
             _uut = new TaxiCompanyRepository(_factory.CreateContext(), identityUserRepository);
         }
+        #endregion
 
         #region GetTaxiCompanyAsync
         // Testing Taxi Company Name
@@ -128,6 +131,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
 
         #region AddTaxiCompanyAsync
+        // With phone
         [Test]
         public async Task AddTaxiCompanyAsync_TaxicompanyValid_TaxiCompanyExistsInDatabase()
         {
@@ -153,6 +157,34 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 var taxicompanyFromDatabase = context.TaxiCompanies.FirstOrDefault(taxicompanyFromDB => taxicompany.Id.Equals(taxicompanyFromDB.Id));
 
                 Assert.That(taxicompanyFromDatabase.Name, Is.EqualTo("CompanyName"));
+            }
+        }
+
+        // No phone
+        [Test]
+        public async Task AddTaxiCompanyAsync_TaxicompanyValidNoPhone_TaxiCompanyExistsInDatabase()
+        {
+            TaxiCompany taxicompany = new TaxiCompany
+            {
+                Name = "TaxiCompanyName",
+            };
+            //As function now relies on Identity framework, insert it manually. 
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxicompany);
+                context.SaveChanges();
+            }
+
+
+            await _uut.AddTaxiCompanyAsync(taxicompany, "Qwerrr111!");
+
+
+
+            using (var context = _factory.CreateContext())
+            {
+                var taxicompanyFromDatabase = context.TaxiCompanies.FirstOrDefault(taxicompanyFromDB => taxicompany.Id.Equals(taxicompanyFromDB.Id));
+
+                Assert.That(taxicompanyFromDatabase.Name, Is.EqualTo("TaxiCompanyName"));
             }
         }
 
