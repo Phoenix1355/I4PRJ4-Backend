@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Http;
-using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
-using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
+using CustomExceptions;
 using NUnit.Framework;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
@@ -39,6 +31,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _uut = new TaxiCompanyRepository(_factory.CreateContext(), identityUserRepository);
         }
 
+        #region GetTaxiCompanyAsync
         // Testing Taxi Company Name
         [Test]
         public void GetTaxiCompanyAsync_TaxiCompanyNameInDatabase_ReturnsTaxiCompanyName()
@@ -105,12 +98,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(taxicompanyReturned.PhoneNumber, Is.EqualTo("45612378"));
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            _factory.Dispose();
-        }
-
         [Test]
         public void GetTaxiCompanyAsync_NoTaxiCompany_ThrowsExceptionWithMessage()
         {
@@ -130,5 +117,89 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             Assert.ThrowsAsync<UserIdInvalidException>(() => _uut.GetTaxiCompanyAsync("DanTaxi@mail.com"));
         }
+        #endregion
+
+        #region TearDown
+        [TearDown]
+        public void TearDown()
+        {
+            _factory.Dispose();
+        }
+        #endregion
+
+        #region AddTaxiCompanyAsync
+        [Test]
+        public async Task AddTaxiCompanyAsync_TaxicompanyValid_TaxiCompanyExistsInDatabase()
+        {
+            TaxiCompany taxicompany = new TaxiCompany
+            {
+                Name = "CompanyName",
+                PhoneNumber = "66664444",
+            };
+            //As function now relies on Identity framework, insert it manually. 
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxicompany);
+                context.SaveChanges();
+            }
+
+
+            await _uut.AddTaxiCompanyAsync(taxicompany, "Qwerrr111!");
+
+
+
+            using (var context = _factory.CreateContext())
+            {
+                var taxicompanyFromDatabase = context.TaxiCompanies.FirstOrDefault(taxicompanyFromDB => taxicompany.Id.Equals(taxicompanyFromDB.Id));
+
+                Assert.That(taxicompanyFromDatabase.Name, Is.EqualTo("CompanyName"));
+            }
+        }
+
+        // With phone number
+        [Test]
+        public void AddTaxiCompanyAsync_TaxiCompanyInvalid_TaxiCompanyAlreadyExistsInDatabase()
+        {
+            TaxiCompany taxicompanyToAddToDatabase = new TaxiCompany
+            {
+                Name = "CompanyName",
+                PhoneNumber = "11223344",
+            };
+
+            _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
+
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxicompanyToAddToDatabase);
+                context.SaveChanges();
+            }
+
+
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddTaxiCompanyAsync(taxicompanyToAddToDatabase, "Qwerrrr111111!"));
+        }
+
+        // No phone number
+        [Test]
+        public void AddTaxiCompanyAsync_TaxiCompanyInvalidWithNoPhone_TaxiCompanyAlreadyExistsInDatabase()
+        {
+            TaxiCompany taxicompanyToAddToDatabase = new TaxiCompany
+            {
+                Name = "CompanyName",
+            };
+
+            _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
+
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxicompanyToAddToDatabase);
+                context.SaveChanges();
+            }
+
+
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddTaxiCompanyAsync(taxicompanyToAddToDatabase, "YaaaAssSS4512!"));
+        }
+
+        #endregion
+
     }
 }
