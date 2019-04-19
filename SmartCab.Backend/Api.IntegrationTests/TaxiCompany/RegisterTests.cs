@@ -55,5 +55,18 @@ namespace Api.IntegrationTests.TaxiCompany
 
             Assert.That(responseSecondRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
+
+        [TestCase("a.mail.com")]
+        [TestCase("plaintext")]
+        [TestCase("#@¤%&##$#£.com")]
+        [TestCase("Nikolaj Molzen <test@domain.com>")]
+        public async Task Register_InvalidRequestEmail_GetsBadRequest(string email)
+        {
+            var request = getRegisterRequest(email);
+
+            var response = await PostAsync("/api/taxicompany/register", request);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
     }
 }
