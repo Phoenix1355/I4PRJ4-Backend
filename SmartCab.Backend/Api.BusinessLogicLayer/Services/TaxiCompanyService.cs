@@ -40,6 +40,39 @@ namespace Api.BusinessLogicLayer.Services
             _mapper = mapper;
             _jwtService = jwtService;
         }
+        /// <summary>
+        /// Adds a new taxi company to the database asynchronously and returns a JWT token wrapped in a response object.
+        /// </summary>
+        /// <remarks>
+        /// The generated token will only give access to endpoints which are available to taxi companies.
+        /// </remarks>
+        /// <param name="request">The required data needed to create the taxi company</param>
+        /// <returns>A RegisterResponseTaxiCompany object containing a valid JWT token</returns>
+        public async Task<RegisterResponseTaxiCompany> AddTaxiCompanyAsync(RegisterRequest request)
+        {
+            // Create the taxi company
+            var taxiCompany = new TaxiCompany
+            {
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber,
+                UserName = request.Email,
+                Email = request.Email
+            };
+
+            // Overwrite the taxi company with the one created and create a TaxiCompanyDto
+            taxiCompany = await _taxiCompanyRepository.AddTaxiCompanyAsync(taxiCompany, request.Password);
+            var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
+
+            // Create the token, wrap it and return the response with the taxiCompanyDto
+            var token = _jwtService.GenerateJwtToken(taxiCompany.Id, taxiCompany.Email, nameof(TaxiCompany));
+            var response = new RegisterResponseTaxiCompany
+            {
+                Token = token,
+                TaxiCompany = taxiCompanyDto
+            };
+
+            return response;
+        }
 
         /// <summary>
         /// Attempts to log the taxi company in. Upon a successful login, a new JWT token is generated and returned.
