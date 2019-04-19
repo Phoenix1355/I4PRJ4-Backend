@@ -31,5 +31,29 @@ namespace Api.IntegrationTests.TaxiCompany
                 Assert.That(entry.Count, Is.EqualTo(1));
             }
         }
+
+        [Test]
+        public async Task Register_RequestTwice_FirstOk()
+        {
+            var request = getRegisterRequest();
+
+            var responseFirstRequest = await PostAsync("/api/taxicompany/register", request);
+
+            var responseSecondRequest = await PostAsync("/api/taxicompany/register", request);
+
+            Assert.That(responseFirstRequest.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task Register_RequestTwice_SecondBadRequest()
+        {
+            var request = getRegisterRequest();
+
+            var responseFirstRequest = await PostAsync("/api/taxicompany/register", request);
+
+            var responseSecondRequest = await PostAsync("/api/taxicompany/register", request);
+
+            Assert.That(responseSecondRequest.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
     }
 }
