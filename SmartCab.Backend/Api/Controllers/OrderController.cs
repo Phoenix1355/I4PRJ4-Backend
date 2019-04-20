@@ -33,7 +33,7 @@ namespace Api.Controllers
         /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
         /// </response>
         /// <response code="500">If an internal server error occured.</response>
-        [Authorize(Roles = nameof(Customer))]
+        [Authorize(Roles = nameof(TaxiCompany))]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
