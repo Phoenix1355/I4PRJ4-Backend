@@ -26,6 +26,20 @@ namespace Api.UnitTests.Controllers
 
         #endregion
 
+        #region Register
+
+        [Test]
+        public async Task Register_Success_ReturnsOkResponse()
+        {
+            _taxiCompanyService.AddTaxiCompanyAsync(null).ReturnsForAnyArgs(new RegisterResponseTaxiCompany());
+
+            var response = await _taxiCompanyController.Register(null) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        #endregion
+
         #region Login
 
         [Test]

@@ -10,13 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
-
-
     /// <summary>
     /// TaxiCompanyRepository with autoinjection of context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ITaxiCompanyRepository" />
-    /// <seealso cref="System.IDisposable" />
     public class TaxiCompanyRepository : ITaxiCompanyRepository
     {
         private readonly ApplicationContext _context;
@@ -50,6 +47,36 @@ namespace Api.DataAccessLayer.Repositories
             }
 
             return taxiCompany;
+        }
+
+        /// <summary>
+        /// Adds the TaxiCompany asynchronous in a transaction
+        /// </summary>
+        /// <param name="taxicompany">The taxicompany to add</param>
+        /// <param name="password">The taxicompanys password </param>
+        /// <returns></returns>
+        /// <exception cref="IdentityException"></exception>
+        public async Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxicompany, string password)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                var identityResult = await _identityUserRepository.AddIdentityUserAsync(taxicompany, password);
+
+                if (identityResult.Succeeded)
+                {
+                    string role = nameof(TaxiCompany);
+                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(taxicompany, role);
+                    if (resultAddRole.Succeeded)
+                    {
+                        transaction.Commit();
+                        return taxicompany;
+                    }
+                }
+                transaction.Rollback();
+
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
         }
     }
 }
