@@ -134,6 +134,9 @@ namespace Api
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
                 mapper.CreateMap<Ride, RideDto>();
                 mapper.CreateMap<TaxiCompany, TaxiCompanyDto>();
+
+                //Maps enum to their name, instead of integer value.
+                mapper.CreateMap<Enum, String>().ConvertUsing(e => e.ToString());
             });
         }
 

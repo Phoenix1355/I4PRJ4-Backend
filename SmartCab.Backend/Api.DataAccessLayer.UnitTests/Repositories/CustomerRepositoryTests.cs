@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
@@ -22,6 +23,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     [TestFixture]
     public class CustomerRepositoryTests
     {
+        #region Setup
+
+        
+
+        
         private CustomerRepository _uut;
         private InMemorySqlLiteContextFactory _factory;
         private FakeSignInManager _mockSignManager;
@@ -33,8 +39,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _factory = new InMemorySqlLiteContextFactory();
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
-            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager, _mockSignManager);
-            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository);
+            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager,_mockSignManager);
+            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository); 
         }
 
         [TearDown]
@@ -42,6 +48,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             _factory.Dispose();
         }
+
+        #endregion
+
+        #region  AddCustomerAsync
+
+
+
 
         [Test]
         public async Task AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
@@ -69,7 +82,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
                 Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
             }
-
+            
         }
 
         [Test]
@@ -90,16 +103,24 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
+        #endregion
+
+        #region GetCustomerAsync
+
+
+
+
+
         [Test]
-        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithName()
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
             Customer customerAddedToDatabase = new Customer
             {
                 Email = "valid@email.com",
-                Name = "Hans Petersen",
+                Name = "Name",
                 PhoneNumber = "12345678",
             };
 
@@ -111,69 +132,34 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
             var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
-            Assert.That(customerReturned.Name, Is.EqualTo("Hans Petersen"));
-        }
-
-        [Test]
-        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithEmail()
-        {
-            Customer customerAddedToDatabase = new Customer
-            {
-                Email = "HansAU@email.com",
-                Name = "Hans",
-                PhoneNumber = "12345678",
-            };
-
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customerAddedToDatabase);
-                context.SaveChanges();
-            }
-
-
-            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
-            Assert.That(customerReturned.Email, Is.EqualTo("HansAU@email.com"));
-        }
-
-        [Test]
-        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithPhoneNumber()
-        {
-            Customer customerAddedToDatabase = new Customer
-            {
-                Email = "HansAU@email.com",
-                Name = "Hans",
-                PhoneNumber = "66665555",
-            };
-
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customerAddedToDatabase);
-                context.SaveChanges();
-            }
-
-
-            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
-            Assert.That(customerReturned.PhoneNumber, Is.EqualTo("66665555"));
+            Assert.That(customerReturned.Name, Is.EqualTo("Name"));
         }
 
         [Test]
         public void GetCustomerAsync_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("Not valid Id"));
+            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
 
         [Test]
-        public async Task GetCustomerAsync_NoCustomer_ThrowsContainMessage()
+        public async Task GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
         {
             try
             {
                 await _uut.GetCustomerAsync("Not valid Id");
+
             }
-            catch (UserIdInvalidException m)
+            catch (UserIdInvalidException e)
             {
-                Assert.That(m.Message, Is.EqualTo("Customer does not exist."));
+                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
             }
         }
+        #endregion
+
+        #region DepositAsync
+
+
+
 
 
         [Test]
@@ -220,7 +206,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(deposit));
+                Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
             }
         }
 
@@ -256,6 +242,201 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Assert.That(context.Customers.Find(customerAddedToDatabase.Id).Balance, Is.EqualTo(300));
             }
         }
+
+        #endregion
+
+        #region GetRidesAsync
+
+
+
+
+        [Test]
+        public async Task GetRidesAsync_ParamterNull_ThrowsException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(async ()=> await _uut.GetRidesAsync(null));
+        }
+
+
+        [Test]
+        public async Task GetRidesAsync_ParameterEmpty_ThrowsException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetRidesAsync(""));
+        }
+
+        [Test]
+        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsEmptyList()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            using (var context = _factory.CreateContext())
+            {
+
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetRidesAsync(customer.Id);
+            Assert.That(response,Is.Empty);
+        }
+
+        [Test]
+        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsListWithOne()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetRidesAsync(customer.Id);
+            Assert.That(response.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnExpectedCustomer()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "ExpectedCustomer",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 200,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            var customer2 = new Customer
+            {
+                Email = "valid2@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            customer2.Rides = new List<Ride>();
+            customer.Rides = new List<Ride>();
+            var soloRide2 = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            customer2.Rides.Add(soloRide2);
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Customers.Add(customer2);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetRidesAsync(customer.Id);
+            Assert.That(response.First().Customer.Name, Is.EqualTo("ExpectedCustomer"));
+        }
+
+        [Test]
+        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnsListWithOneForRightCustomer()
+        {
+            var customer = new Customer
+            {
+                Email = "valid@email.com",
+                Name = "ExpectedCustomer",
+                PhoneNumber = "12345678",
+            };
+
+            customer.Rides = new List<Ride>();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 200,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            var customer2 = new Customer
+            {
+                Email = "valid2@email.com",
+                Name = "Name",
+                PhoneNumber = "12345678",
+            };
+            customer2.Rides = new List<Ride>();
+            customer.Rides = new List<Ride>();
+            var soloRide2 = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            customer2.Rides.Add(soloRide2);
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Customers.Add(customer2);
+                context.SaveChanges();
+            }
+
+            var response = await _uut.GetRidesAsync(customer.Id);
+            Assert.That(response.Count, Is.EqualTo(1));
+        }
+
+        #endregion
+
 
         [Test]
         public void Dispose_DisposeOfObject_Disposes()

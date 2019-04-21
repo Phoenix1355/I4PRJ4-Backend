@@ -6,6 +6,7 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.Controllers;
+using Api.Responses;
 using CustomExceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -100,6 +101,50 @@ namespace Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<UserIdInvalidException>(async () => await _customerController.Deposit(null,null));
         }
+        #endregion
+
+        #region Rides
+
+        [Test]
+        public async Task Rides_Success_ReturnsOkResponse()
+        {
+
+            //Set claims
+            _customerController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "SomeCustomerId")
+                    }))
+                }
+            };
+            //Act and Assert
+            var response = await _customerController.Rides(null) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        [Test]
+        public async Task Rides_CustomerIdEmpty_ThrowsExpectedException()
+        {
+            //Set claims
+            _customerController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "")
+                    }))
+                }
+            };
+            //Act and Assertsult;
+
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _customerController.Rides(null));
+        }
+
         #endregion
     }
 }

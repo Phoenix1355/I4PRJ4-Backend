@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
@@ -196,5 +198,59 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         #endregion
+
+        #region GetRidesAsync
+
+        [Test]
+        public async Task GetRidesAsync_NoRidesFromDatabase_DoesNotThrow()
+        {
+            Assert.DoesNotThrowAsync(async () =>  await _customerService.GetRidesAsync(null)
+        );
+        }
+
+        [Test]
+        public async Task GetRidesAsync__NoRidesFromDatabase_MapsTheExpectedType()
+        {
+            await _customerService.GetRidesAsync(null);
+            _mapper.Received().Map<List<RideDto>>(Arg.Any<List<Ride>>());
+        }
+
+        [Test]
+        public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
+        {
+            List<Ride> rideList = new List<Ride>();
+            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+            await _customerService.GetRidesAsync(null);
+            _mapper.Received().Map<List<RideDto>>(rideList);
+        }
+
+        [Test]
+        public async Task GetRidesAsync__NoRidesFromDatabase_ResponseContainsTheList()
+        {
+            List<Ride> rideList = new List<Ride>();
+            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+
+            List<RideDto> rideListDto = new List<RideDto>();
+            _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);
+
+            var response = await _customerService.GetRidesAsync(null);
+            Assert.That(response.Rides,Is.EqualTo(rideListDto));
+            _mapper.Received().Map<List<RideDto>>(rideList);
+        }
+
+
+        #endregion
+
+        #region DepositAsync
+
+
+        [Test]
+        public void DepositAsync_ReturnedNull_DoesNotThrow()
+        {
+            Assert.DoesNotThrowAsync(async () => await _customerService.GetRidesAsync(null));
+        }
+
+        #endregion
+
     }
 }
