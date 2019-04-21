@@ -24,10 +24,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     public class CustomerRepositoryTests
     {
         #region Setup
-
-        
-
-        
         private CustomerRepository _uut;
         private InMemorySqlLiteContextFactory _factory;
         private FakeSignInManager _mockSignManager;
@@ -52,8 +48,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
 
         #region  AddCustomerAsync
-
-
 
 
         [Test]
@@ -110,10 +104,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #region GetCustomerAsync
 
-
-
-
-
         [Test]
         public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
@@ -157,11 +147,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
 
         #region DepositAsync
-
-
-
-
-
         [Test]
         public async Task DepositAsync_NoCustomer_ThrowsContainsMessage()
         {
@@ -176,7 +161,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
         }
-
 
         [Test]
         public void DepositAsync_NoCustomer_ThrowsUserIdInvalidException()
@@ -247,15 +231,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #region GetRidesAsync
 
-
-
-
         [Test]
         public async Task GetRidesAsync_ParamterNull_ThrowsException()
         {
             Assert.ThrowsAsync<UserIdInvalidException>(async ()=> await _uut.GetRidesAsync(null));
         }
-
 
         [Test]
         public async Task GetRidesAsync_ParameterEmpty_ThrowsException()
@@ -306,7 +286,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 EndDestination = new Address("City", 8200, "Street", 21),
                 StartDestination = new Address("City", 8200, "Street", 21)
             };
-
 
             customer.Rides.Add(soloRide);
             using (var context = _factory.CreateContext())
@@ -434,9 +413,35 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             var response = await _uut.GetRidesAsync(customer.Id);
             Assert.That(response.Count, Is.EqualTo(1));
         }
-
         #endregion
 
+
+        #region SignIn
+
+        [Test]
+        public async Task SigninAsync_SigningIn_CustomerSignedIn()
+        {
+
+            Customer customer = new Customer
+            {
+                Email = "Hans@mail.com",
+                Name = "Hans",
+                PhoneNumber = "66664444",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.SaveChanges();
+            }
+            await _uut.AddCustomerAsync(customer, "Qwer111!");
+
+            var respons = await _mockSignManager.PasswordSignInAsync("Hans@mail.com", "Qwer111!", false, false);
+
+            Assert.That(respons, Is.EqualTo(SignInResult.Success));
+        }
+
+        #endregion
 
         [Test]
         public void Dispose_DisposeOfObject_Disposes()
