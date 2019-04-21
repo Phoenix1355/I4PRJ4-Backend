@@ -94,12 +94,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithName()
         {
             Customer customerAddedToDatabase = new Customer
             {
                 Email = "valid@email.com",
-                Name = "Name",
+                Name = "Hans Petersen",
                 PhoneNumber = "12345678",
             };
 
@@ -111,7 +111,49 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
             var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
-            Assert.That(customerReturned.Name, Is.EqualTo("Name"));
+            Assert.That(customerReturned.Name, Is.EqualTo("Hans Petersen"));
+        }
+
+        [Test]
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithEmail()
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "HansAU@email.com",
+                Name = "Hans",
+                PhoneNumber = "12345678",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
+            }
+
+
+            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
+            Assert.That(customerReturned.Email, Is.EqualTo("HansAU@email.com"));
+        }
+
+        [Test]
+        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomerWithPhoneNumber()
+        {
+            Customer customerAddedToDatabase = new Customer
+            {
+                Email = "HansAU@email.com",
+                Name = "Hans",
+                PhoneNumber = "66665555",
+            };
+
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customerAddedToDatabase);
+                context.SaveChanges();
+            }
+
+
+            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
+            Assert.That(customerReturned.PhoneNumber, Is.EqualTo("66665555"));
         }
 
         [Test]
@@ -221,5 +263,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             _uut.Dispose();
         }
+
     }
 }
