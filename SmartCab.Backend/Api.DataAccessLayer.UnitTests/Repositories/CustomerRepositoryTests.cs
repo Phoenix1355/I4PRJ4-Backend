@@ -33,8 +33,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _factory = new InMemorySqlLiteContextFactory();
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
-            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager,_mockSignManager);
-            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository); 
+            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager, _mockSignManager);
+            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository);
         }
 
         [TearDown]
@@ -69,7 +69,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
                 Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
             }
-            
+
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
         [Test]
@@ -157,22 +157,21 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
+        public void GetCustomerAsync_NoCustomer_ThrowsNotFound()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
 
         [Test]
-        public async Task GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
+        public async Task GetCustomerAsync_NoCustomer_ThrowsContainMessage()
         {
             try
             {
                 await _uut.GetCustomerAsync("Not valid Id");
-
             }
-            catch (UserIdInvalidException e)
+            catch (UserIdInvalidException m)
             {
-                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
+                Assert.That(m.Message, Is.EqualTo("Customer does not exist."));
             }
         }
 
@@ -221,7 +220,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
+                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(deposit));
             }
         }
 
@@ -263,6 +262,5 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             _uut.Dispose();
         }
-
     }
 }
