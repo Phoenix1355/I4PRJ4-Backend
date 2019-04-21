@@ -1,6 +1,9 @@
 language: csharp
 mono: none
 dotnet: 2.1.502
+branches:
+  only:
+  - development
 solution: SmartCab.Backend/SmartCab.Backend.sln
 install:
   - nuget restore SmartCab.Backend/SmartCab.Backend.sln
