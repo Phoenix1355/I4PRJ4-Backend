@@ -105,7 +105,13 @@ namespace Api.DataAccessLayer.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Ride>> GetCustomerRidesAsync(string customerId)
+        /// <summary>
+        /// Returns the rides from the database connected to the customer. 
+        /// </summary>
+        /// <param name="customerId">Id of requesting customer</param>
+        /// <returns>List of rides associated to customer</returns>
+        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+        public async Task<List<Ride>> GetRidesAsync(string customerId)
         {
             var customer = await _context.Customers.FindAsync(customerId);
 

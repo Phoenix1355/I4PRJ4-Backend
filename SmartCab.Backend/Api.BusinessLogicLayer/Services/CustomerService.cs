@@ -127,9 +127,15 @@ namespace Api.BusinessLogicLayer.Services
             await _customerRepository.DepositAsync(customerId, depositAmount);
         }
 
-        public async Task<CustomerRidesResponse> GetCustomerRidesAsync(string customerId)
+
+        /// <summary>
+        /// Gets the rides associated to the customerId and wraps it into a CustomerRidesResponse object as RideDtos. 
+        /// </summary>
+        /// <param name="customerId">Id of the requesting customer</param>
+        /// <returns></returns>
+        public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            var customerRides = await _customerRepository.GetCustomerRidesAsync(customerId);
+            var customerRides = await _customerRepository.GetRidesAsync(customerId);
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

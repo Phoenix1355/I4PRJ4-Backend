@@ -23,6 +23,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     [TestFixture]
     public class CustomerRepositoryTests
     {
+        #region Setup
+
+        
+
+        
         private CustomerRepository _uut;
         private InMemorySqlLiteContextFactory _factory;
         private FakeSignInManager _mockSignManager;
@@ -43,6 +48,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             _factory.Dispose();
         }
+
+        #endregion
+
+        #region  AddCustomerAsync
+
+
+
 
         [Test]
         public async Task AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
@@ -94,6 +106,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
         }
 
+        #endregion
+
+        #region GetCustomerAsync
+
+
+
+
+
         [Test]
         public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
         {
@@ -116,7 +136,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void GetCustomerAsyncc_NoCustomer_ThrowsNotFound()
+        public void GetCustomerAsync_NoCustomer_ThrowsNotFound()
         {
             Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
         }
@@ -134,6 +154,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
             }
         }
+        #endregion
+
+        #region DepositAsync
+
+
+
 
 
         [Test]
@@ -217,21 +243,28 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
         }
 
+        #endregion
+
+        #region GetRidesAsync
+
+
+
+
         [Test]
-        public async Task GetCustomerRidesAsync_ParamterNull_ThrowsException()
+        public async Task GetRidesAsync_ParamterNull_ThrowsException()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>(()=>_uut.GetCustomerRidesAsync(null));
+            Assert.ThrowsAsync<UserIdInvalidException>(async ()=> await _uut.GetRidesAsync(null));
         }
 
 
         [Test]
-        public async Task GetCustomerRidesAsync_ParameterEmpty_ThrowsException()
+        public async Task GetRidesAsync_ParameterEmpty_ThrowsException()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>(() => _uut.GetCustomerRidesAsync(""));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetRidesAsync(""));
         }
 
         [Test]
-        public async Task GetCustomerRidesAsync_CustomerExistButNoRides_ReturnsEmptyList()
+        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsEmptyList()
         {
             var customer = new Customer
             {
@@ -246,12 +279,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            var response = await _uut.GetRidesAsync(customer.Id);
             Assert.That(response,Is.Empty);
         }
 
         [Test]
-        public async Task GetCustomerRidesAsync_CustomerExistButNoRides_ReturnsListWithOne()
+        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsListWithOne()
         {
             var customer = new Customer
             {
@@ -282,12 +315,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            var response = await _uut.GetRidesAsync(customer.Id);
             Assert.That(response.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public async Task GetCustomerRidesAsync_TwoCustomerExistWithRides_ReturnExpectedCustomer()
+        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnExpectedCustomer()
         {
             var customer = new Customer
             {
@@ -340,12 +373,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            var response = await _uut.GetRidesAsync(customer.Id);
             Assert.That(response.First().Customer.Name, Is.EqualTo("ExpectedCustomer"));
         }
 
         [Test]
-        public async Task GetCustomerRidesAsync_TwoCustomerExistWithRides_ReturnsListWithOneForRightCustomer()
+        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnsListWithOneForRightCustomer()
         {
             var customer = new Customer
             {
@@ -398,9 +431,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var response = await _uut.GetCustomerRidesAsync(customer.Id);
+            var response = await _uut.GetRidesAsync(customer.Id);
             Assert.That(response.Count, Is.EqualTo(1));
         }
+
+        #endregion
+
 
         [Test]
         public void Dispose_DisposeOfObject_Disposes()
