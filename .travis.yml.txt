@@ -1,7 +1,11 @@
 language: csharp
 mono: none
 dotnet: 2.1.502
+solution: SmartCab.Backend/SmartCab.Backend.sln
+install:
+  - nuget restore SmartCab.Backend/SmartCab.Backend.sln
+  - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
 script:
  - dotnet restore
- - msbuild solution-name.sln
- - mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./MyProject.Tests/bin/Release/MyProject.Tests.dll
+ - msbuild SmartCab.Backend/SmartCab.Backend.sln
+ - mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./Api.BusinessLogicLayer.UnitTests/bin/Release/netcoreapp2.2/Api.BusinessLogicLayer.UnitTests.dll
