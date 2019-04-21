@@ -234,7 +234,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);
 
             var response = await _customerService.GetRidesAsync(null);
-            Assert.That(response.Rides.GetType(),Is.EqualTo(rideListDto.GetType()));
+            Assert.That(response.Rides,Is.EqualTo(rideListDto));
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
 
