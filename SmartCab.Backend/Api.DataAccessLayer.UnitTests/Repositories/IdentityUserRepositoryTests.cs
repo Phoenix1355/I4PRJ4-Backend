@@ -58,9 +58,35 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             var response = await _uut.SignInAsync(email, password);
 
             Assert.That(response, Is.EqualTo(SignInResult.Failed));
-
-            
         }
+
+
+        [Test]
+        public async Task SigninAsync_SigningIn_DelegateExpectedLockedOut()
+        {
+
+            var email = "Hans@mail.com";
+            var password = "Qwer111!";
+
+            _mockSignManager.PasswordSignInAsyncReturn = SignInResult.LockedOut;
+            var response = await _uut.SignInAsync(email, password);
+
+            Assert.That(response, Is.EqualTo(SignInResult.LockedOut));
+        }
+
+        [Test]
+        public async Task SigninAsync_SigningIn_DelegateExpectedNotAllowed()
+        {
+
+            var email = "Hans@mail.com";
+            var password = "Qwer111!";
+
+            _mockSignManager.PasswordSignInAsyncReturn = SignInResult.NotAllowed;
+            var response = await _uut.SignInAsync(email, password);
+
+            Assert.That(response, Is.EqualTo(SignInResult.NotAllowed));
+        }
+
         #endregion
 
     }
