@@ -132,12 +132,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task GetCustomerAsyncc_NoCustomer_ThrowsContainsMessage()
+        public async Task GetCustomerAsync_NoCustomer_ThrowsContainsMessage()
         {
             try
             {
                 await _uut.GetCustomerAsync("Not valid Id");
-
             }
             catch (UserIdInvalidException e)
             {

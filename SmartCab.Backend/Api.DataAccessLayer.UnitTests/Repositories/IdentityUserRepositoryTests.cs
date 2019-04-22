@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Api.DataAccessLayer.Models;
+﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Repositories;
-using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
-using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
-using NUnit.Framework;
-using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
@@ -46,6 +33,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
+
         #region SignIn
 
         [Test]
@@ -58,6 +46,19 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(response, Is.EqualTo(SignInResult.Success));
         }
 
+
+        [Test]
+        public async Task SigninAsync_SigningIn_SigninFail()
+        {
+       
+            var signin = SignInResult.Failed;
+
+            _uut.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Failed);
+
+            Assert.That(signin, Is.EqualTo(SignInResult.Failed));
+
+            
+        }
         #endregion
 
     }
