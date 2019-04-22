@@ -48,14 +48,16 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
         [Test]
-        public async Task SigninAsync_SigningIn_SigninFail()
+        public async Task SigninAsync_SigningIn_DelegatedExpectedFail()
         {
-       
-            var signin = SignInResult.Failed;
 
-            _uut.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Failed);
+            var email = "Dummy Email";
+            var password = "Dummy Password";
 
-            Assert.That(signin, Is.EqualTo(SignInResult.Failed));
+            _mockSignManager.PasswordSignInAsyncReturn = SignInResult.Failed;
+            var response = await _uut.SignInAsync(email, password);
+
+            Assert.That(response, Is.EqualTo(SignInResult.Failed));
 
             
         }
