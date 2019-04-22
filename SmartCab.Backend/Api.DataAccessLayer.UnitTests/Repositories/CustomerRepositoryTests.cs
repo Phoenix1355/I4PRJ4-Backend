@@ -415,34 +415,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
         #endregion
 
-
-        #region SignIn
-
-        [Test]
-        public async Task SigninAsync_SigningIn_CustomerSignedIn()
-        {
-
-            Customer customer = new Customer
-            {
-                Email = "Hans@mail.com",
-                Name = "Hans",
-                PhoneNumber = "66664444",
-            };
-
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customer);
-                context.SaveChanges();
-            }
-            await _uut.AddCustomerAsync(customer, "Qwer111!");
-
-            var respons = await _mockSignManager.PasswordSignInAsync("Hans@mail.com", "Qwer111!", false, false);
-
-            Assert.That(respons, Is.EqualTo(SignInResult.Success));
-        }
-
-        #endregion
-
         [Test]
         public void Dispose_DisposeOfObject_Disposes()
         {
