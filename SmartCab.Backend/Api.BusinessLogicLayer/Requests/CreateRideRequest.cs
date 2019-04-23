@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Api.BusinessLogicLayer.CustomDataAnnotations;
+using Api.BusinessLogicLayer.Enums;
 using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.Requests
@@ -8,7 +9,7 @@ namespace Api.BusinessLogicLayer.Requests
     public class CreateRideRequest
     {
         [Required]
-        public bool IsShared { get; set; }
+        public RideType RideType { get; set; }
 
         [Required]
         [GreaterThanCurrentDateTime(ErrorMessage = "The departure time must be greater than the current datetime.")]

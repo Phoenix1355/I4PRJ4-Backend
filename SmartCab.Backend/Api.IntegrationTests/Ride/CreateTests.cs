@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
@@ -311,7 +312,7 @@ namespace Api.IntegrationTests.Ride
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
-                IsShared = false,
+                RideType = RideType.SoloRide,
                 PassengerCount = 2
             };
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
@@ -22,6 +23,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IRideRepository _rideRepository;
         private IPriceStrategy _soloRidePriceStrategy;
         private IPriceStrategy _sharedRidePriceStrategy;
+        private IPriceStrategyFactory _priceStrategyFactory;
         private RideService _rideService;
 
 
@@ -36,13 +38,9 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             _soloRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
-            var calculators = new List<IPriceStrategy>
-            {
-                _soloRidePriceStrategy,
-                _sharedRidePriceStrategy
-            };
+            _priceStrategyFactory = Substitute.For<IPriceStrategyFactory>();
 
-            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, calculators);
+            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, _priceStrategyFactory);
             _anAddress = new Address("city", 1000, "street", 1);
         }
 
@@ -57,7 +55,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             _soloRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
 
-            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, false);
+            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, RideType.SoloRide);
 
             Assert.That(price, Is.EqualTo(calculatedPrice));
         }
@@ -73,7 +71,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice); //Stub the shared strategy
 
-            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, true);
+            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, RideType.SharedRide);
 
             Assert.That(price, Is.EqualTo(calculatedPrice));
         }
@@ -95,7 +93,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 StartDestination = _anAddress,
                 EndDestination = _anAddress,
-                IsShared = false
+                RideType = RideType.SoloRide
             };
 
             var response = await _rideService.AddRideAsync(request, "aCustomerId");

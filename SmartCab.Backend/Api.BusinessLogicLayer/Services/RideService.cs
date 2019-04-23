@@ -55,7 +55,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         public Task<CreateRideResponse> AddRideAsync(CreateRideRequest request, string customerId)
         {
-            if (request.IsShared)
+            if (request.RideType == RideType.SharedRide)
             {
                 return AddSharedRideAsync(request, customerId);
             }
@@ -72,7 +72,7 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<CreateRideResponse> AddSoloRideAsync(CreateRideRequest request, string customerId)
         {
             var ride = _mapper.Map<SoloRide>(request);
-            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, false);
+            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
             ride = await _rideRepository.AddSoloRideAsync(ride);
             var response = _mapper.Map<CreateRideResponse>(ride);
