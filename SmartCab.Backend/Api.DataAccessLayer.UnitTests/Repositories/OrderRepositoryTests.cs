@@ -410,10 +410,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.AcceptOrder(invalidTaxiCompanyId, orderCreated.Id));
         }
 
-        [Test]
-        public async Task AcceptOrder_OrderAlreadyAcceptedExistsSoloRide_ThrowsException()
+        [TestCase(OrderStatus.Accepted)]
+        [TestCase(OrderStatus.Expired)]
+        public async Task AcceptOrder_OrderAlreadyAcceptedExistsSoloRide_ThrowsException(OrderStatus status)
         {
-            var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.WaitingForAccept,OrderStatus.Accepted);
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.WaitingForAccept, status);
             var taxiCompany = new TaxiCompany();
             using (var context = _factory.CreateContext())
             {
@@ -424,10 +425,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrder(taxiCompany.Id, orderCreated.Id));
         }
 
-        [Test]
-        public async Task AcceptOrder_OrderExistsSoloRideAlreadyAccepted_ThrowsException()
+        [TestCase(RideStatus.Accepted)]
+        [TestCase(RideStatus.Expired)]
+        [TestCase(RideStatus.Debited)]
+        [TestCase(RideStatus.LookingForMatch)]
+        public async Task AcceptOrder_OrderExistsSoloRideAlreadyAccepted_ThrowsException(RideStatus status)
         {
-            var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.Accepted, OrderStatus.WaitingForAccept);
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase(status);
             var taxiCompany = new TaxiCompany();
             using (var context = _factory.CreateContext())
             {
