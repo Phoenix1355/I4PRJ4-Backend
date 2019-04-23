@@ -17,8 +17,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         private readonly int _validPassengerCount = 2;
         private readonly RideType _validIsShared = RideType.SoloRide;
         
-        [TestCase(false, 0)]
-        [TestCase(true, 0)]
+        [TestCase(RideType.SoloRide, 0)]
+        [TestCase(RideType.SharedRide, 0)]
         [TestCase(null, 0)] //will default to false
         public void IsShared_WhenSet_ValidatesInput(RideType type, int numberOfErrors)
         {

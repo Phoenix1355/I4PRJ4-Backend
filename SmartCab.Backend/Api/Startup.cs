@@ -136,6 +136,9 @@ namespace Api
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
                 mapper.CreateMap<Ride, RideDto>();
                 mapper.CreateMap<TaxiCompany, TaxiCompanyDto>();
+
+                //Maps enum to their name, instead of integer value.
+                mapper.CreateMap<Enum, String>().ConvertUsing(e => e.ToString());
             });
         }
 
@@ -222,7 +225,7 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-
+            services.AddScoped<IPriceStrategyFactory, PriceStrategyFactory>();
             //When adding the same interface to the DI container multiple times
             //an IEnumerable<IPriceStrategy> must used when injecting the concrete classes.
             //Note that the order is important here! The class RideService use this approach.

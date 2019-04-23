@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
@@ -7,6 +8,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
 
@@ -123,6 +125,23 @@ namespace Api.BusinessLogicLayer.Services
 
             //Deposits
             await _customerRepository.DepositAsync(customerId, depositAmount);
+        }
+
+
+        /// <summary>
+        /// Gets the rides associated to the customerId and wraps it into a CustomerRidesResponse object as RideDtos. 
+        /// </summary>
+        /// <param name="customerId">Id of the requesting customer</param>
+        /// <returns></returns>
+        public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
+        {
+            var customerRides = await _customerRepository.GetRidesAsync(customerId);
+            var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
+            var response = new CustomerRidesResponse
+            {
+                Rides = customerRidesDto
+            };
+            return response;
         }
     }
 }

@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -71,5 +75,67 @@ namespace Api.IntegrationTests
         {
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
         }
+
+        protected CreateRideRequest getCreateRideRequest()
+        {
+            return new CreateRideRequest()
+            {
+                ConfirmationDeadline = DateTime.Now.AddSeconds(1), //added one second because those dates must be in the future
+                DepartureTime = DateTime.Now.AddSeconds(1),
+                StartDestination = new Address("City", 8000, "Street", 21),
+                EndDestination = new Address("City", 8000, "Street", 21),
+                RideType = RideType.SoloRide,
+                PassengerCount = 2
+            };
+        }
+
+
+        protected async Task LoginOnCustomerAccount(string email = "test12@gmail.com")
+        {
+            //Create customer
+            var registerRequest = getRegisterRequest(email);
+            await PostAsync("/api/customer/register", registerRequest);
+
+            //Login on customer
+            var loginRequest = getLoginRequest(email);
+            var loginResponse = await PostAsync("/api/customer/login", loginRequest);
+
+            //Map login returned to object
+            var loginResponseObject = GetObject<LoginResponse>(loginResponse);
+
+            //Get Token
+            var token = loginResponseObject.Token;
+
+            //Default header authentication setup.
+            
+            
+           _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
+        }
+
+        protected async Task DepositToCustomer(int amount)
+        {
+            DepositRequest request = new DepositRequest()
+            {
+                Deposit = amount
+            };
+
+            var response = await PutAsync("/api/customer/deposit", request);
+        }
+
+        protected async Task CreateRide()
+        {
+            var request = getCreateRideRequest();
+
+            //Make request
+            var response = await PostAsync("api/rides/create", request);
+        }
+
+        protected async Task CreateRideWithLogin()
+        {
+            await LoginOnCustomerAccount();
+            await DepositToCustomer(1000);
+            await CreateRide();
+        }
     }
+
 }
