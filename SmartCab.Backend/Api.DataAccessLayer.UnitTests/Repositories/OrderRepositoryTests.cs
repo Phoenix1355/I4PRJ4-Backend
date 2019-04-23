@@ -411,9 +411,23 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task AcceptOrder_OrderExistsSoloRideAlreadyAccepted_ThrowsException()
+        public async Task AcceptOrder_OrderAlreadyAcceptedExistsSoloRide_ThrowsException()
         {
             var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.WaitingForAccept,OrderStatus.Accepted);
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrder(taxiCompany.Id, orderCreated.Id));
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderExistsSoloRideAlreadyAccepted_ThrowsException()
+        {
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.Accepted, OrderStatus.WaitingForAccept);
             var taxiCompany = new TaxiCompany();
             using (var context = _factory.CreateContext())
             {
