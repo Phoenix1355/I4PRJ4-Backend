@@ -37,9 +37,49 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
+                .Where(x => x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
+        }
+
+        /// <summary>
+        /// Update the order to accepted, and who accepted the taxicompany. 
+        /// </summary>
+        /// <param name="taxicompanyId">Taxicompany which accepted order</param>
+        /// <param name="orderId">Id of the accepted order</param>
+        /// <returns>Returns the updated order</returns>
+        public async Task<Order> AcceptOrder(string taxicompanyId, int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+            {
+                throw new Exception("Order does not exists"); // Exchange with custom error. 
+            }
+
+            if (order.Status != OrderStatus.WaitingForAccept)
+            {
+                throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+            }
+            //Set status
+            order.Status = OrderStatus.Accepted;
+
+            //Set status on orders connected rides. 
+            foreach (var orderRide in order.Rides)
+            {
+                if (orderRide.Status != RideStatus.WaitingForAccept)
+                {
+                    throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+                }
+                orderRide.Status = RideStatus.Accepted;
+            }
+
+            //Set company that accepted
+            order.TaxiCompanyId = taxicompanyId;
+            
+            //Save
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+            return order;
         }
 
         public async Task<SharedRide> CreateSharedRideAsync(SharedRide ride)
@@ -65,7 +105,7 @@ namespace Api.DataAccessLayer.Repositories
 
                 //Adds order
                 await AddOrderFromRide(ride);
-                
+
                 //Reserve from Customer
                 transaction.Commit();
                 return ride;
@@ -112,7 +152,7 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<Order> AddOrderFromRide(Ride ride)
         {
-            if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
+            if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
             {
                 throw new MultipleOrderException("Already an order for given ride. ");
             }
