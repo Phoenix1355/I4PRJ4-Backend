@@ -50,28 +50,11 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns>Returns the updated order</returns>
         public async Task<Order> AcceptOrder(string taxicompanyId, int orderId)
         {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null)
-            {
-                throw new Exception("Order does not exists"); // Exchange with custom error. 
-            }
-
-            if (order.Status != OrderStatus.WaitingForAccept)
-            {
-                throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
-            }
-            //Set status
-            order.Status = OrderStatus.Accepted;
+            var order = await FindOrder(orderId);
+            SetOrderToAccepted(order);
 
             //Set status on orders connected rides. 
-            foreach (var orderRide in order.Rides)
-            {
-                if (orderRide.Status != RideStatus.WaitingForAccept)
-                {
-                    throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
-                }
-                orderRide.Status = RideStatus.Accepted;
-            }
+            SetAllRidesToAccepted(order.Rides);
 
             //Set company that accepted
             order.TaxiCompanyId = taxicompanyId;
@@ -80,6 +63,39 @@ namespace Api.DataAccessLayer.Repositories
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
             return order;
+        }
+
+        private async Task<Order> FindOrder(int orderId)
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+            {
+                throw new Exception("Order does not exists"); // Exchange with custom error. 
+            }
+
+            return order;
+        }
+
+        private void SetOrderToAccepted(Order order)
+        {
+            if (order.Status != OrderStatus.WaitingForAccept)
+            {
+                throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+            }
+            //Set status
+            order.Status = OrderStatus.Accepted;
+        }
+
+        private void SetAllRidesToAccepted(List<Ride> rides)
+        {
+            foreach (var ride in rides)
+            {
+                if (ride.Status != RideStatus.WaitingForAccept)
+                {
+                    throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+                }
+                ride.Status = RideStatus.Accepted;
+            }
         }
 
         public async Task<SharedRide> CreateSharedRideAsync(SharedRide ride)
