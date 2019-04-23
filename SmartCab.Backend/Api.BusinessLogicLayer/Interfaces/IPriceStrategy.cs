@@ -1,6 +1,6 @@
 ﻿namespace Api.BusinessLogicLayer.Interfaces
 {
-    public interface IPriceCalculator
+    public interface IPriceStrategy
     {
         decimal CalculatePrice(decimal distanceInKm);
     }

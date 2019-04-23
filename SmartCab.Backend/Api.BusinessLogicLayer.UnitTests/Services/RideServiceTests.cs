@@ -20,8 +20,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IMapper _mapper;
         private IGoogleMapsApiService _googleMapsApiService;
         private IRideRepository _rideRepository;
-        private IPriceCalculator _soloRidePriceCalculator;
-        private IPriceCalculator _sharedRidePriceCalculator;
+        private IPriceStrategy _soloRidePriceStrategy;
+        private IPriceStrategy _sharedRidePriceStrategy;
         private RideService _rideService;
 
 
@@ -34,12 +34,12 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _googleMapsApiService = Substitute.For<IGoogleMapsApiService>();
             _rideRepository = Substitute.For<IRideRepository>();
 
-            _soloRidePriceCalculator = Substitute.For<IPriceCalculator>();
-            _sharedRidePriceCalculator = Substitute.For<IPriceCalculator>();
-            var calculators = new List<IPriceCalculator>
+            _soloRidePriceStrategy = Substitute.For<IPriceStrategy>();
+            _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
+            var calculators = new List<IPriceStrategy>
             {
-                _soloRidePriceCalculator,
-                _sharedRidePriceCalculator
+                _soloRidePriceStrategy,
+                _sharedRidePriceStrategy
             };
 
             _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, calculators);
@@ -55,7 +55,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
                 .ReturnsForAnyArgs(distance);
 
-            _soloRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
+            _soloRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
 
             decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, false);
 
@@ -71,7 +71,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
                 .ReturnsForAnyArgs(distance);
 
-            _sharedRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the shared strategy
+            _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice); //Stub the shared strategy
 
             decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, true);
 
@@ -86,7 +86,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
                 .ReturnsForAnyArgs(distance);
-            _soloRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
+            _soloRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
             var expectedResponse = new CreateRideResponse {Price = calculatedPrice };
             _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
             _mapper.Map<SoloRide>(null)
@@ -112,7 +112,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         //    _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
         //        .ReturnsForAnyArgs(distance);
-        //    _sharedRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice);
+        //    _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
         //    var expectedResponse = new CreateRideResponse { Price = calculatedPrice };
         //    _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
         //    _mapper.Map<SoloRide>(null)

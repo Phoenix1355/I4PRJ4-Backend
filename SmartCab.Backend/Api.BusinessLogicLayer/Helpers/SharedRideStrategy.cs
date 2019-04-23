@@ -5,7 +5,7 @@ namespace Api.BusinessLogicLayer.Helpers
     /// <summary>
     /// This class implements a concrete stategy used to calculate prices for shared rides.
     /// </summary>
-    public class SharedRideStrategy : IPriceCalculator
+    public class SharedRideStrategy : IPriceStrategy
     {
         /// <summary>
         /// Calculates and returns the price of a shared ride.

@@ -208,6 +208,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
+            services.AddScoped<IPriceService, PriceService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IHttpClient, TestableHttpClient>();
@@ -222,11 +223,11 @@ namespace Api
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
 
             //When adding the same interface to the DI container multiple times
-            //an IEnumerable<IPriceCalculator> must used when injecting the concrete classes.
+            //an IEnumerable<IPriceStrategy> must used when injecting the concrete classes.
             //Note that the order is important here! The class RideService use this approach.
             //Source: https://www.stevejgordon.co.uk/asp-net-core-dependency-injection-registering-multiple-implementations-interface
-            services.AddScoped<IPriceCalculator, SoloRideStrategy>(); //index 0 in the ienumerable
-            services.AddScoped<IPriceCalculator, SharedRideStrategy>(); //index 1 in the ienumerable
+            services.AddScoped<IPriceStrategy, SoloRideStrategy>(); //index 0 in the ienumerable
+            services.AddScoped<IPriceStrategy, SharedRideStrategy>(); //index 1 in the ienumerable
         }
 
         /// <summary>

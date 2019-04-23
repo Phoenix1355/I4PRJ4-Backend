@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
+using Api.BusinessLogicLayer.Enums;
+using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -24,8 +26,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
-        private readonly IPriceCalculator _soloRidePriceCalculator;
-        private readonly IPriceCalculator _sharedRidePriceCalculator;
+        private readonly IPriceStrategyFactory _priceStrategyFactory;
 
         /// <summary>
         /// Constructor for this class.
@@ -33,22 +34,17 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
-        /// <param name="priceCalculators">A collection that must contain two calculators. The first one for solo ride, the second one for shared rides</param>
+        /// <param name="priceStrategyFactory">Used to get the correct strategy for price calculations</param>
         public RideService(
             IRideRepository rideRepository,
             IMapper mapper,
-            IGoogleMapsApiService googleMapsApiService,
-            IEnumerable<IPriceCalculator> priceCalculators)
+            IGoogleMapsApiService googleMapsApiService, 
+            IPriceStrategyFactory priceStrategyFactory)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
-
-            //The strategy pattern is used to define different strategies for the price calculation
-            //Our DI container does not support named instances, so this is a workaround.
-            //Source: https://www.stevejgordon.co.uk/asp-net-core-dependency-injection-registering-multiple-implementations-interface
-            _soloRidePriceCalculator = priceCalculators.ElementAt(0);
-            _sharedRidePriceCalculator = priceCalculators.ElementAt(1);
+            _priceStrategyFactory = priceStrategyFactory;
         }
 
         /// <summary>
@@ -106,20 +102,13 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="first">The first address</param>
         /// <param name="second">The second address</param>
-        /// <param name="isShared">True if it is a shared ride, false if it is a solo ride.</param>
+        /// <param name="type">The type of the ride</param>
         /// <returns>The price of the ride.</returns>
-        public async Task<decimal> CalculatePriceAsync(Address first, Address second, bool isShared)
+        public async Task<decimal> CalculatePriceAsync(Address first, Address second, RideType type)
         {
             var distance = await GetDistanceInKilometersAsync(first, second);
-
-            if (isShared)
-            {
-                return _sharedRidePriceCalculator.CalculatePrice(distance);
-            }
-            else
-            {
-                return _soloRidePriceCalculator.CalculatePrice(distance);
-            }
+            var priceStrategy = _priceStrategyFactory.GetPriceStrategy(type);
+            return priceStrategy.CalculatePrice(distance);
         }
 
         /// <summary>
