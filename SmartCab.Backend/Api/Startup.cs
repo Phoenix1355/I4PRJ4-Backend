@@ -133,6 +133,10 @@ namespace Api
                 mapper.CreateMap<SharedRide, CreateRideResponse>();
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
                 mapper.CreateMap<Ride, RideDto>();
+                mapper.CreateMap<TaxiCompany, TaxiCompanyDto>();
+
+                //Maps enum to their name, instead of integer value.
+                mapper.CreateMap<Enum, String>().ConvertUsing(e => e.ToString());
             });
         }
 
@@ -208,6 +212,7 @@ namespace Api
         {
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IHttpClient, TestableHttpClient>();
             services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
@@ -215,6 +220,8 @@ namespace Api
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IIdentityUserRepository, IdentityUserRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
+            services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
         }
 
         /// <summary>

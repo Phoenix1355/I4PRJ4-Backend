@@ -97,24 +97,27 @@ namespace Api.Controllers
         /// <summary>
         /// Returns all rides belonging to the customer associated with the supplied JWT token.
         /// </summary>
+        /// <param name="authorization">A valid JWT token.</param>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
         [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
-        [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Rides()
+        [ProducesResponseType(typeof(CustomerRidesResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Rides([FromHeader] string authorization)
         {
-            var email = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-            var expiration = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Expiration)?.Value;
-            //Get name from JWT token --> User.Identity.Name --> this will access a claim set on the token
-            //Get rides from database and return it
-            return Ok(new
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            if (string.IsNullOrEmpty(customerId))
             {
-                Email = email,
-                Expiration = expiration
-            });
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _customerService.GetRidesAsync(customerId);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -125,7 +128,7 @@ namespace Api.Controllers
         [Authorize(Roles = nameof(Customer))]
         [Route("[action]")]
         [HttpPut]
-        [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CustomerRidesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Deposit([FromHeader] string authorization, [FromBody] DepositRequest request)
         {
             var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
@@ -138,7 +141,7 @@ namespace Api.Controllers
 
             await _customerService.DepositAsync(request, customerId);
 
-            return Ok();
+            return NoContent();
         }
     }
 }
