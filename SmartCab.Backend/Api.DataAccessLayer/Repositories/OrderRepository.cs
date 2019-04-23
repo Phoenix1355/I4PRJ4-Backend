@@ -38,6 +38,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns>Returns the updated order</returns>
         public async Task<Order> AcceptOrder(string taxicompanyId, int orderId)
         {
+            var taxiCompanyTask =  FindTaxiCompany(taxicompanyId);
             var order = await FindOrder(orderId);
             SetOrderToAccepted(order);
 
@@ -45,8 +46,7 @@ namespace Api.DataAccessLayer.Repositories
             SetAllRidesToAccepted(order.Rides);
 
             //Set company that accepted
-            var taxiCompany = await FindTaxiCompany(taxicompanyId);
-            order.TaxiCompany = taxiCompany;
+            order.TaxiCompany = await taxiCompanyTask;
 
 
             //Save
