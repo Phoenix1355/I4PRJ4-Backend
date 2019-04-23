@@ -34,7 +34,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-        #region AddSoloRideAsync
+        #region CreateSoloRideAsync
 
         [Test]
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_RideIsCreated()
@@ -131,6 +131,15 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
         #endregion
 
+        #region AcceptOrder
+
+        [Test]
+        public async Task AcceptOrder_OrderExists_OrderIsAccepted()
+        {
+
+        }
+
+        #endregion
 
         #region Helper Methods
         private Customer SeedDatabaseWithCustomer(decimal balance=1000, decimal reserved = 0)

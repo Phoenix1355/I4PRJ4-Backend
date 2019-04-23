@@ -57,8 +57,10 @@ namespace Api.DataAccessLayer.Repositories
             SetAllRidesToAccepted(order.Rides);
 
             //Set company that accepted
-            order.TaxiCompanyId = taxicompanyId;
+            var taxiCompany = await FindTaxiCompany(taxicompanyId);
+            order.TaxiCompany = taxiCompany;
             
+
             //Save
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
@@ -74,6 +76,17 @@ namespace Api.DataAccessLayer.Repositories
             }
 
             return order;
+        }
+
+        private async Task<TaxiCompany> FindTaxiCompany(string taxicompanyId)
+        {
+            var taxiCompany = await _context.TaxiCompanies.FindAsync(taxicompanyId);
+            if (taxiCompany == null)
+            {
+                throw new Exception("Order does not exists"); // Exchange with custom error. 
+            }
+
+            return taxiCompany;
         }
 
         private void SetOrderToAccepted(Order order)
