@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
 using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer;
@@ -219,6 +220,13 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
+
+            //When adding the same interface to the DI container multiple times
+            //an IEnumerable<IPriceCalculator> must used when injecting the concrete classes.
+            //Note that the order is important here! The class RideService use this approach.
+            //Source: https://www.stevejgordon.co.uk/asp-net-core-dependency-injection-registering-multiple-implementations-interface
+            services.AddScoped<IPriceCalculator, SoloRideStrategy>(); //index 0 in the ienumerable
+            services.AddScoped<IPriceCalculator, SharedRideStrategy>(); //index 1 in the ienumerable
         }
 
         /// <summary>

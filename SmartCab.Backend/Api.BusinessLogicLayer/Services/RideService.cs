@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
+        private readonly IPriceCalculator _soloRidePriceCalculator;
+        private readonly IPriceCalculator _sharedRidePriceCalculator;
 
         /// <summary>
         /// Constructor for this class.
@@ -30,11 +33,22 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
-        public RideService(IRideRepository rideRepository, IMapper mapper, IGoogleMapsApiService googleMapsApiService)
+        /// <param name="priceCalculators">A collection that must contain two calculators. The first one for solo ride, the second one for shared rides</param>
+        public RideService(
+            IRideRepository rideRepository,
+            IMapper mapper,
+            IGoogleMapsApiService googleMapsApiService,
+            IEnumerable<IPriceCalculator> priceCalculators)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
+
+            //The strategy pattern is used to define different strategies for the price calculation
+            //Our DI container does not support named instances, so this is a workaround.
+            //Source: https://www.stevejgordon.co.uk/asp-net-core-dependency-injection-registering-multiple-implementations-interface
+            _soloRidePriceCalculator = priceCalculators.ElementAt(0);
+            _sharedRidePriceCalculator = priceCalculators.ElementAt(1);
         }
 
         /// <summary>
@@ -96,21 +110,16 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>The price of the ride.</returns>
         public async Task<decimal> CalculatePriceAsync(Address first, Address second, bool isShared)
         {
-            //Business rule: Price should be 10x the distance in kilometers
-            const decimal multiplier = 10;
-
-            //Business rule: A shared ride gives the customer a discount of 25%
-            const decimal discount = (decimal)0.75;
-
             var distance = await GetDistanceInKilometersAsync(first, second);
-            var price = distance * multiplier;
 
             if (isShared)
             {
-                price *= discount;
+                return _sharedRidePriceCalculator.CalculatePrice(distance);
             }
-
-            return price;
+            else
+            {
+                return _soloRidePriceCalculator.CalculatePrice(distance);
+            }
         }
 
         /// <summary>
@@ -126,7 +135,7 @@ namespace Api.BusinessLogicLayer.Services
             var secondAsString = second.ToString();
             var validateOrigin = _googleMapsApiService.ValidateAddressAsync(firstAsString);
             var validateDestination = _googleMapsApiService.ValidateAddressAsync(firstAsString);
-            await Task.WhenAll(validateOrigin, validateDestination); 
+            await Task.WhenAll(validateOrigin, validateDestination);
 
             //Validation ok (otherwise an exception would be thrown above)
             var distanceInKm = await _googleMapsApiService.GetDistanceInKmAsync(firstAsString, secondAsString);

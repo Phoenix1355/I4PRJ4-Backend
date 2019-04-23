@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -17,7 +20,10 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IMapper _mapper;
         private IGoogleMapsApiService _googleMapsApiService;
         private IRideRepository _rideRepository;
+        private IPriceCalculator _soloRidePriceCalculator;
+        private IPriceCalculator _sharedRidePriceCalculator;
         private RideService _rideService;
+
 
         private Address _anAddress; //An address object to be reused throughout the tests
 
@@ -27,59 +33,100 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper = Substitute.For<IMapper>();
             _googleMapsApiService = Substitute.For<IGoogleMapsApiService>();
             _rideRepository = Substitute.For<IRideRepository>();
-            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService);
+
+            _soloRidePriceCalculator = Substitute.For<IPriceCalculator>();
+            _sharedRidePriceCalculator = Substitute.For<IPriceCalculator>();
+            var calculators = new List<IPriceCalculator>
+            {
+                _soloRidePriceCalculator,
+                _sharedRidePriceCalculator
+            };
+
+            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, calculators);
             _anAddress = new Address("city", 1000, "street", 1);
         }
 
-        [TestCase(false, 0.1, 1)]
-        [TestCase(false, 1, 10)]
-        [TestCase(false, 5, 50)]
-        [TestCase(false, 10.9, 109)]
-        [TestCase(false, 50, 500)]
-        [TestCase(false, 1000.1, 10001)]
-        [TestCase(true, 0.1, 0.75)]
-        [TestCase(true, 1, 7.5)]
-        [TestCase(true, 5, 37.5)]
-        [TestCase(true, 10.9, 81.75)]
-        [TestCase(true, 50, 375)]
-        [TestCase(true, 1000.1, 7500.75)]
-        public async Task CalculatePriceAsync_WhenCalled_CalculatesTheCorrectPrice(bool isShared, decimal distance, decimal expectedPrice)
+        [Test]
+        public async Task CalculatePriceAsync_WhenRideIsASoloRide_ReturnsTheCorrectPrice()
         {
-            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>()).ReturnsForAnyArgs(distance);
+            decimal distance = 10;
+            decimal calculatedPrice = 100;
 
-            var price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, isShared);
+            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(distance);
 
-            Assert.That(price, Is.EqualTo(expectedPrice));
+            _soloRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
+
+            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, false);
+
+            Assert.That(price, Is.EqualTo(calculatedPrice));
         }
 
-        [TestCase(false, 0.1, 1)]
-        [TestCase(false, 1, 10)]
-        [TestCase(false, 5, 50)]
-        [TestCase(false, 10.9, 109)]
-        [TestCase(false, 50, 500)]
-        [TestCase(false, 1000.1, 10001)]
-        //[TestCase(true, 0.1, 0.75)] //sharedrideasync is not implemented yet
-        //[TestCase(true, 1, 7.5)]
-        //[TestCase(true, 5, 37.5)]
-        //[TestCase(true, 10.9, 81.75)]
-        //[TestCase(true, 50, 375)]
-        //[TestCase(true, 1000.1, 7500.75)]
-        public async Task AddRideAsync_WhenCalled_ReturnsACreateRideResponseContainingTheCorrectPrice(bool isShared, decimal distance, decimal expectedPrice)
+        [Test]
+        public async Task CalculatePriceAsync_WhenRideIsASharedRide_ReturnsTheCorrectPrice()
         {
-            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>()).ReturnsForAnyArgs(distance);
-            var expectedResponse = new CreateRideResponse {Price = expectedPrice};
+            decimal distance = 10;
+            decimal calculatedPrice = 75;
+
+            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(distance);
+
+            _sharedRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the shared strategy
+
+            decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, true);
+
+            Assert.That(price, Is.EqualTo(calculatedPrice));
+        }
+
+        [Test]
+        public async Task AddRideAsync_WhenRideIsASoloRide_ReturnsACreateRideResponseContainingTheCorrectPrice()
+        {
+            decimal distance = 10;
+            decimal calculatedPrice = 100;
+
+            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(distance);
+            _soloRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice); //Stub the solo strategy
+            var expectedResponse = new CreateRideResponse {Price = calculatedPrice };
             _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
-            _mapper.Map<SoloRide>(null).ReturnsForAnyArgs(new SoloRide {StartDestination = _anAddress, EndDestination = _anAddress});
+            _mapper.Map<SoloRide>(null)
+                .ReturnsForAnyArgs(new SoloRide {StartDestination = _anAddress, EndDestination = _anAddress});
             var request = new CreateRideRequest
             {
                 StartDestination = _anAddress,
                 EndDestination = _anAddress,
-                IsShared = isShared
+                IsShared = false
             };
 
             var response = await _rideService.AddRideAsync(request, "aCustomerId");
 
-            Assert.That(response.Price, Is.EqualTo(expectedPrice));
+            Assert.That(response.Price, Is.EqualTo(calculatedPrice));
         }
+
+        //TODO: Adding a shared ride is not implemented yet, but the test will most likely not change
+        //[Test]
+        //public async Task AddRideAsync_WhenRideIsASharedRide_ReturnsACreateRideResponseContainingTheCorrectPrice()
+        //{
+        //    decimal distance = 10;
+        //    decimal calculatedPrice = 100;
+
+        //    _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+        //        .ReturnsForAnyArgs(distance);
+        //    _sharedRidePriceCalculator.CalculatePrice(distance).Returns(calculatedPrice);
+        //    var expectedResponse = new CreateRideResponse { Price = calculatedPrice };
+        //    _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
+        //    _mapper.Map<SoloRide>(null)
+        //        .ReturnsForAnyArgs(new SoloRide { StartDestination = _anAddress, EndDestination = _anAddress });
+        //    var request = new CreateRideRequest
+        //    {
+        //        StartDestination = _anAddress,
+        //        EndDestination = _anAddress,
+        //        IsShared = true
+        //    };
+
+        //    var response = await _rideService.AddRideAsync(request, "aCustomerId");
+
+        //    Assert.That(response.Price, Is.EqualTo(calculatedPrice));
+        //}
     }
 }
