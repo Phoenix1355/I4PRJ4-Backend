@@ -98,7 +98,9 @@ namespace Api.Controllers
         /// Creates a new ride and ties the ride to the customer sending the request.
         /// </summary>
         /// <remarks>
-        /// Required role: "Customer".
+        /// Required role: "Customer".<br/>
+        /// If the ride is a solo ride the type should have the value "SoloRide".<br/>
+        /// If the ride is a shared ride the type must have the value "SharedRide".
         /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">Information about the ride that should be updated.</param>

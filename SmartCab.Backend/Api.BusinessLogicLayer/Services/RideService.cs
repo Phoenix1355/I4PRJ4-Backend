@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
+using Api.BusinessLogicLayer.Enums;
+using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -23,6 +26,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
+        private readonly IPriceStrategyFactory _priceStrategyFactory;
 
         /// <summary>
         /// Constructor for this class.
@@ -30,11 +34,17 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
-        public RideService(IRideRepository rideRepository, IMapper mapper, IGoogleMapsApiService googleMapsApiService)
+        /// <param name="priceStrategyFactory">Used to get the correct strategy for price calculations</param>
+        public RideService(
+            IRideRepository rideRepository,
+            IMapper mapper,
+            IGoogleMapsApiService googleMapsApiService, 
+            IPriceStrategyFactory priceStrategyFactory)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
+            _priceStrategyFactory = priceStrategyFactory;
         }
 
         /// <summary>
@@ -45,7 +55,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         public Task<CreateRideResponse> AddRideAsync(CreateRideRequest request, string customerId)
         {
-            if (request.IsShared)
+            if (request.RideType == RideType.SharedRide)
             {
                 return AddSharedRideAsync(request, customerId);
             }
@@ -62,7 +72,7 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<CreateRideResponse> AddSoloRideAsync(CreateRideRequest request, string customerId)
         {
             var ride = _mapper.Map<SoloRide>(request);
-            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, false);
+            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
             ride = await _rideRepository.AddSoloRideAsync(ride);
             var response = _mapper.Map<CreateRideResponse>(ride);
@@ -92,25 +102,13 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="first">The first address</param>
         /// <param name="second">The second address</param>
-        /// <param name="isShared">True if it is a shared ride, false if it is a solo ride.</param>
+        /// <param name="type">The type of the ride</param>
         /// <returns>The price of the ride.</returns>
-        public async Task<decimal> CalculatePriceAsync(Address first, Address second, bool isShared)
+        public async Task<decimal> CalculatePriceAsync(Address first, Address second, RideType type)
         {
-            //Business rule: Price should be 10x the distance in kilometers
-            const decimal multiplier = 10;
-
-            //Business rule: A shared ride gives the customer a discount of 25%
-            const decimal discount = (decimal)0.75;
-
             var distance = await GetDistanceInKilometersAsync(first, second);
-            var price = distance * multiplier;
-
-            if (isShared)
-            {
-                price *= discount;
-            }
-
-            return price;
+            var priceStrategy = _priceStrategyFactory.GetPriceStrategy(type);
+            return priceStrategy.CalculatePrice(distance);
         }
 
         /// <summary>
@@ -126,7 +124,7 @@ namespace Api.BusinessLogicLayer.Services
             var secondAsString = second.ToString();
             var validateOrigin = _googleMapsApiService.ValidateAddressAsync(firstAsString);
             var validateDestination = _googleMapsApiService.ValidateAddressAsync(firstAsString);
-            await Task.WhenAll(validateOrigin, validateDestination); 
+            await Task.WhenAll(validateOrigin, validateDestination);
 
             //Validation ok (otherwise an exception would be thrown above)
             var distanceInKm = await _googleMapsApiService.GetDistanceInKmAsync(firstAsString, secondAsString);

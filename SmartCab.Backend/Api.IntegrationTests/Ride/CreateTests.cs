@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
@@ -303,6 +304,48 @@ namespace Api.IntegrationTests.Ride
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
+        private CreateRideRequest getCreateRideRequest()
+        {
+            return new CreateRideRequest()
+            {
+                ConfirmationDeadline = DateTime.Now.AddSeconds(1), //added one second because those dates must be in the future
+                DepartureTime = DateTime.Now.AddSeconds(1),
+                StartDestination = new Address("City", 8000, "Street", 21),
+                EndDestination = new Address("City", 8000, "Street", 21),
+                RideType = RideType.SoloRide,
+                PassengerCount = 2
+            };
+        }
 
+
+        private async Task LoginOnCustomerAccount()
+        {
+            //Create customer
+            var registerRequest = getRegisterRequest();
+            await PostAsync("/api/customer/register", registerRequest);
+
+            //Login on customer
+            var loginRequest = getLoginRequest();
+            var loginResponse = await PostAsync("/api/customer/login", loginRequest);
+
+            //Map login returned to object
+            var loginResponseObject = GetObject<LoginResponse>(loginResponse);
+
+            //Get Token
+            var token = loginResponseObject.Token;
+
+            //Default header authentication setup.
+            _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
+        }
+
+        private async Task DepositToCustomer(int amount)
+        {
+            DepositRequest request = new DepositRequest()
+            {
+                Deposit = amount
+            };
+            
+            var response = await PutAsync("/api/customer/deposit", request);
+        }
     }
 }

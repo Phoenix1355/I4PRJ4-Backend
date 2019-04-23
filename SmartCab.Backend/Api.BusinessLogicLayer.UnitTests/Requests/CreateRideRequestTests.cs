@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.DataAccessLayer.Models;
 using NUnit.Framework;
@@ -14,16 +15,16 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         private readonly DateTime _validConfirmationTime = DateTime.Now.AddHours(1);
         private readonly Address _validAddress = new Address("City", 8210, "Street", 1);
         private readonly int _validPassengerCount = 2;
-        private readonly bool _validIsShared = false;
+        private readonly RideType _validIsShared = RideType.SoloRide;
         
-        [TestCase(false, 0)]
-        [TestCase(true, 0)]
+        [TestCase(RideType.SoloRide, 0)]
+        [TestCase(RideType.SharedRide, 0)]
         [TestCase(null, 0)] //will default to false
-        public void IsShared_WhenSet_ValidatesInput(bool isShared, int numberOfErrors)
+        public void IsShared_WhenSet_ValidatesInput(RideType type, int numberOfErrors)
         {
             var request = new CreateRideRequest
             {
-                IsShared = isShared,
+                RideType = type,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
@@ -40,7 +41,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 1;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = DateTime.Now,
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
@@ -57,7 +58,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 1;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = DateTime.Now.AddSeconds(-1),
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
@@ -74,7 +75,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 0;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
@@ -91,7 +92,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 1;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = DateTime.Now,
                 PassengerCount = _validPassengerCount,
@@ -108,7 +109,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 1;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = DateTime.Now.AddSeconds(-1),
                 PassengerCount = _validPassengerCount,
@@ -125,7 +126,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
             var expectedNumberOfErrors = 0;
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = DateTime.Now.AddSeconds(1),
                 PassengerCount = _validPassengerCount,
@@ -147,7 +148,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         {
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = passengerCount,
@@ -163,7 +164,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         {
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
@@ -179,7 +180,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         {
             var request = new CreateRideRequest
             {
-                IsShared = _validIsShared,
+                RideType = _validIsShared,
                 DepartureTime = _validDepartureTime,
                 ConfirmationDeadline = _validConfirmationTime,
                 PassengerCount = _validPassengerCount,
