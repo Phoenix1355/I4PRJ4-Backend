@@ -129,16 +129,16 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Updates the ride with the supplied ID so it is accepted.
+        /// Updates the order with the supplied ID, and associated rides so they are accepted.
         /// </summary>
         /// <remarks>
         /// Required role: "TaxiCompany"
         /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="id">The id of the ride that should be accepted.</param>
+        /// <param name="id">The id of the order that should be accepted.</param>
         /// <returns></returns>
-        /// <response code="400">Could mean that the ride was no longer in an "accepted" state when the request made it to the server</response>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="400">Could mean that the Order was already in accepted state when the request made it to the server</response>
+        /// <response code="401">If the user was not logged in already (token was expired)</response>
         [Route("{id}/[action]")]
         [Produces("application/json")]
         [HttpPut]
