@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -102,6 +103,24 @@ namespace Api.DataAccessLayer.Repositories
             customer.Balance += deposit;
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Returns the rides from the database connected to the customer. 
+        /// </summary>
+        /// <param name="customerId">Id of requesting customer</param>
+        /// <returns>List of rides associated to customer</returns>
+        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+        public async Task<List<Ride>> GetRidesAsync(string customerId)
+        {
+            var customer = await _context.Customers.FindAsync(customerId);
+
+            if (customer == null)
+            {
+                throw new UserIdInvalidException("Customer does not exist.");
+            }
+
+            return customer.Rides;
         }
 
         #region IDisposable implementation
