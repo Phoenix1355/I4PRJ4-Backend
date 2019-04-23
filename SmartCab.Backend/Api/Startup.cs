@@ -225,13 +225,6 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-            services.AddScoped<IPriceStrategyFactory, PriceStrategyFactory>();
-            //When adding the same interface to the DI container multiple times
-            //an IEnumerable<IPriceStrategy> must used when injecting the concrete classes.
-            //Note that the order is important here! The class RideService use this approach.
-            //Source: https://www.stevejgordon.co.uk/asp-net-core-dependency-injection-registering-multiple-implementations-interface
-            services.AddScoped<IPriceStrategy, SoloRideStrategy>(); //index 0 in the ienumerable
-            services.AddScoped<IPriceStrategy, SharedRideStrategy>(); //index 1 in the ienumerable
         }
 
         /// <summary>
