@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
 using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -208,6 +209,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddDependencyInjection(IServiceCollection services)
         {
+            services.AddScoped<IPriceStrategyFactory, PriceStrategyFactory>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IHttpClient, TestableHttpClient>();
