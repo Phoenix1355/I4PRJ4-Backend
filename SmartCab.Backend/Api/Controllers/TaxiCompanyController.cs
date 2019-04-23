@@ -22,26 +22,33 @@ namespace Api.Controllers
         {
             _taxiCompanyService = taxiCompanyService;
         }
+
         /// <summary>
-        /// Registers a new taxi company account and returns the username for the created account.
+        /// Registers a new taxi company account and returns a token to the calling client
         /// </summary>
         /// <remarks>
-        /// The following requirements apply to the username:
-        /// ---- Some requirement: Some value
-        /// 
+        /// When a taxi company is successfully created, a status code 200 will be returned
+        /// This response will contain a JWT token that is tied to the taxi company account
+        /// <br/>
         /// The following requirements apply to the password:
-        /// ---- Some requirement: Some value
+        /// ---- Minimum 8 characters long
+        /// ---- Minimum one lower case letter
+        /// ---- Minimum one upper case letter
+        /// ---- Minimum one number
+        /// ---- Minimum one non-alphanumeric letter
         /// </remarks>
-        /// <param name="model">The data needed to create the taxi company account.</param>
-        /// <returns>The created taxi company's username.</returns>
+        /// <param name="request">The data needed to create the taxi company account.</param>
+        /// <returns>The valid JWT token that is tied to the taxi company</returns>
+        /// <response code="400">If the supplied request wasn't valid</response>
+        /// <response code="500">If an internal server error occured</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
-        [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Register(RegisterRequest model)
+        [ProducesResponseType(typeof(RegisterResponseTaxiCompany), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
-            //register logic
-            return Ok(new RegisterResponse { Token = "Some username" });
+            var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
+            return Ok(response);
         }
 
         /// <summary>

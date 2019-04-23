@@ -38,6 +38,72 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         #endregion
 
+        #region AddTaxiCompanyAsync
+
+        [Test]
+        public async Task AddTaxiCompanyAsync_AddingTaxiCompanySucceeds_ReturnsARegisterResponseTaxiCompanyThatContainsTheExpectedToken()
+        {
+            var request = new RegisterRequest
+            {
+                Email = "test@domain.com",
+                Name = "Name",
+                Password = "Qwer111!",
+                PasswordRepeated = "Qwer111!",
+                PhoneNumber = "12345678"
+            };
+
+            var taxiCompany = new TaxiCompany
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs(taxiCompany);
+            _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
+
+            var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
+
+            Assert.That(response.Token, Is.EqualTo("TheGeneratedToken"));
+        }
+
+        [Test]
+        public async Task AddTaxiCompanyAsync_AddingTaxiCompanySucceeds_ReturnsARegisterResponseTaxiCompanyThatContainsTheExpectedTaxiCompanyDto()
+        {
+            var request = new RegisterRequest
+            {
+                Email = "test@domain.com",
+                Name = "Name",
+                Password = "Qwer111!",
+                PasswordRepeated = "Qwer111!",
+                PhoneNumber = "12345678"
+            };
+
+            var taxiCompany = new TaxiCompany
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs<TaxiCompany>(taxiCompany);
+
+            var taxiCompanyDto = new TaxiCompanyDto
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);
+
+            var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
+
+            Assert.That(response.TaxiCompany, Is.EqualTo(taxiCompanyDto));
+        }
+
+        #endregion
+
         #region LoginTaxiCompanyAsync
 
         [Test]
@@ -66,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Email = request.Email,
                 Name = "Some Name",
-                PhoneNumber = "123456789"
+                PhoneNumber = "12345678"
             };
 
             _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);
@@ -104,7 +170,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Email = request.Email,
                 Name = "Some Name",
-                PhoneNumber = "123456789"
+                PhoneNumber = "12345678"
             };
 
             _mapper.Map<TaxiCompanyDto>(null).ReturnsForAnyArgs(taxiCompanyDto);
