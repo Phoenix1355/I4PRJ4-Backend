@@ -9,15 +9,14 @@ namespace Api.BusinessLogicLayer.Requests
     public class CreateRideRequest
     {
         [Required]
-        [IsRideTypeValid(ErrorMessage = "The type of the ride is not valid.")]
         public RideType RideType { get; set; }
 
         [Required]
-        [GreaterThanCurrentDateTime(ErrorMessage = "The departure time must be greater than the current datetime.")]
+        [GreaterThanCurrentDateTimeValidation(ErrorMessage = "The departure time must be greater than the current datetime.")]
         public DateTime DepartureTime { get; set; }
 
         [Required]
-        [GreaterThanCurrentDateTime(ErrorMessage = "The confirmation time must be greater than the current datetime.")]
+        [GreaterThanCurrentDateTimeValidation(ErrorMessage = "The confirmation time must be greater than the current datetime.")]
         public DateTime ConfirmationDeadline { get; set; }
 
         [Required]
