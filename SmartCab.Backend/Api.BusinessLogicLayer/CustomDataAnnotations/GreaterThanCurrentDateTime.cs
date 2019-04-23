@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Api.BusinessLogicLayer.Enums;
 using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.CustomDataAnnotations
@@ -19,6 +20,16 @@ namespace Api.BusinessLogicLayer.CustomDataAnnotations
             }
 
             return false;
+        }
+    }
+
+    public class IsRideTypeValid : ValidationAttribute
+    {
+        public override bool IsValid(object value)
+        {
+            var type = (string) value;
+
+            return Enum.GetNames(typeof(RideType)).Contains(type);
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Api.BusinessLogicLayer.Requests
     public class CreateRideRequest
     {
         [Required]
+        [IsRideTypeValid(ErrorMessage = "The type of the ride is not valid.")]
         public RideType RideType { get; set; }
 
         [Required]
