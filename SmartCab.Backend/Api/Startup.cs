@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
 using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
@@ -223,7 +224,7 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-
+            services.AddScoped<IPriceStrategyFactory, PriceStrategyFactory>();
             //When adding the same interface to the DI container multiple times
             //an IEnumerable<IPriceStrategy> must used when injecting the concrete classes.
             //Note that the order is important here! The class RideService use this approach.
