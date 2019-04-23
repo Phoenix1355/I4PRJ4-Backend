@@ -72,7 +72,7 @@ namespace Api.DataAccessLayer.Repositories
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null)
             {
-                throw new Exception("Order does not exists"); // Exchange with custom error. 
+                throw new UserIdInvalidException("Order does not exists"); // Exchange with custom error. 
             }
 
             return order;
@@ -83,7 +83,7 @@ namespace Api.DataAccessLayer.Repositories
             var taxiCompany = await _context.TaxiCompanies.FindAsync(taxicompanyId);
             if (taxiCompany == null)
             {
-                throw new Exception("Order does not exists"); // Exchange with custom error. 
+                throw new UserIdInvalidException("TaxiCompany does not exists");
             }
 
             return taxiCompany;
@@ -93,7 +93,7 @@ namespace Api.DataAccessLayer.Repositories
         {
             if (order.Status != OrderStatus.WaitingForAccept)
             {
-                throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+                throw new UnexpectedStatusException("Order is not waiting for accept, cannot be accepted"); 
             }
             //Set status
             order.Status = OrderStatus.Accepted;
@@ -105,7 +105,7 @@ namespace Api.DataAccessLayer.Repositories
             {
                 if (ride.Status != RideStatus.WaitingForAccept)
                 {
-                    throw new Exception("Order is not waiting for accept, cannot be accepted"); // Change with custom error. 
+                    throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted"); 
                 }
                 ride.Status = RideStatus.Accepted;
             }
