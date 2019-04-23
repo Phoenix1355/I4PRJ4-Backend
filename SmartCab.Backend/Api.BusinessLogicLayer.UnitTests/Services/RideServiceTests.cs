@@ -25,8 +25,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IPriceStrategy _sharedRidePriceStrategy;
         private IPriceStrategyFactory _priceStrategyFactory;
         private RideService _rideService;
-
-
         private Address _anAddress; //An address object to be reused throughout the tests
 
         [SetUp]
@@ -35,7 +33,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper = Substitute.For<IMapper>();
             _googleMapsApiService = Substitute.For<IGoogleMapsApiService>();
             _rideRepository = Substitute.For<IRideRepository>();
-
             _soloRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _priceStrategyFactory = Substitute.For<IPriceStrategyFactory>();
@@ -53,10 +50,9 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
                 .ReturnsForAnyArgs(distance);
 
-            var mockPriceStrategy = Substitute.For<IPriceStrategy>();
-            mockPriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
+            _soloRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
+            _priceStrategyFactory.GetPriceStrategy(Arg.Any<RideType>()).Returns(_soloRidePriceStrategy);
 
-            _priceStrategyFactory.GetPriceStrategy(Arg.Any<RideType>()).Returns(mockPriceStrategy);
             decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, RideType.SoloRide);
 
             Assert.That(price, Is.EqualTo(calculatedPrice));
@@ -68,14 +64,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             decimal distance = 10;
             decimal calculatedPrice = 75;
 
-            var mockPriceStrategy = Substitute.For<IPriceStrategy>();
-            mockPriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
-
-            _priceStrategyFactory.GetPriceStrategy(Arg.Any<RideType>()).Returns(mockPriceStrategy);
-
             _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
                 .ReturnsForAnyArgs(distance);
 
+            _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
+            _priceStrategyFactory.GetPriceStrategy(Arg.Any<RideType>()).Returns(_sharedRidePriceStrategy);
 
             decimal price = await _rideService.CalculatePriceAsync(_anAddress, _anAddress, RideType.SharedRide);
 
