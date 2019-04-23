@@ -15,6 +15,6 @@ namespace Api.DataAccessLayer.Interfaces
         Task<Ride> DeleteRideAsync(int id);
         Task<List<SoloRide>> GetOpenSoloRidesAsync();
 
-        Task<Order> AcceptOrder(string taxicompanyId, int orderId);
+
     }
 }
