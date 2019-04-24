@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// TaxiCompanyRepository with autoinjection of context and identityUserRepository. 
+    /// TaxiCompanyRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ITaxiCompanyRepository" />
     public class TaxiCompanyRepository : ITaxiCompanyRepository
@@ -22,7 +22,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Initializes a new instance of the <see cref="TaxiCompanyRepository"/> class.
         /// </summary>
-        /// <param name="context">The context - Autoinjected </param>
+        /// <param name="context">The _context - Autoinjected </param>
         /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
         public TaxiCompanyRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// CustomerRepository with autoinjection of context and identityUserRepository. 
+    /// CustomerRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
@@ -23,7 +23,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
         /// </summary>
-        /// <param name="context">The context - Autoinjected</param>
+        /// <param name="context">The _context - Autoinjected</param>
         /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
         public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
