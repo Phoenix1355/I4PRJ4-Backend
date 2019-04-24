@@ -60,9 +60,10 @@ namespace Api.DataAccessLayer.Repositories
             return _dbSet.Find(id);
         }
 
-        public virtual void Insert(TEntity entity)
+        public virtual TEntity Insert(TEntity entity)
         {
             _dbSet.Add(entity);
+            return entity;
         }
 
         public virtual void Delete(object id)
@@ -80,10 +81,12 @@ namespace Api.DataAccessLayer.Repositories
             _dbSet.Remove(entityToDelete);
         }
 
-        public virtual void Update(TEntity entityToUpdate)
+        public virtual TEntity Update(TEntity entityToUpdate, Action<TEntity> UpdateFunction = null)
         {
+            UpdateFunction?.Invoke(entityToUpdate);
             _dbSet.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).State = EntityState.Modified;
+            return entityToUpdate;
         }
     }
 }

@@ -17,6 +17,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
@@ -225,6 +226,7 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
+            services.AddScoped<CreateRideUOW>();
         }
 
         /// <summary>
