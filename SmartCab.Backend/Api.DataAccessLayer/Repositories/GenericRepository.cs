@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Castle.Core.Internal;
+using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -24,7 +26,7 @@ namespace Api.DataAccessLayer.Repositories
 
         public virtual IEnumerable<TEntity> All()
         {
-            return _dbSet;
+            return Find();
         }
 
         public virtual IEnumerable<TEntity> Find(
@@ -37,6 +39,20 @@ namespace Api.DataAccessLayer.Repositories
                 query = query.Where(filter);
             }
             return query.ToList();
+        }
+
+        public virtual TEntity FindOnlyOne(
+            Expression<Func<TEntity, bool>> filter)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            query = query.Where(filter);
+            if (query.IsNullOrEmpty() || query.Count() > 2)
+            {
+                throw new UserIdInvalidException("Filter did not result in a unique match");
+            }
+
+            return query.First();
         }
 
         public virtual TEntity FindByID(object id)
