@@ -80,12 +80,16 @@ namespace Api.BusinessLogicLayer.Services
             ride.CustomerId = customerId;
 
             //New segment
+            _createRideUOW.TransactionWrapper(() =>
+            {
+            //Now wrapped in transaction
             _createRideUOW.ReservePriceFromCustomer(customerId,ride.Price);
-            ride = _createRideUOW.AddRide(ride);
+            ride = (SoloRide) _createRideUOW.AddRide(ride);
             var order = _createRideUOW.CreateOrder();
             _createRideUOW.SaveChanges();
             _createRideUOW.AddRideToOrder(ride, order);
             _createRideUOW.SaveChanges();
+            });
             //Notice the two save changes
 
             var response = _mapper.Map<CreateRideResponse>(ride);

@@ -13,7 +13,7 @@ namespace Api.DataAccessLayer.UnitOfWork
     public class CreateRideUOW : ICreateRideUOW
     {
         private GenericRepository<Customer> _customerRepository;
-        private GenericRepository<SoloRide> _rideRepository;
+        private GenericRepository<Ride> _rideRepository;
         private GenericRepository<Order> _orderRepository;
         private ApplicationContext _context;
 
@@ -21,8 +21,17 @@ namespace Api.DataAccessLayer.UnitOfWork
         {
             _context = context;
             _customerRepository = new GenericRepository<Customer>(_context);
-            _rideRepository = new GenericRepository<SoloRide>(_context);
+            _rideRepository = new GenericRepository<Ride>(_context);
             _orderRepository = new GenericRepository<Order>(_context);
+        }
+
+
+        public void TransactionWrapper(Action ActionInsideTransaction)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                ActionInsideTransaction();
+            }
         }
 
         public void ReservePriceFromCustomer(string customerId, decimal price)
@@ -41,7 +50,7 @@ namespace Api.DataAccessLayer.UnitOfWork
             _customerRepository.Update(customer);
         }
 
-        public SoloRide AddRide(SoloRide ride)
+        public Ride AddRide(Ride ride)
         {
             return _rideRepository.Add(ride);
         }
