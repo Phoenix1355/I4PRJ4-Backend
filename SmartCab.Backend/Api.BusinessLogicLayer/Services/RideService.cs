@@ -78,7 +78,16 @@ namespace Api.BusinessLogicLayer.Services
             var ride = _mapper.Map<SoloRide>(request);
             ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
-            ride = await _rideRepository.AddSoloRideAsync(ride);
+
+            //New segment
+            _createRideUOW.ReservePriceFromCustomer(customerId,ride.Price);
+            ride = _createRideUOW.AddRide(ride);
+            var order = _createRideUOW.CreateOrder();
+            _createRideUOW.SaveChanges();
+            _createRideUOW.AddRideToOrder(ride, order);
+            _createRideUOW.SaveChanges();
+            //Notice the two save changes
+
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;
         }
