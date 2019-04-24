@@ -12,6 +12,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
+        private readonly ICreateRideUOW _createRideUOW;
 
         /// <summary>
         /// Constructor for this class.
@@ -39,12 +41,14 @@ namespace Api.BusinessLogicLayer.Services
             IRideRepository rideRepository,
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
-            IPriceStrategyFactory priceStrategyFactory)
+            IPriceStrategyFactory priceStrategyFactory, 
+            ICreateRideUOW createRideUow)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
+            _createRideUOW = createRideUow;
         }
 
         /// <summary>

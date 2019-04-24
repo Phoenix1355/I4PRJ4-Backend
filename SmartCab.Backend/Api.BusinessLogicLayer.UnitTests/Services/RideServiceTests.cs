@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
@@ -25,6 +26,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IPriceStrategy _sharedRidePriceStrategy;
         private IPriceStrategyFactory _priceStrategyFactory;
         private RideService _rideService;
+        private ICreateRideUOW _createRideUOW;
         private Address _anAddress; //An address object to be reused throughout the tests
 
         [SetUp]
@@ -36,8 +38,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _soloRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _priceStrategyFactory = Substitute.For<IPriceStrategyFactory>();
-
-            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, _priceStrategyFactory);
+            _createRideUOW = Substitute.For<ICreateRideUOW>();
+            _rideService = new RideService(_rideRepository, _mapper, _googleMapsApiService, _priceStrategyFactory, _createRideUOW);
             _anAddress = new Address("city", 1000, "street", 1);
         }
 

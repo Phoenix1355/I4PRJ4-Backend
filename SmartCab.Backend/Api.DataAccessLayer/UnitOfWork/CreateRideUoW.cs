@@ -10,10 +10,11 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
-    public class CreateRideUOW
+    public class CreateRideUOW : ICreateRideUOW
     {
         private GenericRepository<Customer> _customerRepository;
         private GenericRepository<SoloRide> _rideRepository;
+        private GenericRepository<Order> _orderRepository;
         private ApplicationContext _context;
 
         public CreateRideUOW(ApplicationContext context)
@@ -21,75 +22,56 @@ namespace Api.DataAccessLayer.UnitOfWork
             _context = context;
             _customerRepository = new GenericRepository<Customer>(_context);
             _rideRepository = new GenericRepository<SoloRide>(_context);
+            _orderRepository = new GenericRepository<Order>(_context);
         }
 
-        public async Task<SoloRide> AddSoloRideAsync(SoloRide ride)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                //Add ride and reserves amount.
-                ride = await AddRideAndReserveFundsForRide(ride);
-
-                //Adds order
-                await AddOrderFromRide(ride);
-
-                //Reserve from Customer
-                transaction.Commit();
-                return ride;
-            }
-        }
-
-        private async Task<SoloRide> AddRideAndReserveFundsForRide(SoloRide ride)
-        {
-            //Reserve funds. 
-            ReservePriceFromCustomer(ride.CustomerId, ride.Price);
-
-            //adds SoloRide
-            return _rideRepository.Update(ride);
-        }
-
-        private void ReservePriceFromCustomer(string customerId, decimal price)
+        public void ReservePriceFromCustomer(string customerId, decimal price)
         {
             var customer = _customerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
-            _customerRepository.Update(customer, (customerInline) =>
+
+            if ((customer.Balance - customer.ReservedAmount) >= price)
             {
-                if ((customerInline.Balance - customerInline.ReservedAmount) >= price)
-                {
-                    customerInline.ReservedAmount += price;
-                }
-                else
-                {
-                    throw new InsufficientFundsException("Not enough credit");
-                }
-            });
+                customer.ReservedAmount += price;
+            }
+            else
+            {
+                throw new InsufficientFundsException("Not enough credit");
+            }
+
+            _customerRepository.Update(customer);
         }
 
-        private async Task<SoloRide> AddRide(SoloRide ride)
+        public SoloRide AddRide(SoloRide ride)
         {
-            _context.Rides.Update(ride);
-            await _context.SaveChangesAsync();
-            return ride;
+            return _rideRepository.Add(ride);
         }
 
-        private async Task<Order> AddOrderFromRide(Ride ride)
+        public Order CreateOrder()
+        {
+            Order order = new Order()
+            {
+                Price = 0,
+                Rides = new List<Ride>(),
+                Status = OrderStatus.WaitingForAccept,
+            };
+            return _orderRepository.Add(order);
+        }
+
+        public Order AddRideToOrder(Ride ride, Order order)
         {
             if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
             {
                 throw new MultipleOrderException("Already an order for given ride. ");
             }
 
-            Order order = new Order()
-            {
-                Price = ride.Price,
-                Rides = new List<Ride>(),
-                Status = OrderStatus.WaitingForAccept,
-            };
+            order.Price += ride.Price;
             order.Rides.Add(ride);
-
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-            return order;
+            return _orderRepository.Update(order);
         }
 
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
+        }
     }
 }
