@@ -83,6 +83,12 @@ namespace Api.DataAccessLayer.Repositories
 
         public virtual TEntity Update(TEntity entityToUpdate)
         {
+            if (_context.Entry(entityToUpdate).State == EntityState.Added)
+            {
+                _dbSet.Remove(entityToUpdate);
+                _dbSet.Add(entityToUpdate);
+                return entityToUpdate;
+            }
             _dbSet.Attach(entityToUpdate);
             _context.Entry(entityToUpdate).State = EntityState.Modified;
             return entityToUpdate;

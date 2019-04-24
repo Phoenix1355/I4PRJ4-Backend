@@ -86,7 +86,6 @@ namespace Api.BusinessLogicLayer.Services
             _createRideUOW.ReservePriceFromCustomer(customerId,ride.Price);
             ride = (SoloRide) _createRideUOW.AddRide(ride);
             var order = _createRideUOW.CreateOrder();
-            _createRideUOW.SaveChanges(); // To ensure that order exist in database before updates. 
             _createRideUOW.AddRideToOrder(ride, order);
             _createRideUOW.SaveChanges();
             });
