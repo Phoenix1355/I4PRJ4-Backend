@@ -111,9 +111,11 @@ namespace Api.BusinessLogicLayer.Services
             throw new IdentityException("Login failed. Credentials was not found in the database.");
         }
 
-        public async Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password)
+        public async Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password, string authorization)
         {
-            
+            await _identityUserRepository.ChangePassword(password, newCustomer.Email);
+
+
         }
 
 

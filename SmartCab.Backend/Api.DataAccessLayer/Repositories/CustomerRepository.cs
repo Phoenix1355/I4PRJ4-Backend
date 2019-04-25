@@ -61,9 +61,9 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        public async Task<Customer> EditCustomerAsync()
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization)
         {
-            
+            await _identityUserRepository.EditIdentityUserAsync(newCustomer, authorization);
         }
 
         /// <summary>

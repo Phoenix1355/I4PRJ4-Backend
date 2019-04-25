@@ -10,8 +10,9 @@ namespace Api.DataAccessLayer.Interfaces
     public interface IIdentityUserRepository
     {
         Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password);
-
         Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role);
         Task<SignInResult> SignInAsync(string email, string password);
+        Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token);
+        Task ChangePassword(string newPassword, string email);
     }
 }

@@ -59,15 +59,27 @@ namespace Api.DataAccessLayer.Repositories
             return await _signInManager.PasswordSignInAsync(email, password, false, false);
         }
 
-        public async Task ChangePassword(string newPassword, string email, string oldPassword)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token)
+        {
+            var result1 = await _userManager.ChangeEmailAsync(user, user.Email, token);
+            var result2 = await _userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, token);
+
+            if (result1 == IdentityResult.Success && result2 == IdentityResult.Success)
+                return IdentityResult.Success;
+            else
+                return IdentityResult.Failed();
+        }
+
+        public async Task ChangePassword(string newPassword, string email)
         {
             var currentUser = await _userManager.FindByEmailAsync(email);
 
             if (currentUser != null)
             {
-                await _userManager.ChangePasswordAsync(currentUser, oldPassword, newPassword);
+                await _userManager.RemovePasswordAsync(currentUser);
+
+                await _userManager.AddPasswordAsync(currentUser, newPassword);
             }
         }
-
     }
 }

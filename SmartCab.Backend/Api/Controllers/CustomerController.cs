@@ -109,7 +109,7 @@ namespace Api.Controllers
                     $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
             }
 
-            var response = await _customerService.EditCustomerAsync(newCustomer, password);
+            var response = await _customerService.EditCustomerAsync(newCustomer, password, authorization);
 
             return Ok(response);
         }

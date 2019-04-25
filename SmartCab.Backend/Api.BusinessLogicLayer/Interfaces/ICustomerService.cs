@@ -16,6 +16,6 @@ namespace Api.BusinessLogicLayer.Interfaces
         Task<LoginResponse> LoginCustomerAsync(LoginRequest request);
         Task DepositAsync(DepositRequest request, string customerId);
         Task<CustomerRidesResponse> GetRidesAsync(string customerId);
-        Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password);
+        Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password, string authorization);
     }
 }
