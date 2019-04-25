@@ -12,31 +12,23 @@ namespace Api.DataAccessLayer.UnitOfWork
 {
     public class CreateRideUOW : ICreateRideUOW
     {
-        private GenericRepository<Customer> _customerRepository;
-        private GenericRepository<Ride> _rideRepository;
-        private GenericRepository<Order> _orderRepository;
+        public GenericRepository<Customer> CustomerRepository { get; }
+        public GenericRepository<Ride> RideRepository { get; }
+        public GenericRepository<Order> OrderRepository { get; }
         private ApplicationContext _context;
 
         public CreateRideUOW(ApplicationContext context)
         {
             _context = context;
-            _customerRepository = new GenericRepository<Customer>(_context);
-            _rideRepository = new GenericRepository<Ride>(_context);
-            _orderRepository = new GenericRepository<Order>(_context);
+            CustomerRepository = new GenericRepository<Customer>(_context);
+            RideRepository = new GenericRepository<Ride>(_context);
+            OrderRepository = new GenericRepository<Order>(_context);
         }
 
-
-        public void TransactionWrapper(Action ActionInsideTransaction)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                ActionInsideTransaction();
-            }
-        }
 
         public void ReservePriceFromCustomer(string customerId, decimal price)
         {
-            var customer = _customerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
+            var customer = CustomerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
 
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
@@ -47,23 +39,7 @@ namespace Api.DataAccessLayer.UnitOfWork
                 throw new InsufficientFundsException("Not enough credit");
             }
 
-            _customerRepository.Update(customer);
-        }
-
-        public Ride AddRide(Ride ride)
-        {
-            return _rideRepository.Add(ride);
-        }
-
-        public Order CreateOrder()
-        {
-            Order order = new Order()
-            {
-                Price = 0,
-                Rides = new List<Ride>(),
-                Status = OrderStatus.WaitingForAccept,
-            };
-            return _orderRepository.Add(order);
+            CustomerRepository.Update(customer);
         }
 
         public Order AddRideToOrder(Ride ride, Order order)
@@ -75,7 +51,7 @@ namespace Api.DataAccessLayer.UnitOfWork
 
             order.Price += ride.Price;
             order.Rides.Add(ride);
-            return _orderRepository.Update(order);
+            return OrderRepository.Update(order);
         }
 
         public void SaveChanges()

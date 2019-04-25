@@ -12,10 +12,11 @@ namespace Api.DataAccessLayer.UnitOfWork
 {
     public interface ICreateRideUOW
     {
-        void TransactionWrapper(Action ActionInsideTransaction);
+        GenericRepository<Customer> CustomerRepository { get; }
+        GenericRepository<Ride> RideRepository { get; }
+        GenericRepository<Order> OrderRepository { get; }
+
         void ReservePriceFromCustomer(string customerId, decimal price);
-        Ride AddRide(Ride ride);
-        Order CreateOrder();
         Order AddRideToOrder(Ride ride, Order order);
         void SaveChanges();
     }
