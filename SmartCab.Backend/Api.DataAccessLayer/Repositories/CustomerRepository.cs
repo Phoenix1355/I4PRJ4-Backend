@@ -7,6 +7,7 @@ using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using CustomExceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -61,6 +62,9 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         public async Task<Customer> EditCustomerAsync()
+        {
+            
+        }
 
         /// <summary>
         /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 

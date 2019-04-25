@@ -58,5 +58,16 @@ namespace Api.DataAccessLayer.Repositories
         {
             return await _signInManager.PasswordSignInAsync(email, password, false, false);
         }
+
+        public async Task ChangePassword(string newPassword, string email, string oldPassword)
+        {
+            var currentUser = await _userManager.FindByEmailAsync(email);
+
+            if (currentUser != null)
+            {
+                await _userManager.ChangePasswordAsync(currentUser, oldPassword, newPassword);
+            }
+        }
+
     }
 }
