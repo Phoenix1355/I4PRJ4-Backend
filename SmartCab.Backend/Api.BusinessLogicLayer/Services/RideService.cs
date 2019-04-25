@@ -28,7 +28,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
-        private readonly IUoW _iuoW;
+        private readonly IUoW _UnitOfWork;
 
         /// <summary>
         /// Constructor for this class.
@@ -42,13 +42,13 @@ namespace Api.BusinessLogicLayer.Services
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
             IPriceStrategyFactory priceStrategyFactory, 
-            IUoW iuoW)
+            IUoW unitOfWork)
         {
             _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
-            _iuoW = iuoW;
+            _UnitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -81,11 +81,11 @@ namespace Api.BusinessLogicLayer.Services
 
             //New segment
 
-            _iuoW.ReservePriceFromCustomer(customerId,ride.Price);
-            ride = (SoloRide) _iuoW.RideRepository.Add(ride);
-            var order = _iuoW.OrderRepository.Add(new Order());
-            _iuoW.AddRideToOrder(ride, order);
-            _iuoW.SaveChanges();
+            _UnitOfWork.ReservePriceFromCustomer(customerId,ride.Price);
+            ride = (SoloRide) _UnitOfWork.RideRepository.Add(ride);
+            var order = _UnitOfWork.OrderRepository.Add(new Order());
+            _UnitOfWork.AddRideToOrder(ride, order);
+            _UnitOfWork.SaveChanges();
             
 
             var response = _mapper.Map<CreateRideResponse>(ride);
