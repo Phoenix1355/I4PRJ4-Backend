@@ -59,6 +59,12 @@ namespace Api.DataAccessLayer.Repositories
             return await _signInManager.PasswordSignInAsync(email, password, false, false);
         }
 
+        /// <summary>
+        /// Changes the identityUsers email and phone number in asynchronous.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token)
         {
             var result1 = await _userManager.ChangeEmailAsync(user, user.Email, token);
@@ -69,7 +75,12 @@ namespace Api.DataAccessLayer.Repositories
             else
                 return IdentityResult.Failed();
         }
-
+        /// <summary>
+        /// Changes the identityUsers password in a asynchronous.
+        /// </summary>
+        /// <param name="newPassword"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public async Task ChangePassword(string newPassword, string email)
         {
             var currentUser = await _userManager.FindByEmailAsync(email);
