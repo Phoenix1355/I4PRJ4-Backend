@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
@@ -81,17 +82,19 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="newPassword"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async Task ChangePassword(string newPassword, string email)
+        public async Task<IdentityUser> ChangePassword(string newPassword, string email)
         {
             var currentUser = await _userManager.FindByEmailAsync(email);
-            currentUser.
 
             if (currentUser != null)
             {
                 await _userManager.RemovePasswordAsync(currentUser);
 
                 await _userManager.AddPasswordAsync(currentUser, newPassword);
+                return currentUser;
             }
+
+            return null;
         }
     }
 }
