@@ -60,6 +60,8 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
+        public async Task<Customer> EditCustomerAsync()
+
         /// <summary>
         /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
         /// </summary>
