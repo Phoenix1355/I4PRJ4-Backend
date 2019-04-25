@@ -84,6 +84,7 @@ namespace Api.DataAccessLayer.Repositories
         public async Task ChangePassword(string newPassword, string email)
         {
             var currentUser = await _userManager.FindByEmailAsync(email);
+            currentUser.
 
             if (currentUser != null)
             {
