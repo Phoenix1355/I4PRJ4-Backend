@@ -10,14 +10,14 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
-    public class CreateRideUOW : ICreateRideUOW
+    public class UoW : IUoW
     {
         public GenericRepository<Customer> CustomerRepository { get; }
         public GenericRepository<Ride> RideRepository { get; }
         public GenericRepository<Order> OrderRepository { get; }
         private ApplicationContext _context;
 
-        public CreateRideUOW(ApplicationContext context)
+        public UoW(ApplicationContext context)
         {
             _context = context;
             CustomerRepository = new GenericRepository<Customer>(_context);

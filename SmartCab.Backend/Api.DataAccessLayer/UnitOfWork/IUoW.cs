@@ -10,7 +10,7 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
-    public interface ICreateRideUOW
+    public interface IUoW
     {
         GenericRepository<Customer> CustomerRepository { get; }
         GenericRepository<Ride> RideRepository { get; }
