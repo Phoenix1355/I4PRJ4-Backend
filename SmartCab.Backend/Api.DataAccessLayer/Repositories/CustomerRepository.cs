@@ -70,6 +70,10 @@ namespace Api.DataAccessLayer.Repositories
             
             customer.Name = newCustomer.Name;
 
+            customer.PhoneNumber = newCustomer.PhoneNumber;
+
+            customer.UserName = newCustomer.Email;
+
             await _identityUserRepository.EditIdentityUserAsync(customer, authorization, newCustomer, password);
 
             _context.Customers.Update(customer);

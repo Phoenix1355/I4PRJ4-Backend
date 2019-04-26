@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Primitives;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -68,12 +69,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password)
         {
-            var result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, token);
-            var result2 = await _userManager.ChangePhoneNumberAsync(user, newCustomer.PhoneNumber, token);
-            var result3 = await ChangePassword(password, newCustomer.Email);
+            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
+            var result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
+            await _userManager.UpdateAsync(user);
+            
+            var result3 = await ChangePassword(password, user.Email);
+            await _userManager.UpdateAsync(user);
 
-            if (result1 == IdentityResult.Success && result2 == IdentityResult.Success &&
-                result3 == IdentityResult.Success)
+            if (result1 == IdentityResult.Success && result3 == IdentityResult.Success)
                 return IdentityResult.Success;
             else
                 return IdentityResult.Failed();
