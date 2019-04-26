@@ -264,7 +264,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
-            await _identityUserRepository.EditIdentityUserAsync(customer.Name, "");
+            //await _identityUserRepository.EditIdentityUserAsync(customer.Name, "");
 
             var respons = _identityUserRepository.SignInAsync("Axel@gmail.com", "Qwerrr111!");
 
