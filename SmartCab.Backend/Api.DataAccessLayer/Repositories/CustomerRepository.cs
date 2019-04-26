@@ -61,11 +61,21 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        public async Task<IdentityResult> EditCustomerAsync(Customer newCustomer, string authorization)
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization, string customerId, string password)
         {
-            var response = await _identityUserRepository.EditIdentityUserAsync(newCustomer, authorization);
+            //var response = await _identityUserRepository.EditIdentityUserAsync(newCustomer, authorization);
+            //var customer = await _identityUserRepository.ChangePassword(password, newCustomer.Email);
 
-            return response;
+            var customer = await _context.Customers.FindAsync(customerId);
+            
+            customer.Name = newCustomer.Name;
+
+            await _identityUserRepository.EditIdentityUserAsync(customer, authorization, newCustomer, password);
+
+            _context.Customers.Update(customer);
+            await _context.SaveChangesAsync();
+
+            return customer;
         }
 
         /// <summary>
