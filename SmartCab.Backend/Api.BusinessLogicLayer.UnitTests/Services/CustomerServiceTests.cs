@@ -241,6 +241,40 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         #endregion
 
+        #region EditCustomerAsync
+
+        [Test]
+        public async Task EditCustomerAsyncAsync_ChangeName_NameChanged()
+        {
+
+            var request = new RegisterRequest
+            {
+                Email = "Axel@gmail.com",
+                Name = "Axel",
+                Password = "Qwer111!",
+                PasswordRepeated = "Qwer111!",
+                PhoneNumber = "12345678"
+            };
+
+            var customer = new Customer
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
+            await _identityUserRepository.EditIdentityUserAsync(customer.Name, "");
+
+            var respons = _identityUserRepository.SignInAsync("Axel@gmail.com", "Qwerrr111!");
+
+            Assert.That(respons, Is.EqualTo(SignInResult.Success));
+
+        }
+
+
+        #endregion
+
         #region DepositAsync
 
 
