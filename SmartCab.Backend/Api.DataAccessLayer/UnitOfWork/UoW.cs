@@ -64,13 +64,7 @@ namespace Api.DataAccessLayer.UnitOfWork
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = await _context.Customers.FindAsync(customerId);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-
+            var customer = CustomerRepository.FindByID(customerId);
             //Update customer
             customer.Balance += deposit;
             _context.Customers.Update(customer);
