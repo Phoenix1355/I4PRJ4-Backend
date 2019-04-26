@@ -66,12 +66,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password)
         {
-            var result1 = await _userManager.ChangeEmailAsync(user, user.Email, token);
-            var result2 = await _userManager.ChangePhoneNumberAsync(user, user.PhoneNumber, token);
+            var result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, token);
+            var result2 = await _userManager.ChangePhoneNumberAsync(user, newCustomer.PhoneNumber, token);
+            var result3 = await ChangePassword(password, newCustomer.Email);
 
-            if (result1 == IdentityResult.Success && result2 == IdentityResult.Success)
+            if (result1 == IdentityResult.Success && result2 == IdentityResult.Success &&
+                result3 == IdentityResult.Success)
                 return IdentityResult.Success;
             else
                 return IdentityResult.Failed();
@@ -82,7 +84,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="newPassword"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async Task<IdentityUser> ChangePassword(string newPassword, string email)
+        public async Task<IdentityResult> ChangePassword(string newPassword, string email)
         {
             var currentUser = await _userManager.FindByEmailAsync(email);
 
@@ -91,10 +93,10 @@ namespace Api.DataAccessLayer.Repositories
                 await _userManager.RemovePasswordAsync(currentUser);
 
                 await _userManager.AddPasswordAsync(currentUser, newPassword);
-                return currentUser;
+                return IdentityResult.Success;
             }
 
-            return null;
+            return IdentityResult.Failed();
         }
     }
 }
