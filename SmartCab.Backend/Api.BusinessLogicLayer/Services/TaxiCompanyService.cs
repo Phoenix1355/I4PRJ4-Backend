@@ -22,6 +22,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
 
+
         /// <summary>
         /// Constructor for this class.
         /// </summary>

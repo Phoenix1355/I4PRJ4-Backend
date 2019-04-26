@@ -8,6 +8,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
@@ -27,6 +28,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
+        private IUoW _UoW;
 
         [SetUp]
         public void Setup()
@@ -35,7 +37,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            _customerService = new CustomerService(_jwtService, _customerRepository, _identityUserRepository, _mapper);
+            _UoW = Substitute.For<IUoW>();
+            _customerService = new CustomerService(_jwtService, _customerRepository, _identityUserRepository, _mapper, _UoW);
         }
 
             #endregion

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
@@ -16,13 +17,15 @@ namespace Api.DataAccessLayer.UnitOfWork
         public GenericRepository<Ride> RideRepository { get; }
         public GenericRepository<Order> OrderRepository { get; }
         private ApplicationContext _context;
+        public IIdentityUserRepository IdentityUserRepository { get; }
 
-        public UoW(ApplicationContext context)
+        public UoW(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
             _context = context;
             CustomerRepository = new GenericRepository<Customer>(_context);
             RideRepository = new GenericRepository<Ride>(_context);
             OrderRepository = new GenericRepository<Order>(_context);
+            IdentityUserRepository = identityUserRepository;
         }
 
 
@@ -52,6 +55,25 @@ namespace Api.DataAccessLayer.UnitOfWork
             order.Price += ride.Price;
             order.Rides.Add(ride);
             return OrderRepository.Update(order);
+        }
+
+        public async Task DepositAsync(string customerId, decimal deposit)
+        {
+            if (deposit <= 0)
+            {
+                throw new NegativeDepositException("Cannot deposit negative amount");
+            }
+
+            var customer = await _context.Customers.FindAsync(customerId);
+
+            if (customer == null)
+            {
+                throw new UserIdInvalidException("Customer does not exist.");
+            }
+
+            //Update customer
+            customer.Balance += deposit;
+            _context.Customers.Update(customer);
         }
 
         public void SaveChanges()

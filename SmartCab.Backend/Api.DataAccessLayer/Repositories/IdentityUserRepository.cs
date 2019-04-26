@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Repositories
@@ -34,7 +37,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password)
         {
-            return await _userManager.CreateAsync(user, password);
+            var result =  await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -45,7 +55,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
-            return await _userManager.AddToRoleAsync(user, role);
+            var result = await _userManager.AddToRoleAsync(user, role);
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -56,7 +73,13 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<SignInResult> SignInAsync(string email, string password)
         {
-            return await _signInManager.PasswordSignInAsync(email, password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+            if (!result.Succeeded)
+            {
+                throw new IdentityException("Login failed. Credentials was not found in the database.");
+            }
+
+            return result;
         }
     }
 }

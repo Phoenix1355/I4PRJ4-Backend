@@ -29,7 +29,7 @@ namespace Api.DataAccessLayer.Repositories
             return Find();
         }
 
-        public virtual IEnumerable<TEntity> Find(
+        public virtual List<TEntity> Find(
             Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _dbSet;
@@ -49,7 +49,7 @@ namespace Api.DataAccessLayer.Repositories
             query = query.Where(filter);
             if (query.IsNullOrEmpty() || query.Count() > 2)
             {
-                throw new UserIdInvalidException("Filter did not result in a unique match");
+               
             }
 
             return query.First();
@@ -57,7 +57,13 @@ namespace Api.DataAccessLayer.Repositories
 
         public virtual TEntity FindByID(object id)
         {
-            return _dbSet.Find(id);
+            var entity = _dbSet.Find(id);
+            if (entity == null)
+            {
+                throw new UserIdInvalidException("Filter did not result in a unique match");
+            }
+
+            return entity;
         }
 
         public virtual TEntity Add(TEntity entity)
