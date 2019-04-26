@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
@@ -28,7 +29,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
-        
+        private IUoW _UoW;
 
         [SetUp]
         public void Setup()
@@ -37,7 +38,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            var _UoW = Substitute.For<IUoW>();
+            _UoW = Substitute.For<IUoW>();
             _customerService = new CustomerService(_jwtService, _customerRepository, _identityUserRepository, _mapper, _UoW);
         }
 
@@ -91,7 +92,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -131,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -168,7 +169,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -185,20 +186,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             Assert.That(response.Customer, Is.EqualTo(customerDto));
         }
 
-        [Test]
-        public void LoginCustomerAsync_EmailAndPasswordCombinationNotFound_ThrowsIdentityException()
-        {
-            var request = new LoginRequest
-            {
-                Email = "test@domain.com",
-                Password = "Password1!"
-            };
-
-            var signinResult = SignInResult.Failed;
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signinResult);
-
-            Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<IdentityException>());
-        }
 
         #endregion
 
@@ -222,7 +209,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -231,7 +218,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ResponseContainsTheList()
         {
             List<Ride> rideList = new List<Ride>();
-            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+           
+            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);

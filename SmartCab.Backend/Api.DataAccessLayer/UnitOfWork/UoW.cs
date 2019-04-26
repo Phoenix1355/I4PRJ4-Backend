@@ -67,7 +67,7 @@ namespace Api.DataAccessLayer.UnitOfWork
             var customer = CustomerRepository.FindByID(customerId);
             //Update customer
             customer.Balance += deposit;
-            _context.Customers.Update(customer);
+            CustomerRepository.Update(customer);
         }
 
         public void SaveChanges()

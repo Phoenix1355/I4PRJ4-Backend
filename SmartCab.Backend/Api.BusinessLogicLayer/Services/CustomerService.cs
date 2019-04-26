@@ -141,8 +141,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            //var customerRides = _unitOfWork.RideRepository.Find(ride => ride.CustomerId == customerId);
-            var customerRides = _unitOfWork.CustomerRepository.FindByID(customerId).Rides;
+            var customerRides = _unitOfWork.RideRepository.Find(ride => ride.CustomerId == customerId);
+            //var customerRides = _unitOfWork.CustomerRepository.FindByID(customerId).Rides;
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {
