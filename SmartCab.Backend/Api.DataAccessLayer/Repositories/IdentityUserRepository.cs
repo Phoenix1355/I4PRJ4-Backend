@@ -62,10 +62,12 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Changes the identityUsers email and phone number in asynchronous.
+        /// 
         /// </summary>
         /// <param name="user"></param>
         /// <param name="token"></param>
+        /// <param name="newCustomer"></param>
+        /// <param name="password"></param>
         /// <returns></returns>
         public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password)
         {
