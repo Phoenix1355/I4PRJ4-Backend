@@ -71,16 +71,34 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password)
         {
-            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
-            var result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
-            await _userManager.UpdateAsync(user);
-            await _userManager.UpdateNormalizedEmailAsync(user);
+            IdentityResult result1, result2, result3;
+            if (newCustomer.Email != "")
+            {
+                var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
+                result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
+                await _userManager.UpdateAsync(user);
+                await _userManager.UpdateNormalizedEmailAsync(user);
 
-            var result2 = await _userManager.SetUserNameAsync(user, newCustomer.Email);
-            await _userManager.UpdateNormalizedUserNameAsync(user);
-            
-            var result3 = await ChangePassword(password, user.Email);
-            await _userManager.UpdateAsync(user);
+                result2 = await _userManager.SetUserNameAsync(user, newCustomer.Email);
+                await _userManager.UpdateNormalizedUserNameAsync(user);
+            }
+            else
+            {
+                result1 = IdentityResult.Success;
+                result2 = IdentityResult.Success;
+            }
+
+
+            if (password != "")
+            {
+                result3 = await ChangePassword(password, user.Email);
+                await _userManager.UpdateAsync(user);
+            }
+            else
+            {
+                result3 = IdentityResult.Success;
+            }
+
 
             if (result1 == IdentityResult.Success && 
                 result2 == IdentityResult.Success &&
