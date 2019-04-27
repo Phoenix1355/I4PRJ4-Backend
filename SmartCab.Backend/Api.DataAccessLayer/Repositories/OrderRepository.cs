@@ -55,6 +55,11 @@ namespace Api.DataAccessLayer.Repositories
             return order;
         }
 
+        /// <summary>
+        /// Returns the order with the supplied id.
+        /// </summary>
+        /// <param name="orderId">The id of the order.</param>
+        /// <returns>The order that has the supplied id.</returns>
         private async Task<Order> FindOrder(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
@@ -66,6 +71,11 @@ namespace Api.DataAccessLayer.Repositories
             return order;
         }
 
+        /// <summary>
+        /// Returns the taxi company that has the supplied id.
+        /// </summary>
+        /// <param name="taxicompanyId">The id of the taxi company.</param>
+        /// <returns>The taxi company that has the supplied id.</returns>
         private async Task<TaxiCompany> FindTaxiCompany(string taxicompanyId)
         {
             var taxiCompany = await _context.TaxiCompanies.FindAsync(taxicompanyId);
@@ -77,6 +87,10 @@ namespace Api.DataAccessLayer.Repositories
             return taxiCompany;
         }
 
+        /// <summary>
+        /// Updates the status of the order to "Accepted".
+        /// </summary>
+        /// <param name="order">The order that should have its status updated.</param>
         private void SetOrderToAccepted(Order order)
         {
             if (order.Status != OrderStatus.WaitingForAccept)
@@ -87,6 +101,10 @@ namespace Api.DataAccessLayer.Repositories
             order.Status = OrderStatus.Accepted;
         }
 
+        /// <summary>
+        /// Updates the status of all supplied rides to "Accepted".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
         private void SetAllRidesToAccepted(List<Ride> rides)
         {
             foreach (var ride in rides)
