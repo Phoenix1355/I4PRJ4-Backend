@@ -52,9 +52,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="taxiCompanyId">The id of the taxi company who accepted the order.</param>
         /// <param name="orderId">The id of the order that should be accepted.</param>
         /// <returns>A response containing the updated order.</returns>
-        public async Task<AcceptOrderResponse> AcceptOrder(string taxiCompanyId, int orderId)
+        public async Task<AcceptOrderResponse> AcceptOrderAsync(string taxiCompanyId, int orderId)
         {
-            var order = await _orderRepository.AcceptOrder(taxiCompanyId, orderId);
+            var order = await _orderRepository.AcceptOrderAsync(taxiCompanyId, orderId);
             //TODO: push out notifications to associated customers (Debit customers should happen in the dataaccess layer as par of a transaction)
             var orderDto = _mapper.Map<OrderDto>(order);
             var response = new AcceptOrderResponse {Order = orderDto};

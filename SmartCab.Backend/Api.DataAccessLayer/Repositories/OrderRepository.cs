@@ -36,10 +36,10 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="taxicompanyId">Taxicompany which accepted order</param>
         /// <param name="orderId">Id of the accepted order</param>
         /// <returns>Returns the updated order</returns>
-        public async Task<Order> AcceptOrder(string taxicompanyId, int orderId)
+        public async Task<Order> AcceptOrderAsync(string taxicompanyId, int orderId)
         {
-            var taxiCompanyTask =  FindTaxiCompany(taxicompanyId);
-            var order = await FindOrder(orderId);
+            var taxiCompanyTask =  FindTaxiCompanyAsync(taxicompanyId);
+            var order = await FindOrderAsync(orderId);
             SetOrderToAccepted(order);
 
             //Set status on orders connected rides. 
@@ -60,7 +60,7 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="orderId">The id of the order.</param>
         /// <returns>The order that has the supplied id.</returns>
-        private async Task<Order> FindOrder(int orderId)
+        private async Task<Order> FindOrderAsync(int orderId)
         {
             var order = await _context.Orders.FindAsync(orderId);
             if (order == null)
@@ -76,7 +76,7 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="taxicompanyId">The id of the taxi company.</param>
         /// <returns>The taxi company that has the supplied id.</returns>
-        private async Task<TaxiCompany> FindTaxiCompany(string taxicompanyId)
+        private async Task<TaxiCompany> FindTaxiCompanyAsync(string taxicompanyId)
         {
             var taxiCompany = await _context.TaxiCompanies.FindAsync(taxicompanyId);
             if (taxiCompany == null)

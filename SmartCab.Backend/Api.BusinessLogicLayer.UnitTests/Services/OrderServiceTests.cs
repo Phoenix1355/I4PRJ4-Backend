@@ -58,7 +58,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper.Map<OrderDto>(null).ReturnsForAnyArgs(orderDto);
             var expectedResponse = new AcceptOrderResponse {Order = orderDto};
 
-            var response = await _orderService.AcceptOrder(taxiCompanyId, orderId);
+            var response = await _orderService.AcceptOrderAsync(taxiCompanyId, orderId);
 
             Assert.That(response.Order, Is.EqualTo(expectedResponse.Order));
         }
