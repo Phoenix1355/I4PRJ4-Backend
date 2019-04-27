@@ -129,25 +129,5 @@ namespace Api.Controllers
             return Ok(response);
 
         }
-
-        /// <summary>
-        /// Updates the order with the supplied ID, and associated rides so they are accepted.
-        /// </summary>
-        /// <remarks>
-        /// Required role: "TaxiCompany"
-        /// </remarks>
-        /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="id">The id of the order that should be accepted.</param>
-        /// <returns></returns>
-        /// <response code="400">Could mean that the Order was already in accepted state when the request made it to the server</response>
-        /// <response code="401">If the user was not logged in already (token was expired)</response>
-        [Route("{id}/[action]")]
-        [Produces("application/json")]
-        [HttpPut]
-        public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
-        {
-            throw new NotImplementedException("Not implemented yet");
-            return Ok($"The ride with {id} is now successfully marked as accepted.");
-        }
     }
 }
