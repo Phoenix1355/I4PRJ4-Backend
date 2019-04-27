@@ -12,6 +12,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Statuses;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.IdentityModel.Tokens;
@@ -72,6 +73,7 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<CreateRideResponse> AddSoloRideAsync(CreateRideRequest request, string customerId)
         {
             var ride = _mapper.Map<SoloRide>(request);
+            ride.Status = RideStatus.WaitingForAccept; //Because it is a solo ride, the ride is waiting for acceptance immediately
             ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
             ride = await _rideRepository.AddSoloRideAsync(ride);

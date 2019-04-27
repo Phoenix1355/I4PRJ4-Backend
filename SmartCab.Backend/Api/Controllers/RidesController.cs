@@ -34,36 +34,6 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Returns all open rides stored in the system.
-        /// </summary>
-        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
-        /// <returns>All open rides stored in the system</returns>
-        /// <response code="401">
-        /// An invalid JWT token was provided in the authorization header.<br/>
-        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
-        /// </response>
-        /// <response code="500">If an internal server error occured.</response>
-        [Produces("application/json")]
-        [Route("[action]")]
-        [HttpGet]
-        [ProducesResponseType(typeof(OpenRidesResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Open([FromHeader] string authorization)
-        {
-            try
-            {
-                throw new NotImplementedException("Not implemented yet");
-                //var rides = await _rideService.GetAllRidesAsync();
-                //return Ok(rides);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorMessage();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
-
-        /// <summary>
         /// Returns all available details about a specific ride.
         /// </summary>
         /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
@@ -127,7 +97,6 @@ namespace Api.Controllers
 
             var response = await _rideService.AddRideAsync(request, customerId);
             return Ok(response);
-
         }
     }
 }

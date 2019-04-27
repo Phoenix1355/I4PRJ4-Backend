@@ -108,7 +108,6 @@ namespace Api.UnitTests.Controllers
         [Test]
         public async Task Rides_Success_ReturnsOkResponse()
         {
-
             //Set claims
             _customerController.ControllerContext = new ControllerContext
             {
@@ -127,7 +126,7 @@ namespace Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Rides_CustomerIdEmpty_ThrowsExpectedException()
+        public void Rides_CustomerIdEmpty_ThrowsUserIdInvalidException()
         {
             //Set claims
             _customerController.ControllerContext = new ControllerContext
@@ -140,8 +139,8 @@ namespace Api.UnitTests.Controllers
                     }))
                 }
             };
-            //Act and Assertsult;
 
+            //Act and Assertsult;
             Assert.ThrowsAsync<UserIdInvalidException>(async () => await _customerController.Rides(null));
         }
 
