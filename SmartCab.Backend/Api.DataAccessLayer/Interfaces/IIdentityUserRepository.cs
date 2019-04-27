@@ -14,5 +14,6 @@ namespace Api.DataAccessLayer.Interfaces
         Task<SignInResult> SignInAsync(string email, string password);
         Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password, string oldPassword);
         Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword);
+        Task<IdentityResult> ChangeEmail(IdentityUser user, Customer newCustomer);
     }
 }
