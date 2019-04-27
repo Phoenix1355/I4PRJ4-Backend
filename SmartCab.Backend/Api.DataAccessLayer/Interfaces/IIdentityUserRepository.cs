@@ -12,7 +12,7 @@ namespace Api.DataAccessLayer.Interfaces
         Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password);
         Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role);
         Task<SignInResult> SignInAsync(string email, string password);
-        Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password);
-        Task<IdentityResult> ChangePassword(string newPassword, string email);
+        Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password, string oldPassword);
+        Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword);
     }
 }

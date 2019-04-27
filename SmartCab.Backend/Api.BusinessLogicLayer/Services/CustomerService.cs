@@ -118,9 +118,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="password"></param>
         /// <param name="authorization"></param>
         /// <returns></returns>
-        public async Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password, string authorization, string customerId)
+        public async Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password, string authorization, string customerId, string oldPassword)
         {
-            var customer = await _customerRepository.EditCustomerAsync(newCustomer, authorization, customerId, password);
+            var customer = await _customerRepository.EditCustomerAsync(newCustomer, authorization, customerId, password, oldPassword);
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
 

@@ -102,6 +102,7 @@ namespace Api.Controllers
             };
 
             var password = request.Password;
+            var oldPassword = request.OldPassword;
             
             if (string.IsNullOrEmpty(customerId))
             {
@@ -109,7 +110,7 @@ namespace Api.Controllers
                     $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
             }
 
-            var response = await _customerService.EditCustomerAsync(newCustomer, password, authorization, customerId);
+            var response = await _customerService.EditCustomerAsync(newCustomer, password, authorization, customerId, oldPassword);
 
             return Ok(response);
         }

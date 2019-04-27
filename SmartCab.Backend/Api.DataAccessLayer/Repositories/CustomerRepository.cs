@@ -61,22 +61,32 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization, string customerId, string password)
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization, string customerId, string password, string oldPassword)
         {
-            var customer = await _context.Customers.FindAsync(customerId);
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                var customer = await _context.Customers.FindAsync(customerId);
 
-            if (newCustomer.Name != "")
-                customer.Name = newCustomer.Name;
+                if (newCustomer.Name != customer.Name)
+                    customer.Name = newCustomer.Name;
 
-            if (newCustomer.PhoneNumber != "")
-                customer.PhoneNumber = newCustomer.PhoneNumber;
+                if (newCustomer.PhoneNumber != customer.PhoneNumber)
+                    customer.PhoneNumber = newCustomer.PhoneNumber;
 
-            await _identityUserRepository.EditIdentityUserAsync(customer, authorization, newCustomer, password);
+                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, authorization, newCustomer, password, oldPassword);
 
-            _context.Customers.Update(customer);
-            await _context.SaveChangesAsync();
+                if (identityResult.Succeeded)
+                {
+                    _context.Customers.Update(customer);
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                    return customer;
+                }
+                transaction.Rollback();
 
-            return customer;
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
         }
 
         /// <summary>

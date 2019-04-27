@@ -1,7 +1,9 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Primitives;
 
@@ -69,60 +71,57 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="newCustomer"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password, string oldPassword)
         {
-            IdentityResult result1, result2, result3;
-            if (newCustomer.Email != "")
+            IdentityResult resultEmail, resultPassword;
+            if (newCustomer.Email != user.Email)
             {
                 var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
-                result1 = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
+                resultEmail = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
                 await _userManager.UpdateAsync(user);
                 await _userManager.UpdateNormalizedEmailAsync(user);
 
-                result2 = await _userManager.SetUserNameAsync(user, newCustomer.Email);
+                await _userManager.SetUserNameAsync(user, newCustomer.Email);
                 await _userManager.UpdateNormalizedUserNameAsync(user);
             }
             else
             {
-                result1 = IdentityResult.Success;
-                result2 = IdentityResult.Success;
+                resultEmail = IdentityResult.Success;
             }
 
 
             if (password != "")
             {
-                result3 = await ChangePassword(password, user.Email);
+                resultPassword = await ChangePassword(password, user, oldPassword);
                 await _userManager.UpdateAsync(user);
             }
             else
-            {
-                result3 = IdentityResult.Success;
-            }
+                resultPassword = IdentityResult.Success;
 
 
-            if (result1 == IdentityResult.Success && 
-                result2 == IdentityResult.Success &&
-                result3 == IdentityResult.Success)
+            if (resultEmail == IdentityResult.Success && 
+                resultPassword == IdentityResult.Success)
                 return IdentityResult.Success;
             else
                 return IdentityResult.Failed();
         }
+
         /// <summary>
         /// Changes the identityUsers password in a asynchronous.
         /// </summary>
         /// <param name="newPassword"></param>
-        /// <param name="email"></param>
+        /// <param name="user"></param>
+        /// <param name="oldPassword"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> ChangePassword(string newPassword, string email)
+        public async Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword)
         {
-            var currentUser = await _userManager.FindByEmailAsync(email);
+            var currentUser = await _userManager.FindByEmailAsync(user.Email);
 
             if (currentUser != null)
             {
-                await _userManager.RemovePasswordAsync(currentUser);
-
-                await _userManager.AddPasswordAsync(currentUser, newPassword);
-                return IdentityResult.Success;
+                var response = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+                
+                return response;
             }
 
             return IdentityResult.Failed();
