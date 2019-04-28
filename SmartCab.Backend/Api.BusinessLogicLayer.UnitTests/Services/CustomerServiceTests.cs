@@ -8,6 +8,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.Requests;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
@@ -244,32 +245,57 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         #region EditCustomerAsync
 
         [Test]
-        public async Task EditCustomerAsyncAsync_ChangeName_NameChanged()
+        public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponseThatContainsTheValues()
         {
-
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
-                Email = "Axel@gmail.com",
-                Name = "Axel",
-                Password = "Qwer111!",
-                PasswordRepeated = "Qwer111!",
-                PhoneNumber = "12345678"
+                Email = "test@domain.com",
+                Name = "Name",
+                Password = "",
+                RepeatedPassword = "",
+                PhoneNumber = "12345678",
+                OldPassword = ""
             };
 
             var customer = new Customer
+            {
+                Email = "test@domain.dk",
+                Name = "SomeName",
+                PhoneNumber = "99999999",
+                Id = "97444f6d-ea93-4d30-9d38-055db32114b5"
+            };
+
+            var loginResponse = new LoginResponse
+            {
+                Customer = new CustomerDto
+                    {Email = customer.Email, Name = customer.Name, PhoneNumber = customer.PhoneNumber},
+                Token = "SomeToken"
+            };
+
+            var loginRequest = new LoginRequest
+            {
+                Email = customer.Email,
+                Password = "Qwer111!"
+            };
+
+            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
+            _customerService.LoginCustomerAsync(loginRequest).ReturnsForAnyArgs(loginResponse);
+
+            var customerDto = new CustomerDto
             {
                 Email = request.Email,
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
-            //await _identityUserRepository.EditIdentityUserAsync(customer.Name, "");
+            var editCustomerResponse = new EditCustomerResponse
+            {
+                Customer = customerDto
+            };
 
-            var respons = _identityUserRepository.SignInAsync("Axel@gmail.com", "Qwerrr111!");
+            var response = await _customerService.EditCustomerAsync(request, customer.Id);
 
-            Assert.That(respons, Is.EqualTo(SignInResult.Success));
-
+            Assert.That(response.Customer, Is.EqualTo(editCustomerResponse));
         }
 
 
