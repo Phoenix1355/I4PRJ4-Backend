@@ -72,7 +72,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="password"></param>
         /// <param name="oldPassword"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string token, Customer newCustomer, string password, string oldPassword)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, Customer newCustomer, string password, string oldPassword)
         {
             IdentityResult resultEmail, resultPassword;
 

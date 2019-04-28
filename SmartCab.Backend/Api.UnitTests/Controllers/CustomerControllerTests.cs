@@ -6,6 +6,7 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.Controllers;
+using Api.Requests;
 using Api.Responses;
 using CustomExceptions;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,50 @@ namespace Api.UnitTests.Controllers
             var response = await _customerController.Login(null) as ObjectResult;
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        #endregion
+
+        #region Edit
+
+        [Test]
+        public async Task Edit_Success_ReturnsOkResponse()
+        {
+            _customerController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "SomeCustomerId")
+                    }))
+                }
+            };
+
+            var request = new EditCustomerRequest();
+
+            var response = await _customerController.Edit(null, request) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        [Test]
+        public void Edit_CustomerIdEmpty_ThrowsUserIdInvalidException()
+        {
+            var request = new EditCustomerRequest();
+
+            _customerController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "")
+                    }))
+                }
+            };
+
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _customerController.Edit(null, request));
         }
 
         #endregion

@@ -8,6 +8,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.Requests;
 using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
@@ -118,9 +119,19 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="password"></param>
         /// <param name="authorization"></param>
         /// <returns></returns>
-        public async Task<EditCustomerResponse> EditCustomerAsync(Customer newCustomer, string password, string authorization, string customerId, string oldPassword)
+        public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
-            var customer = await _customerRepository.EditCustomerAsync(newCustomer, authorization, customerId, password, oldPassword);
+            var newCustomer = new Customer
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber,
+            };
+
+            var password = request.Password;
+            var oldPassword = request.OldPassword;
+
+            var customer = await _customerRepository.EditCustomerAsync(newCustomer, customerId, password, oldPassword);
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
 

@@ -15,6 +15,6 @@ namespace Api.DataAccessLayer.Interfaces
         Task<Customer> GetCustomerAsync(string email);
         Task DepositAsync(string customerId, decimal deposit);
         Task<List<Ride>> GetRidesAsync(string customerId);
-        Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization, string customerId, string password, string oldPassword);
+        Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword);
     }
 }

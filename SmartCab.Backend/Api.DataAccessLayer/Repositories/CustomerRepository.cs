@@ -61,7 +61,7 @@ namespace Api.DataAccessLayer.Repositories
             }
         }
 
-        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string authorization, string customerId, string password, string oldPassword)
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
         {
             using (var transaction = _context.Database.BeginTransaction())
             {
@@ -73,7 +73,7 @@ namespace Api.DataAccessLayer.Repositories
                 if (newCustomer.PhoneNumber != customer.PhoneNumber)
                     customer.PhoneNumber = newCustomer.PhoneNumber;
 
-                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, authorization, newCustomer, password, oldPassword);
+                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
 
                 if (identityResult.Succeeded)
                 {

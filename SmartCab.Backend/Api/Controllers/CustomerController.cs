@@ -93,16 +93,6 @@ namespace Api.Controllers
         public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditCustomerRequest request)
         {
             var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
-
-            var newCustomer = new Customer
-            {
-                Email = request.Email,
-                Name = request.Name,
-                PhoneNumber = request.PhoneNumber
-            };
-
-            var password = request.Password;
-            var oldPassword = request.OldPassword;
             
             if (string.IsNullOrEmpty(customerId))
             {
@@ -110,7 +100,7 @@ namespace Api.Controllers
                     $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
             }
 
-            var response = await _customerService.EditCustomerAsync(newCustomer, password, authorization, customerId, oldPassword);
+            var response = await _customerService.EditCustomerAsync(request, customerId);
 
             return Ok(response);
         }
