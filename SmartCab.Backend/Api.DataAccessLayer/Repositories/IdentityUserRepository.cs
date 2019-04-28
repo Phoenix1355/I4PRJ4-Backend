@@ -64,7 +64,7 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// 
+        /// Edits the users information
         /// </summary>
         /// <param name="user"></param>
         /// <param name="token"></param>
