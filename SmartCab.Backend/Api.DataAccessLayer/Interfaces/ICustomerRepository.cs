@@ -10,9 +10,6 @@ namespace Api.DataAccessLayer.Interfaces
     /// </summary>
     public interface ICustomerRepository
     {
-        Task<Customer> AddCustomerAsync(Customer customer, string password);
-        Task<Customer> GetCustomerAsync(string email);
         Task DepositAsync(string customerId, decimal deposit);
-        Task<List<Ride>> GetRidesAsync(string customerId);
     }
 }

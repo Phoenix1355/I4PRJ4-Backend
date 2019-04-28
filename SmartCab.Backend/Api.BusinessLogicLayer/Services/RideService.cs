@@ -10,6 +10,7 @@ using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
@@ -24,11 +25,10 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class RideService : IRideService
     {
-        private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
-        private readonly IUoW _UnitOfWork;
+        private readonly IDataAccessFactory _factory;
 
         /// <summary>
         /// Constructor for this class.
@@ -38,17 +38,14 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
         /// <param name="priceStrategyFactory">Used to get the correct strategy for price calculations</param>
         public RideService(
-            IRideRepository rideRepository,
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
-            IPriceStrategyFactory priceStrategyFactory, 
-            IUoW unitOfWork)
+            IPriceStrategyFactory priceStrategyFactory, IDataAccessFactory factory)
         {
-            _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
-            _UnitOfWork = unitOfWork;
+            _factory = factory;
         }
 
         /// <summary>
@@ -80,14 +77,8 @@ namespace Api.BusinessLogicLayer.Services
             ride.CustomerId = customerId;
 
             //New segment
-
-            _UnitOfWork.ReservePriceFromCustomer(customerId,ride.Price);
-            ride = (SoloRide) _UnitOfWork.RideRepository.Add(ride);
-            var order = _UnitOfWork.OrderRepository.Add(new Order());
-            _UnitOfWork.AddRideToOrder(ride, order);
-            _UnitOfWork.SaveChanges();
+            ride = _factory.RideRepository.AddSoloRideAsync(ride);
             
-
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;
         }

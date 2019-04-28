@@ -15,7 +15,6 @@ namespace Api.DataAccessLayer.Factories
         private IOrderRepository _orderRepository;
         private IRideRepository _rideRepository;
         private ITaxiCompanyRepository _taxiCompanyRepository;
-        private IIdentityUserRepository _identityUserRepository;
         public IUoW UnitOfWork { get; }
 
         public ICustomerRepository CustomerRepository
@@ -24,24 +23,55 @@ namespace Api.DataAccessLayer.Factories
             {
                 if (_customerRepository == null)
                 {
-                    _customerRepository = new CustomerRepository();
+                    _customerRepository = new CustomerRepository(UnitOfWork);
                 }
                 return _customerRepository;
             }
         }
 
-        public IOrderRepository OrderRepository => _orderRepository;
+        public IOrderRepository OrderRepository
+        {
+            get
+            {
+                if (_orderRepository == null)
+                {
+                    _orderRepository = new OrderRepository(UnitOfWork);
+                }
+                return _orderRepository;
+            }
+        }
 
-        public IRideRepository RideRepository => _rideRepository;
+        public IRideRepository RideRepository
+        {
+            get
+            {
+                if (_rideRepository == null)
+                {
+                    _rideRepository = new RideRepository(UnitOfWork);
+                }
+                return _rideRepository;
+            }
+        }
 
-        public ITaxiCompanyRepository TaxiCompanyRepository => _taxiCompanyRepository;
+        public ITaxiCompanyRepository TaxiCompanyRepository
+        {
+            get
+            {
+                if (_taxiCompanyRepository == null)
+                {
+                    _taxiCompanyRepository = new TaxiCompanyRepository(UnitOfWork);
+                }
+                return _taxiCompanyRepository;
+            }
+        }
 
-        public IIdentityUserRepository IdentityUserRepository => _identityUserRepository;
+        public IIdentityUserRepository IdentityUserRepository { get; }
 
         # endregion
-        public DataAccessFactory(IUoW unitOfWork)
+        public DataAccessFactory(IUoW unitOfWork, IIdentityUserRepository identityUserRepository)
         {
             UnitOfWork = unitOfWork;
+            IdentityUserRepository = identityUserRepository;
         }
     }
 }

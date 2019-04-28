@@ -6,6 +6,6 @@ namespace Api.DataAccessLayer.Interfaces
 {
     public interface IOrderRepository
     {
-        Task<List<Order>> GetOpenOrdersAsync();
+       
     }
 }

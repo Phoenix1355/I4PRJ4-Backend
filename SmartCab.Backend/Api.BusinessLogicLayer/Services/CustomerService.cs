@@ -6,6 +6,7 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
@@ -26,6 +27,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IIdentityUserRepository _identityUserRepository;
         private readonly IMapper _mapper;
         private readonly IUoW _unitOfWork;
+        private readonly IDataAccessFactory _factory;
 
         /// <summary>
         /// Constructor for this class.
@@ -40,12 +42,13 @@ namespace Api.BusinessLogicLayer.Services
             ICustomerRepository customerRepository,
             IIdentityUserRepository identityUserRepository,
             IMapper mapper, 
-            IUoW unitOfWork)
+            IUoW unitOfWork, IDataAccessFactory factory)
         {
             _jwtService = jwtService;
             _customerRepository = customerRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _factory = factory;
             _identityUserRepository = identityUserRepository;
         }
 

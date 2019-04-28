@@ -20,63 +20,14 @@ namespace Api.DataAccessLayer.Repositories
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
         private readonly IUoW _unitOfWork;
-        private readonly IIdentityUserRepository _identityUserRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
         /// </summary>
         /// <param name="context">The _context - Autoinjected</param>
         /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(IUoW unitOfWork, IIdentityUserRepository identityUserRepository)
+        public CustomerRepository(IUoW unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _identityUserRepository = identityUserRepository;
-        }
-
-        /// <summary>
-        /// Adds the customer asynchronous in a transaction
-        /// </summary>
-        /// <param name="customer">The customer to add</param>
-        /// <param name="password">The users password </param>
-        /// <returns></returns>
-        /// <exception cref="IdentityException"></exception>
-        public async Task<Customer> AddCustomerAsync(Customer customer, string password)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            { 
-                var identityResult = await _identityUserRepository.AddIdentityUserAsync(customer, password);
-                if (identityResult.Succeeded)
-                {
-                    string role = nameof(Customer);
-                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(customer, role);
-                    if (resultAddRole.Succeeded)
-                    {
-                        transaction.Commit();
-                        return customer;
-                    }
-                }
-                transaction.Rollback();
-
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }
-        }
-
-        /// <summary>
-        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
-        /// </summary>
-        /// <param name="email">The email.</param>
-        /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<Customer> GetCustomerAsync(string email)
-        {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-
-            return customer;
         }
 
         /// <summary>
@@ -93,36 +44,14 @@ namespace Api.DataAccessLayer.Repositories
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = await _context.Customers.FindAsync(customerId);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
+            var customer = _unitOfWork.CustomerRepository.FindOnlyOne(c => c.Id == customerId);
             
             //Update customer
             customer.Balance += deposit;
-            _context.Customers.Update(customer);
-            await _context.SaveChangesAsync();
+            _unitOfWork.CustomerRepository.Update(customer);
+            _unitOfWork.SaveChanges();
         }
 
-        /// <summary>
-        /// Returns the rides from the database connected to the customer. 
-        /// </summary>
-        /// <param name="customerId">Id of requesting customer</param>
-        /// <returns>List of rides associated to customer</returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<List<Ride>> GetRidesAsync(string customerId)
-        {
-            var customer = await _context.Customers.FindAsync(customerId);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-
-            return customer.Rides;
-        }
 
         #region IDisposable implementation
 
