@@ -243,32 +243,34 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         #endregion
 
         #region EditCustomerAsync
-
+        
         [Test]
-        public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponseThatContainsTheValues()
+        public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponse()
         {
+
+            //Arrange
             var request = new EditCustomerRequest
             {
                 Email = "test@domain.com",
-                Name = "Name",
-                Password = "",
-                RepeatedPassword = "",
-                PhoneNumber = "12345678",
-                OldPassword = ""
+                Name = "Axel",
+                Password = "Qwer111!",
+                RepeatedPassword = "Qwer111!",
+                PhoneNumber = "66666666",
+                OldPassword = "Qwerrr111!"
             };
 
             var customer = new Customer
             {
-                Email = "test@domain.dk",
-                Name = "SomeName",
-                PhoneNumber = "99999999",
-                Id = "97444f6d-ea93-4d30-9d38-055db32114b5"
+                Id = "SomeId",
+                Email = request.Email
             };
+
+            _customerRepository.AddCustomerAsync(customer, "Qwer111!").ReturnsForAnyArgs(customer);
 
             var loginResponse = new LoginResponse
             {
                 Customer = new CustomerDto
-                    {Email = customer.Email, Name = customer.Name, PhoneNumber = customer.PhoneNumber},
+                    { Email = customer.Email, Name = customer.Name, PhoneNumber = customer.PhoneNumber },
                 Token = "SomeToken"
             };
 
@@ -278,9 +280,9 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Password = "Qwer111!"
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
-            _customerService.LoginCustomerAsync(loginRequest).ReturnsForAnyArgs(loginResponse);
-
+            _identityUserRepository.SignInAsync("test@domain.com", "Qwer111!").ReturnsForAnyArgs(SignInResult.Success);
+            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            
             var customerDto = new CustomerDto
             {
                 Email = request.Email,
@@ -293,16 +295,17 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Customer = customerDto
             };
 
+            _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
+
+            //Act
             var response = await _customerService.EditCustomerAsync(request, customer.Id);
 
-            Assert.That(response.Customer, Is.EqualTo(editCustomerResponse));
+            //Assert
+            Assert.That(response.Customer, Is.EqualTo(editCustomerResponse.Customer));
         }
-
-
         #endregion
 
         #region DepositAsync
-
 
         [Test]
         public void DepositAsync_ReturnedNull_DoesNotThrow()
@@ -311,6 +314,5 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         #endregion
-
     }
 }
