@@ -14,6 +14,7 @@ namespace Api.DataAccessLayer.UnitOfWork
     public interface IUoW
     {
         IGenericRepository<Customer> GenericCustomerRepository { get; }
+        IGenericRepository<TaxiCompany> GenericTaxiCompanyRepository { get; }
         IGenericRepository<Ride> GenericRideRepository { get; }
         IGenericRepository<Order> GenericOrderRepository { get; }
         IIdentityUserRepository IdentityUserRepository { get; }
@@ -21,6 +22,5 @@ namespace Api.DataAccessLayer.UnitOfWork
         void ReservePriceFromCustomer(string customerId, decimal price);
         Order AddRideToOrder(Ride ride, Order order);
         void SaveChanges();
-        Task DepositAsync(string customerId, decimal deposit);
     }
 }

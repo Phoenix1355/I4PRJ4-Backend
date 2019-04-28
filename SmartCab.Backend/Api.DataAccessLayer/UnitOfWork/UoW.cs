@@ -14,6 +14,7 @@ namespace Api.DataAccessLayer.UnitOfWork
     public class UoW : IUoW
     {
         public IGenericRepository<Customer> GenericCustomerRepository { get; }
+        public IGenericRepository<TaxiCompany> GenericTaxiCompanyRepository { get; }
         public IGenericRepository<Ride> GenericRideRepository { get; }
         public IGenericRepository<Order> GenericOrderRepository { get; }
         private ApplicationContext _context;
@@ -25,6 +26,7 @@ namespace Api.DataAccessLayer.UnitOfWork
             GenericCustomerRepository = new GenericRepository<Customer>(_context);
             GenericRideRepository = new GenericRepository<Ride>(_context);
             GenericOrderRepository = new GenericRepository<Order>(_context);
+            GenericTaxiCompanyRepository = new GenericRepository<TaxiCompany>(_context);
             IdentityUserRepository = identityUserRepository;
         }
 
@@ -61,5 +63,6 @@ namespace Api.DataAccessLayer.UnitOfWork
         {
             _context.SaveChanges();
         }
+
     }
 }

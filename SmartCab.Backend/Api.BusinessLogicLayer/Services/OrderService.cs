@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
@@ -16,18 +17,18 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
-        private readonly IUoW _unitOfWork;
+        private readonly IDataAccessFactory _factory;
 
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IUoW unitOfWork)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper, IDataAccessFactory factory)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
+            _factory = factory;
         }
 
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
-            var openOrders = _unitOfWork.GenericOrderRepository.Find(order => order.Status == OrderStatus.WaitingForAccept);
+            var openOrders = _factory.UnitOfWork.GenericOrderRepository.Find(order => order.Status == OrderStatus.WaitingForAccept);
             var openOrderDtos = _mapper.Map<List<OrderDto>>(openOrders);
             var response = new OpenOrdersResponse {Orders = openOrderDtos};
             return response;
