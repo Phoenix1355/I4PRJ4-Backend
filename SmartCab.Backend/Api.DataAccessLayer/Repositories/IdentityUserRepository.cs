@@ -100,7 +100,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user"></param>
         /// <param name="oldPassword"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword)
+        private async Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword)
         {
             var response = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
             await _userManager.UpdateAsync(user);
@@ -113,7 +113,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user"></param>
         /// <param name="newCustomer"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> ChangeEmail(IdentityUser user, Customer newCustomer)
+        private async Task<IdentityResult> ChangeEmail(IdentityUser user, Customer newCustomer)
         {
             var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
             var response = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
