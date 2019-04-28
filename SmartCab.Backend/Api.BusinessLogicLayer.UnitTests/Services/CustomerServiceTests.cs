@@ -265,8 +265,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _customerRepository.AddCustomerAsync(customer, "Qwer111!").ReturnsForAnyArgs(customer);
-
             var loginResponse = new LoginResponse
             {
                 Customer = new CustomerDto

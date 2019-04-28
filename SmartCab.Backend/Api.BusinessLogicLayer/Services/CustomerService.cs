@@ -115,9 +115,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <summary>
         /// Gets the users info and changes the users password, name, email and phone number.
         /// </summary>
-        /// <param name="newCustomer"></param>
-        /// <param name="password"></param>
-        /// <param name="authorization"></param>
+        /// <param name="request"></param>
+        /// <param name="customerId"></param>
         /// <returns></returns>
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
