@@ -16,7 +16,7 @@ namespace Api.DataAccessLayer.Repositories
     /// <summary>
     /// This class exposes all the possible request to the database that is related to "Rides"
     /// </summary>
-    public class RideRepository : IRideRepository, IDisposable
+    public class RideRepository : IRideRepository
     {
         private readonly IUoW _unitOfWork;
 
@@ -29,15 +29,7 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<SharedRide> CreateSharedRideAsync(SharedRide ride)
         {
             throw new NotImplementedException();
-            using (var transaction = _unitOfWork.Database.BeginTransaction())
-            {
-                //Add ride and reserves amount.
-                //ride = await AddRideAndReserveFundsForRide(ride);
-
-                ////Reserve from Customer
-                //transaction.Commit();
-                //return ride;
-            }
+            
         }
 
         public SoloRide AddSoloRideAsync(SoloRide ride)
@@ -49,24 +41,5 @@ namespace Api.DataAccessLayer.Repositories
             _unitOfWork.SaveChanges();
             return ride;
         }
-
-        #region IDisposable implementation
-
-        //Dispose pattern:
-        //https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose#basic_pattern
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _unitOfWork?.Dispose();
-        }
-
-        #endregion
     }
 }

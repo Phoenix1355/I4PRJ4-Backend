@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
+using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
@@ -17,15 +18,15 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IMapper _mapper;
         private IOrderRepository _orderRepository;
         private OrderService _orderService;
-        private IUoW _UoW;
+        private IDataAccessFactory _factory;
 
         [SetUp]
         public void Setup()
         {
             _mapper = Substitute.For<IMapper>();
             _orderRepository = Substitute.For<IOrderRepository>();
-            _UoW = Substitute.For<IUoW>();
-            _orderService = new OrderService(_orderRepository, _mapper, _UoW);
+            _factory = Substitute.For<IDataAccessFactory>();
+            _orderService = new OrderService(_orderRepository, _mapper, _factory);
         }
 
         [Test]

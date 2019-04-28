@@ -49,7 +49,7 @@ namespace Api.DataAccessLayer.Repositories
             query = query.Where(filter);
             if (query.IsNullOrEmpty() || query.Count() > 2)
             {
-               
+                throw new UserIdInvalidException("Filter did not result in a unique match");
             }
 
             return query.First();

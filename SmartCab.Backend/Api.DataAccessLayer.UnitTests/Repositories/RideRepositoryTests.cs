@@ -14,15 +14,18 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 {
     class RideRepositoryTests
     {
+        /*
         #region Setup
 
         private RideRepository _uut;
         private InMemorySqlLiteContextFactory _factory;
-
+        
         [SetUp]
         public void SetUp()
         {
             _factory = new InMemorySqlLiteContextFactory();
+
+
             _uut = new RideRepository(_factory.CreateContext());
         }
 
@@ -166,6 +169,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             };
         }
         #endregion
-       
+       */
     }
+
 }

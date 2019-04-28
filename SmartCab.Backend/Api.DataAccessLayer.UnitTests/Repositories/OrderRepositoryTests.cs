@@ -15,6 +15,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     [TestFixture]
     class OrderRepositoryTests
     {
+        /*
         #region Setup
 
         private OrderRepository _uut;
@@ -34,7 +35,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-
+        
         #region GetOpenOrdersAsync
 
 
@@ -314,5 +315,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
+    */
     }
 }

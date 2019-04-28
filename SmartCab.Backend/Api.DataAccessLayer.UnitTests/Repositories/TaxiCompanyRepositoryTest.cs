@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using Microsoft.AspNetCore.Identity;
@@ -30,10 +31,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _mockSignManager = new FakeSignInManager();
             _mockUserManager = new FakeUserManager();
             IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager, _mockSignManager);
-            _uut = new TaxiCompanyRepository(_factory.CreateContext(), identityUserRepository);
+            var UoW = new UoW(_factory.CreateContext(), identityUserRepository);
+            _uut = new TaxiCompanyRepository(UoW);
         }
         #endregion
-
+        /*
         #region GetTaxiCompanyAsync
         // Testing Taxi Company Name
         [Test]
@@ -232,6 +234,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-
+    */
     }
 }

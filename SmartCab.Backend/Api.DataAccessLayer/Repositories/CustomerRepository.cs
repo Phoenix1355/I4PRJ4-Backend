@@ -17,7 +17,7 @@ namespace Api.DataAccessLayer.Repositories
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
-    public class CustomerRepository : ICustomerRepository, IDisposable
+    public class CustomerRepository : ICustomerRepository
     {
         private readonly IUoW _unitOfWork;
         /// <summary>
@@ -55,20 +55,7 @@ namespace Api.DataAccessLayer.Repositories
 
         #region IDisposable implementation
 
-        //Dispose pattern:
-        //https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose#basic_pattern
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            _context?.Dispose();
-        }
 
         #endregion
     }

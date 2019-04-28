@@ -14,6 +14,7 @@ using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer;
+using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
@@ -227,6 +228,7 @@ namespace Api
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
             services.AddScoped<IUoW,UoW>();
+            services.AddScoped<IDataAccessFactory, DataAccessFactory>();
         }
 
         /// <summary>
