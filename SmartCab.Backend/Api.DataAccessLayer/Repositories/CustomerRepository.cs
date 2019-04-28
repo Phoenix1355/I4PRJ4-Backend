@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,16 +19,16 @@ namespace Api.DataAccessLayer.Repositories
     /// <seealso cref="System.IDisposable" />
     public class CustomerRepository : ICustomerRepository, IDisposable
     {
-        private readonly ApplicationContext _context;
+        private readonly IUoW _unitOfWork;
         private readonly IIdentityUserRepository _identityUserRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
         /// </summary>
         /// <param name="context">The _context - Autoinjected</param>
         /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+        public CustomerRepository(IUoW unitOfWork, IIdentityUserRepository identityUserRepository)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _identityUserRepository = identityUserRepository;
         }
 
