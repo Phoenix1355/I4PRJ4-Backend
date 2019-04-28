@@ -21,5 +21,6 @@ namespace Api.DataAccessLayer.Models
         public decimal Price { get; set; }
 
         public virtual TaxiCompany TaxiCompany { get; set; }
+        public string TaxiCompanyId { get; set; }
     }
 }
