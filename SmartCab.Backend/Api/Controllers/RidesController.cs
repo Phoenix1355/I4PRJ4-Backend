@@ -34,36 +34,6 @@ namespace Api.Controllers
         }
 
         /// <summary>
-        /// Returns all open rides stored in the system.
-        /// </summary>
-        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
-        /// <returns>All open rides stored in the system</returns>
-        /// <response code="401">
-        /// An invalid JWT token was provided in the authorization header.<br/>
-        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
-        /// </response>
-        /// <response code="500">If an internal server error occured.</response>
-        [Produces("application/json")]
-        [Route("[action]")]
-        [HttpGet]
-        [ProducesResponseType(typeof(OpenRidesResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Open([FromHeader] string authorization)
-        {
-            try
-            {
-                throw new NotImplementedException("Not implemented yet");
-                //var rides = await _rideService.GetAllRidesAsync();
-                //return Ok(rides);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorMessage();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
-
-        /// <summary>
         /// Returns all available details about a specific ride.
         /// </summary>
         /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
@@ -127,27 +97,6 @@ namespace Api.Controllers
 
             var response = await _rideService.AddRideAsync(request, customerId);
             return Ok(response);
-
-        }
-
-        /// <summary>
-        /// Updates the order with the supplied ID, and associated rides so they are accepted.
-        /// </summary>
-        /// <remarks>
-        /// Required role: "TaxiCompany"
-        /// </remarks>
-        /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="id">The id of the order that should be accepted.</param>
-        /// <returns></returns>
-        /// <response code="400">Could mean that the Order was already in accepted state when the request made it to the server</response>
-        /// <response code="401">If the user was not logged in already (token was expired)</response>
-        [Route("{id}/[action]")]
-        [Produces("application/json")]
-        [HttpPut]
-        public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
-        {
-            throw new NotImplementedException("Not implemented yet");
-            return Ok($"The ride with {id} is now successfully marked as accepted.");
         }
     }
 }

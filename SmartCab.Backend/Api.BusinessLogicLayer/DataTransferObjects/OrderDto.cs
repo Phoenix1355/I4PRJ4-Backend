@@ -7,8 +7,9 @@ namespace Api.BusinessLogicLayer.DataTransferObjects
     public class OrderDto
     {
         public int Id { get; set; }
-        public OrderStatus Status { get; set; }
-        public List<RideDto> Rides { get; set; }
+        public string Status { get; set; }
         public decimal Price { get; set; }
+        public List<RideDto> Rides { get; set; }
+        
     }
 }

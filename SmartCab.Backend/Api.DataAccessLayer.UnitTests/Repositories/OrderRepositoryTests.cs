@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
+using CustomExceptions;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -228,7 +230,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(2));
         }
 
-        private Order CreateTestOrderWithSoloRideInDatabase()
+        private Order CreateTestOrderWithSoloRideInDatabase(RideStatus rideStatus = RideStatus.WaitingForAccept, OrderStatus orderStatus = OrderStatus.WaitingForAccept)
         {
             using (var context = _factory.CreateContext())
             {
@@ -245,14 +247,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                     PassengerCount = 0,
                     CreatedOn = DateTime.Now,
                     Price = 100,
-                    Status = RideStatus.WaitingForAccept,
+                    Status = rideStatus,
                     EndDestination = new Address("City", 8200, "Street", 21),
                     StartDestination = new Address("City", 8200, "Street", 21)
                 };
                 context.SoloRides.Add(soloRide);
                 Order order = new Order()
                 {
-                    Status = OrderStatus.WaitingForAccept,
+                    Status = orderStatus,
                     Price = 100,
                     Rides = new List<Ride>()
                 };
@@ -311,6 +313,133 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
                 return order;
             }
+        }
+
+        #endregion
+
+
+        #region AcceptOrderAsync
+        private async Task<Order> OrderExistsSoloRide()
+        {
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase();
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+
+            return await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderExistsSoloRide_OrderIsAccepted()
+        {
+            var order = await OrderExistsSoloRide();
+            Assert.That(order.Status,Is.EqualTo(OrderStatus.Accepted));
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderExistsSoloRide_RidesIsAccepted()
+        {
+            var order = await OrderExistsSoloRide();
+            foreach (var orderRide in order.Rides)
+            {
+                Assert.That(orderRide.Status, Is.EqualTo(RideStatus.Accepted));
+            }
+            
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderExistsSoloRide_OrderIsAcceptedByExpectedId()
+        {
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase();
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+            var order =  await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+            Assert.That(order.TaxiCompany.Id, Is.EqualTo(taxiCompany.Id));
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderExistsSharedRide_RidesIsAccepted()
+        {
+            var orderCreated = CreateTestOrderWithSharedRideInDatabase();
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+
+            var order = await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+            foreach (var orderRide in order.Rides)
+            {
+                Assert.That(orderRide.Status, Is.EqualTo(RideStatus.Accepted));
+            }
+        }
+
+        [Test]
+        public async Task AcceptOrder_OrderDoesNotExist_ThrowsException()
+        {
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+            int invalidOrderId = -3;
+
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, invalidOrderId));
+        }
+
+        [Test]
+        public async Task AcceptOrder_TaxicompanyDoesNotExist_ThrowsException()
+        {
+            var orderCreated = CreateTestOrderWithSharedRideInDatabase();
+
+            string invalidTaxiCompanyId = "Bogus ID";
+
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.AcceptOrderAsync(invalidTaxiCompanyId, orderCreated.Id));
+        }
+
+        [TestCase(OrderStatus.Accepted)]
+        [TestCase(OrderStatus.Expired)]
+        public async Task AcceptOrder_OrderAlreadyAcceptedExistsSoloRide_ThrowsException(OrderStatus status)
+        {
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase(RideStatus.WaitingForAccept, status);
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
+        }
+
+        [TestCase(RideStatus.Accepted)]
+        [TestCase(RideStatus.Expired)]
+        [TestCase(RideStatus.Debited)]
+        [TestCase(RideStatus.LookingForMatch)]
+        public async Task AcceptOrder_OrderExistsSoloRideAlreadyAccepted_ThrowsException(RideStatus status)
+        {
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase(status);
+            var taxiCompany = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxiCompany);
+                context.SaveChanges();
+            }
+
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
         }
 
         #endregion

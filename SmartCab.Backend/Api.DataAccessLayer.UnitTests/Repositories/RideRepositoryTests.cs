@@ -34,7 +34,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-        #region AddSoloRideAsync
+        #region CreateSoloRideAsync
 
         [Test]
         public async Task CreateSoloRideAsync_ValidRideAndCustomerWithFunds_RideIsCreated()

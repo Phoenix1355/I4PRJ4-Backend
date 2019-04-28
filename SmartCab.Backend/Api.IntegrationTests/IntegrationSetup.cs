@@ -112,6 +112,28 @@ namespace Api.IntegrationTests
            _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
         }
 
+        protected async Task LoginOnTaxiCompanyAccount(string email = "test12@gmail.com")
+        {
+
+            var registerRequest = getRegisterRequest(email);
+            var response = await PostAsync("/api/taxicompany/register", registerRequest);
+            
+            //Login on customer
+            var loginRequest = getLoginRequest(email);
+            var loginResponse = await PostAsync("/api/taxicompany/login", loginRequest);
+
+            //Map login returned to object
+            var loginResponseObject = GetObject<LoginResponse>(loginResponse);
+
+            //Get Token
+            var token = loginResponseObject.Token;
+
+            //Default header authentication setup.
+
+
+            _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
+        }
+
         protected async Task DepositToCustomer(int amount)
         {
             DepositRequest request = new DepositRequest()
@@ -136,6 +158,13 @@ namespace Api.IntegrationTests
             await DepositToCustomer(1000);
             await CreateRide();
         }
+
+        protected void ClearHeaders()
+        {
+            _client.DefaultRequestHeaders.Clear();
+        }
+
+
     }
 
 }

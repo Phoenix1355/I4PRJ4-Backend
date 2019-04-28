@@ -37,7 +37,7 @@ namespace Api.DataAccessLayer.Repositories
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
-                .Where(x=>x.Status == RideStatus.Expired) //TODO: Change this method
+                .Where(x => x.Status == RideStatus.Expired) //TODO: Change this method
                 .ToListAsync();
             return rides;
         }
@@ -65,7 +65,7 @@ namespace Api.DataAccessLayer.Repositories
 
                 //Adds order
                 await AddOrderFromRide(ride);
-                
+
                 //Reserve from Customer
                 transaction.Commit();
                 return ride;
@@ -112,7 +112,7 @@ namespace Api.DataAccessLayer.Repositories
 
         private async Task<Order> AddOrderFromRide(Ride ride)
         {
-            if(_context.Orders.Count(o => o.Rides.Contains(ride))!= 0)
+            if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
             {
                 throw new MultipleOrderException("Already an order for given ride. ");
             }
