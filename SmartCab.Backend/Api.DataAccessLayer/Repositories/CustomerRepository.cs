@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// CustomerRepository with autoinjection of _context and identityUserRepository. 
+    /// GenericCustomerRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
@@ -44,11 +44,11 @@ namespace Api.DataAccessLayer.Repositories
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = _unitOfWork.CustomerRepository.FindOnlyOne(c => c.Id == customerId);
+            var customer = _unitOfWork.GenericCustomerRepository.FindOnlyOne(c => c.Id == customerId);
             
             //Update customer
             customer.Balance += deposit;
-            _unitOfWork.CustomerRepository.Update(customer);
+            _unitOfWork.GenericCustomerRepository.Update(customer);
             _unitOfWork.SaveChanges();
         }
 

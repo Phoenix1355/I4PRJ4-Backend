@@ -92,7 +92,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -132,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -169,7 +169,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -209,7 +209,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _UoW.GenericRideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -219,7 +219,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         {
             List<Ride> rideList = new List<Ride>();
            
-            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _UoW.GenericRideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);

@@ -13,9 +13,9 @@ namespace Api.DataAccessLayer.UnitOfWork
 {
     public interface IUoW
     {
-        IGenericRepository<Customer> CustomerRepository { get; }
-        IGenericRepository<Ride> RideRepository { get; }
-        IGenericRepository<Order> OrderRepository { get; }
+        IGenericRepository<Customer> GenericCustomerRepository { get; }
+        IGenericRepository<Ride> GenericRideRepository { get; }
+        IGenericRepository<Order> GenericOrderRepository { get; }
         IIdentityUserRepository IdentityUserRepository { get; }
 
         void ReservePriceFromCustomer(string customerId, decimal price);

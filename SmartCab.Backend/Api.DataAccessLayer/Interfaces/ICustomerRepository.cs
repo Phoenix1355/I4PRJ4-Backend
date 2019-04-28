@@ -6,7 +6,7 @@ using CustomExceptions;
 namespace Api.DataAccessLayer.Interfaces
 {
     /// <summary>
-    /// Interface for CustomerRepository, containing relevant methods. 
+    /// Interface for GenericCustomerRepository, containing relevant methods. 
     /// </summary>
     public interface ICustomerRepository
     {

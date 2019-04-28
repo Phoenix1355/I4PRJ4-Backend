@@ -13,25 +13,25 @@ namespace Api.DataAccessLayer.UnitOfWork
 {
     public class UoW : IUoW
     {
-        public IGenericRepository<Customer> CustomerRepository { get; }
-        public IGenericRepository<Ride> RideRepository { get; }
-        public IGenericRepository<Order> OrderRepository { get; }
+        public IGenericRepository<Customer> GenericCustomerRepository { get; }
+        public IGenericRepository<Ride> GenericRideRepository { get; }
+        public IGenericRepository<Order> GenericOrderRepository { get; }
         private ApplicationContext _context;
         public IIdentityUserRepository IdentityUserRepository { get; }
 
         public UoW(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
             _context = context;
-            CustomerRepository = new GenericRepository<Customer>(_context);
-            RideRepository = new GenericRepository<Ride>(_context);
-            OrderRepository = new GenericRepository<Order>(_context);
+            GenericCustomerRepository = new GenericRepository<Customer>(_context);
+            GenericRideRepository = new GenericRepository<Ride>(_context);
+            GenericOrderRepository = new GenericRepository<Order>(_context);
             IdentityUserRepository = identityUserRepository;
         }
 
 
         public void ReservePriceFromCustomer(string customerId, decimal price)
         {
-            var customer = CustomerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
+            var customer = GenericCustomerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
 
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
@@ -42,7 +42,7 @@ namespace Api.DataAccessLayer.UnitOfWork
                 throw new InsufficientFundsException("Not enough credit");
             }
 
-            CustomerRepository.Update(customer);
+            GenericCustomerRepository.Update(customer);
         }
 
         public Order AddRideToOrder(Ride ride, Order order)
@@ -54,20 +54,7 @@ namespace Api.DataAccessLayer.UnitOfWork
 
             order.Price += ride.Price;
             order.Rides.Add(ride);
-            return OrderRepository.Update(order);
-        }
-
-        public async Task DepositAsync(string customerId, decimal deposit)
-        {
-            if (deposit <= 0)
-            {
-                throw new NegativeDepositException("Cannot deposit negative amount");
-            }
-
-            var customer = CustomerRepository.FindByID(customerId);
-            //Update customer
-            customer.Balance += deposit;
-            CustomerRepository.Update(customer);
+            return GenericOrderRepository.Update(order);
         }
 
         public void SaveChanges()

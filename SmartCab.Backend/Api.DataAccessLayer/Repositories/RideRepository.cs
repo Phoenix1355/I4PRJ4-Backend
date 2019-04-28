@@ -43,8 +43,8 @@ namespace Api.DataAccessLayer.Repositories
         public SoloRide AddSoloRideAsync(SoloRide ride)
         {
             _unitOfWork.ReservePriceFromCustomer(ride.CustomerId, ride.Price);
-            ride = (SoloRide)_unitOfWork.RideRepository.Add(ride);
-            var order = _unitOfWork.OrderRepository.Add(new Order());
+            ride = (SoloRide)_unitOfWork.GenericRideRepository.Add(ride);
+            var order = _unitOfWork.GenericOrderRepository.Add(new Order());
             _unitOfWork.AddRideToOrder(ride, order);
             _unitOfWork.SaveChanges();
             return ride;

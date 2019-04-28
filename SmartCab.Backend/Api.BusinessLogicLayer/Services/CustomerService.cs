@@ -23,10 +23,7 @@ namespace Api.BusinessLogicLayer.Services
     public class CustomerService : ICustomerService
     {
         private readonly IJwtService _jwtService;
-        private readonly ICustomerRepository _customerRepository;
-        private readonly IIdentityUserRepository _identityUserRepository;
         private readonly IMapper _mapper;
-        private readonly IUoW _unitOfWork;
         private readonly IDataAccessFactory _factory;
 
         /// <summary>
@@ -38,18 +35,15 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
             IJwtService jwtService,
-            
-            ICustomerRepository customerRepository,
-            IIdentityUserRepository identityUserRepository,
             IMapper mapper, 
-            IUoW unitOfWork, IDataAccessFactory factory)
+            IDataAccessFactory factory)
         {
             _jwtService = jwtService;
-            _customerRepository = customerRepository;
+
             _mapper = mapper;
-            _unitOfWork = unitOfWork;
+
             _factory = factory;
-            _identityUserRepository = identityUserRepository;
+
         }
 
         /// <summary>
@@ -73,9 +67,9 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
-            await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
-            await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
-            _unitOfWork.SaveChanges();
+            await _factory.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
+            await _factory.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
+            
 
             //customer = await _customerRepository.AddCustomerAsync(customer, request.Password);
             var customerDto = _mapper.Map<CustomerDto>(customer);
@@ -102,10 +96,10 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
             //Check if its possible to log in
-            var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
+            var result = await _factory.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
-            var customer = _unitOfWork.CustomerRepository.FindOnlyOne(customerFilter => customerFilter.Email == request.Email);
+            var customer = _factory.UnitOfWork.GenericCustomerRepository.FindOnlyOne(customerFilter => customerFilter.Email == request.Email);
 
             //All good, now generate the token and return it
             var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
@@ -132,8 +126,8 @@ namespace Api.BusinessLogicLayer.Services
             var depositAmount = request.Deposit;
 
             //Deposits
-            await _unitOfWork.DepositAsync(customerId, depositAmount);
-            _unitOfWork.SaveChanges();
+            await _factory.CustomerRepository.DepositAsync(customerId, depositAmount);
+            _factory.UnitOfWork.SaveChanges();
         }
 
 
@@ -144,8 +138,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            var customerRides = _unitOfWork.RideRepository.Find(ride => ride.CustomerId == customerId);
-            //var customerRides = _unitOfWork.CustomerRepository.FindByID(customerId).Rides;
+            var customerRides = _factory.UnitOfWork.GenericRideRepository.Find(ride => ride.CustomerId == customerId);
+            //var customerRides = _unitOfWork.GenericCustomerRepository.FindByID(customerId).Rides;
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

@@ -27,7 +27,7 @@ namespace Api.BusinessLogicLayer.Services
 
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
-            var openOrders = _unitOfWork.OrderRepository.Find(order => order.Status == OrderStatus.WaitingForAccept);
+            var openOrders = _unitOfWork.GenericOrderRepository.Find(order => order.Status == OrderStatus.WaitingForAccept);
             var openOrderDtos = _mapper.Map<List<OrderDto>>(openOrders);
             var response = new OpenOrdersResponse {Orders = openOrderDtos};
             return response;
