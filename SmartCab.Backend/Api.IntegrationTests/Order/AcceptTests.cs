@@ -57,6 +57,22 @@ namespace Api.IntegrationTests.Order
         }
 
         [Test]
+        public async Task Accept_OrderAlreadyAccepted_BadRequestResponse()
+        {
+            await CreateRideWithLogin();
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            await PutAsync(uri, null);
+            var response = await PutAsync(uri, null);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [Test]
         public async Task Accept_OrderDoesExist_ResponseContainsExpectedValues()
         {
             await CreateRideWithLogin();
