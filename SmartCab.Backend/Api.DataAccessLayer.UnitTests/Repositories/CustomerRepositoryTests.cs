@@ -440,11 +440,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            await _uut.AddCustomerAsync(customer, "Qwerrr111!");
+           await _uut.AddCustomerAsync(customer, "Qwerrr111!");
 
             var response = await _uut.EditCustomerAsync(new Customer(), customer.Id, "Qwer111!", "Qwerrr111!");
 
-            Assert.That(response.Id, Is.EqualTo(customer.Id));
+            Assert.That(response, Is.EqualTo(customer));
         }
 
         #endregion
