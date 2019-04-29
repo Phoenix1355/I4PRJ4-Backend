@@ -124,7 +124,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _unitOfWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customer = new Customer
@@ -133,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _unitOfWork.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindByEmail(null).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -161,7 +160,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customer = new Customer
@@ -170,7 +168,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _unitOfWork.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindByEmail(null).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -210,7 +208,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _unitOfWork.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _unitOfWork.CustomerRepository.FindCustomerRides(null).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -220,7 +218,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         {
             List<Ride> rideList = new List<Ride>();
 
-            _unitOfWork.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _unitOfWork.CustomerRepository.FindCustomerRides(null).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);

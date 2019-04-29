@@ -180,26 +180,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             // Assert
             Assert.That(response.TaxiCompany, Is.EqualTo(taxiCompanyDto));
         }
-
-        [Test]
-        public void LoginTaxiCompanyAsync_EmailAndPasswordCombinationNotFound_ThrowsIdentityException()
-        {
-            // Assert
-            var request = new LoginRequest
-            {
-                Email = "test@domain.com",
-                Password = "Password1!"
-            };
-
-            // Act
-            var signInResult = SignInResult.Failed;
-            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signInResult);
-
-            
-            //Assert
-            Assert.That(() => _taxiCompanyService.LoginTaxiCompanyAsync(request), Throws.TypeOf<IdentityException>());
-        }
-
         #endregion
     
     }
