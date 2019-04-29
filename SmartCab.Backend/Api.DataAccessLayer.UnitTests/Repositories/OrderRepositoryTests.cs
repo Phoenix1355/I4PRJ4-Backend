@@ -424,7 +424,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-
+        /*
         #region AcceptOrderAsync
         private async Task<Order> OrderExistsSoloRide()
         {
@@ -550,6 +550,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-    
+    */
     }
 }

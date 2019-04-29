@@ -4,6 +4,7 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
+using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
@@ -59,6 +60,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Status = RideStatus.WaitingForAccept.ToString()
             };
             _mapper.Map<OrderDto>(null).ReturnsForAnyArgs(orderDto);
+            var order = new Order();
+            var taxicompany = new TaxiCompany();
+            _unitOfWork.OrderRepository.FindByIDAsync(null).ReturnsForAnyArgs(order);
+            _unitOfWork.TaxiCompanyRepository.FindByIDAsync(null).ReturnsForAnyArgs(taxicompany);
+
             var expectedResponse = new AcceptOrderResponse {Order = orderDto};
 
             var response = await _orderService.AcceptOrderAsync(taxiCompanyId, orderId);

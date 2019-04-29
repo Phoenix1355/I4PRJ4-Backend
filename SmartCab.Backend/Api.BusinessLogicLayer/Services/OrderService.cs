@@ -56,7 +56,14 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response containing the updated order.</returns>
         public async Task<AcceptOrderResponse> AcceptOrderAsync(string taxiCompanyId, int orderId)
         {
-            var order = await _unitOfWork.OrderRepository.AcceptOrderAsync(taxiCompanyId, orderId);
+            var taxiCompany = await _unitOfWork.TaxiCompanyRepository.FindByIDAsync(taxiCompanyId);
+            var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
+            await _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
+            order.TaxiCompanyId = taxiCompany.Id;
+            await _unitOfWork.OrderRepository.SetOrderToAccepted(order);
+            await _unitOfWork.SaveChangesAsync();
+            //Set status on orders connected rides. 
+
             //TODO: push out notifications to associated customers (Debit customers should happen in the dataaccess layer as par of a transaction)
             var orderDto = _mapper.Map<OrderDto>(order);
             var response = new AcceptOrderResponse {Order = orderDto};
