@@ -96,9 +96,9 @@ namespace Api.BusinessLogicLayer.Services
             var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
-            var customer = _unitOfWork.CustomerRepository.FindByEmail(request.Email);
+            var customer = await _unitOfWork.CustomerRepository.FindByEmailAsync(request.Email);
 
-            //All good, now generate the token and return it
+            //AllAsync good, now generate the token and return it
             var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
             var customerDto = _mapper.Map<CustomerDto>(customer);
             var response = new LoginResponse
@@ -124,7 +124,7 @@ namespace Api.BusinessLogicLayer.Services
 
             //Deposits
             await _unitOfWork.CustomerRepository.DepositAsync(customerId,depositAmount);
-            _unitOfWork.SaveChanges();
+            _unitOfWork.SaveChangesAsync();
             
         }
 
@@ -136,8 +136,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            //var customerRides = _factory.UnitOfWork.RideRepository.Find(ride => ride.CustomerId == customerId);
-            var customerRides = _unitOfWork.CustomerRepository.FindCustomerRides(customerId);
+            //var customerRides = _factory.UnitOfWork.RideRepository.FindAsync(ride => ride.CustomerId == customerId);
+            var customerRides = await _unitOfWork.CustomerRepository.FindCustomerRidesAsync(customerId);
 
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse

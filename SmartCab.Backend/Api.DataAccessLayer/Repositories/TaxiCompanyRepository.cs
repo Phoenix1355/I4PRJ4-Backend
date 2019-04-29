@@ -26,13 +26,13 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Find the taxicompany with a given email otherwise throws exceptions 
+        /// FindAsync the taxicompany with a given email otherwise throws exceptions 
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public TaxiCompany FindByEmail(string email)
+        public async Task<TaxiCompany> FindByEmail(string email)
         {
-            return FindOnlyOne(taxicompany => taxicompany.Email == email);
+            return await FindOnlyOneAsync(taxicompany => taxicompany.Email == email);
         }
     }
 }

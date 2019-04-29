@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 using Castle.Core.Internal;
 using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
@@ -32,9 +33,9 @@ namespace Api.DataAccessLayer.Repositories
         /// Returns all elements of the given entity
         /// </summary>
         /// <returns></returns>
-        public virtual List<TEntity> All()
+        public virtual Task<List<TEntity>> AllAsync()
         {
-            return Find();
+            return FindAsync();
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public virtual List<TEntity> Find(
+        public virtual Task<List<TEntity>> FindAsync(
             Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _dbSet;
@@ -50,7 +51,7 @@ namespace Api.DataAccessLayer.Repositories
             {
                 query = query.Where(filter);
             }
-            return query.ToList();
+            return query.ToListAsync();
         }
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <exception cref="UserIdInvalidException">Filter did not result in a unique match</exception>
-        public virtual TEntity FindOnlyOne(
+        public virtual Task<TEntity> FindOnlyOneAsync(
             Expression<Func<TEntity, bool>> filter)
         {
             IQueryable<TEntity> query = _dbSet;
@@ -70,7 +71,7 @@ namespace Api.DataAccessLayer.Repositories
                 throw new UserIdInvalidException("Filter did not result in a unique match");
             }
 
-            return query.First();
+            return query.FirstAsync();
         }
 
         /// <summary>
@@ -79,9 +80,9 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="id"></param>
         /// <returns></returns>
         /// <exception cref="UserIdInvalidException">No entity with given id</exception> 
-        public virtual TEntity FindByID(object id)
+        public virtual async Task<TEntity> FindByIDAsync(object id)
         {
-            var entity = _dbSet.Find(id);
+            var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
                 throw new UserIdInvalidException("No entity with given id");
@@ -95,9 +96,9 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Returns the added entity</returns>
-        public virtual TEntity Add(TEntity entity)
+        public virtual async Task<TEntity> AddAsync(TEntity entity)
         {
-            _dbSet.Add(entity);
+            await _dbSet.AddAsync(entity);
             return entity;
         }
 
@@ -105,9 +106,9 @@ namespace Api.DataAccessLayer.Repositories
         /// Deletes the given entity based on Id
         /// </summary>
         /// <param name="id"></param>
-        public virtual void Delete(object id)
+        public virtual async Task DeleteAsync(object id)
         {
-            TEntity entityToDelete = FindByID(id);
+            TEntity entityToDelete = await FindByIDAsync(id);
             Delete(entityToDelete);
         }
 
@@ -129,12 +130,12 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="entityToUpdate"></param>
         /// <returns>Returns the entity</returns>
-        public virtual TEntity Update(TEntity entityToUpdate)
+        public virtual async Task<TEntity> UpdateAsync(TEntity entityToUpdate)
         {
             if (_context.Entry(entityToUpdate).State == EntityState.Added)
             {
                 _dbSet.Remove(entityToUpdate);
-                _dbSet.Add(entityToUpdate);
+                await _dbSet.AddAsync(entityToUpdate);
                 return entityToUpdate;
             }
             _dbSet.Attach(entityToUpdate);

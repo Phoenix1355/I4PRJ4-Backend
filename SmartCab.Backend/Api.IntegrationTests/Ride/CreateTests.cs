@@ -18,7 +18,7 @@ namespace Api.IntegrationTests.Ride
     class CreateTests : IntegrationSetup
     {
         //-----------------------------------------INFO--------------------------------
-        //   All rides cost 100 kr, no matter what adresses they contain. 
+        //   AllAsync rides cost 100 kr, no matter what adresses they contain. 
         //-----------------------------------------Info end --------------------------
 
 

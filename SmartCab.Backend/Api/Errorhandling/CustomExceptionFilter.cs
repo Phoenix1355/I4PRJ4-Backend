@@ -34,7 +34,7 @@ namespace Api.ErrorHandling
             var error = new ErrorMessage();
             var status = StatusCodes.Status500InternalServerError;
 
-            //All custom exceptions that should return status 400
+            //AllAsync custom exceptions that should return status 400
             if (exceptionType == typeof(GoogleMapsApiException) ||
                 exceptionType == typeof(IdentityException) ||
                 exceptionType == typeof(InsufficientFundsException) ||
@@ -46,7 +46,7 @@ namespace Api.ErrorHandling
                 error = new ErrorMessage(exceptionMessage);
             }
 
-            //All custom exceptions that should return status 401
+            //AllAsync custom exceptions that should return status 401
             if (exceptionType == typeof(UserIdInvalidException))
             {
                 status = StatusCodes.Status401Unauthorized;

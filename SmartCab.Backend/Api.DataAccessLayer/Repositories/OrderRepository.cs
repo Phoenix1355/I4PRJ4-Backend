@@ -24,32 +24,32 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Add a ride to an order 
+        /// AddAsync a ride to an order 
         /// </summary>
         /// <param name="ride"></param>
         /// <param name="order"></param>
         /// <returns></returns>
         /// <exception cref="MultipleOrderException">Already an order for given ride.</exception> 
-        public Order AddRideToOrder(Ride ride, Order order)
+        public async Task<Order> AddRideToOrderAsync(Ride ride, Order order)
         {
-            
-            if (Find(o => o.Rides.Contains(ride)).Count != 0)
+            var orders = await FindAsync(o => o.Rides.Contains(ride));
+            if (orders.Count != 0)
             {
                 throw new MultipleOrderException("Already an order for given ride. ");
             }
 
             order.Price += ride.Price;
             order.Rides.Add(ride);
-            return Update(order);
+            return await UpdateAsync(order);
         }
 
         /// <summary>
-        /// Find all orders with status waiting for accept. 
+        /// FindAsync all orders with status waiting for accept. 
         /// </summary>
         /// <returns>List of orders with status waiting for accept.</returns>
-        public List<Order> FindOpenOrders()
+        public async Task<List<Order>> FindOpenOrdersAsync()
         {
-            return Find(order => order.Status == OrderStatus.WaitingForAccept);
+            return await FindAsync(order => order.Status == OrderStatus.WaitingForAccept);
         }
     }
 }

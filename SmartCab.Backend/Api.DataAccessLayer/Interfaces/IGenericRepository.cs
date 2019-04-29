@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 using Castle.Core.Internal;
 using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
@@ -15,18 +16,22 @@ namespace Api.DataAccessLayer.Repositories
     /// <typeparam name="TEntity"></typeparam>
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        List<TEntity> All();
+        Task<List<TEntity>> AllAsync();
 
-        List<TEntity> Find(
+        Task<List<TEntity>> FindAsync(
             Expression<Func<TEntity, bool>> filter = null);
 
-        TEntity FindOnlyOne(
+        Task<TEntity> FindOnlyOneAsync(
             Expression<Func<TEntity, bool>> filter);
 
-        TEntity FindByID(object id);
-        TEntity Add(TEntity entity);
-        void Delete(object id);
+        Task<TEntity> FindByIDAsync(object id);
+
+        Task<TEntity> AddAsync(TEntity entity);
+
+        Task DeleteAsync(object id);
+
         void Delete(TEntity entityToDelete);
-        TEntity Update(TEntity entityToUpdate);
+
+        Task<TEntity> UpdateAsync(TEntity entityToUpdate);
     }
 }

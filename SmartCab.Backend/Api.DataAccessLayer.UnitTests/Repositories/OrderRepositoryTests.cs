@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
@@ -41,10 +42,10 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-        #region AddRideToOrder
+        #region AddRideToOrderAsync
 
         [Test]
-        public void AddRideToOrder_OrderAndRideExists_1RideAddedToOrder()
+        public async Task AddRideToOrder_OrderAndRideExists_1RideAddedToOrder()
         {
             Customer customer = new Customer();
             Order order = new Order();
@@ -67,8 +68,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 EndDestination = new Address("City", 8200, "Street", 21),
                 StartDestination = new Address("City", 8200, "Street", 21)
             };
-            _uut.OrderRepository.AddRideToOrder(soloRide, order);
-            _uut.SaveChanges();
+            await _uut.OrderRepository.AddRideToOrderAsync(soloRide, order);
+            await _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
@@ -77,7 +78,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void AddRideToOrder_RideAlreadyAddedToOrder_ThrowsException()
+        public async Task AddRideToOrder_RideAlreadyAddedToOrder_ThrowsException()
         {
             Customer customer = new Customer();
             Order order = new Order();
@@ -100,13 +101,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 EndDestination = new Address("City", 8200, "Street", 21),
                 StartDestination = new Address("City", 8200, "Street", 21)
             };
-            _uut.OrderRepository.AddRideToOrder(soloRide, order);
-            _uut.SaveChanges();
-            Assert.Throws<MultipleOrderException>(()=>_uut.OrderRepository.AddRideToOrder(soloRide,order));
+            await _uut.OrderRepository.AddRideToOrderAsync(soloRide, order);
+            await _uut.SaveChangesAsync();
+            Assert.ThrowsAsync<MultipleOrderException>(()=>_uut.OrderRepository.AddRideToOrderAsync(soloRide,order));
         }
 
         [Test]
-        public void AddRideToOrder_OrderAndRideExistsNotSaved_RideNotAddedToOrder()
+        public async Task AddRideToOrder_OrderAndRideExistsNotSaved_RideNotAddedToOrder()
         {
             Customer customer = new Customer();
             Order order = new Order();
@@ -130,7 +131,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 StartDestination = new Address("City", 8200, "Street", 21)
             };
 
-            _uut.OrderRepository.AddRideToOrder(soloRide, order);
+            await _uut.OrderRepository.AddRideToOrderAsync(soloRide, order);
 
             using (var context = _factory.CreateContext())
             {
@@ -147,7 +148,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
         [Test]
-        public void GetOpenOrdersAsync_SingleMatchedRideInData_Returns1Ride()
+        public async Task GetOpenOrdersAsync_SingleMatchedRideInData_Returns1Ride()
         {
             using (var context = _factory.CreateContext())
             {
@@ -159,13 +160,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
             
             Assert.That(orders.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_MultipleMatchedRideInData_ReturnsMultipleRides()
+        public async Task GetOpenOrdersAsync_MultipleMatchedRideInData_ReturnsMultipleRides()
         {
             using (var context = _factory.CreateContext())
             {
@@ -180,13 +181,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 }
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.Count, Is.EqualTo(5));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_SingleMatchedRideInData_HasSameId()
+        public async Task GetOpenOrdersAsync_SingleMatchedRideInData_HasSameId()
         {
             Order order = new Order()
             {
@@ -198,21 +199,21 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.First().Id, Is.EqualTo(order.Id));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_NoOrder_Returns0()
+        public async Task GetOpenOrdersAsync_NoOrder_Returns0()
         {
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_ContainsOnlyAcceptedRides_Returns0Ride()
+        public async Task GetOpenOrdersAsync_ContainsOnlyAcceptedRides_Returns0Ride()
         {
             using (var context = _factory.CreateContext())
             {
@@ -224,13 +225,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
 
         [TestCase(OrderStatus.Accepted)] 
-        public void GetOpenOrdersAsync_RideStatusCodeIsNotLookingForMatch_Returns0Ride(OrderStatus status)
+        public async Task GetOpenOrdersAsync_RideStatusCodeIsNotLookingForMatch_Returns0Ride(OrderStatus status)
         {
             using (var context = _factory.CreateContext())
             {
@@ -242,13 +243,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_SomeRideWithStatusAndSomeWithout_Returns2Ride()
+        public async Task GetOpenOrdersAsync_SomeRideWithStatusAndSomeWithout_Returns2Ride()
         {
             using (var context = _factory.CreateContext())
             {
@@ -276,13 +277,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.Count, Is.EqualTo(2));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_Only1Ride_ContainsExpectedPrice()
+        public async Task GetOpenOrdersAsync_Only1Ride_ContainsExpectedPrice()
         {
             using (var context = _factory.CreateContext())
             {
@@ -295,27 +296,27 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.FirstOrDefault().Price, Is.EqualTo(100));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_Only1Ride_Contains1Ride()
+        public async Task GetOpenOrdersAsync_Only1Ride_Contains1Ride()
         {
             var orderInDB = CreateTestOrderWithSoloRideInDatabase();
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void GetOpenOrdersAsync_Only1Ride_ContainsOfTypeSoloRide()
+        public async Task GetOpenOrdersAsync_Only1Ride_ContainsOfTypeSoloRide()
         {
             var order = CreateTestOrderWithSoloRideInDatabase();
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             var rideInOrder = orders.FirstOrDefault().Rides.FirstOrDefault();
 
@@ -327,11 +328,11 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void GetOpenOrdersAsync_SharedRide_Contains2Ride()
+        public async Task GetOpenOrdersAsync_SharedRide_Contains2Ride()
         {
             var orderInDB = CreateTestOrderWithSharedRideInDatabase();
 
-            var orders = _uut.OrderRepository.FindOpenOrders();
+            var orders = await _uut.OrderRepository.FindOpenOrdersAsync();
 
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(2));
         }

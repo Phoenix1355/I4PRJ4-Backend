@@ -41,11 +41,11 @@ namespace Api.DataAccessLayer.Repositories
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = FindByID(customerId);
+            var customer = await FindByIDAsync(customerId);
             
             //Update customer
             customer.Balance += deposit;
-            Update(customer);
+            await UpdateAsync(customer);
         }
         /// <summary>
         /// Reserves price if customers balance is high enough to be positive. 
@@ -53,9 +53,9 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="customerId"></param>
         /// <param name="price"></param>
         /// /// <exception cref="UserIdInvalidException">Not enough credit</exception>
-        public void ReservePriceFromCustomer(string customerId, decimal price)
+        public async Task ReservePriceFromCustomerAsync(string customerId, decimal price)
         {
-            var customer = FindByID(customerId);
+            var customer = await FindByIDAsync(customerId);
 
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
@@ -66,27 +66,28 @@ namespace Api.DataAccessLayer.Repositories
                 throw new InsufficientFundsException("Not enough credit");
             }
 
-            Update(customer);
+            await UpdateAsync(customer);
         }
 
         /// <summary>
-        /// Find customer by email
+        /// FindAsync customer by email
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Customer FindByEmail(string email)
+        public async Task<Customer> FindByEmailAsync(string email)
         {
-            return FindOnlyOne(customer => customer.Email == email);
+            return await FindOnlyOneAsync(customer => customer.Email == email);
         }
 
         /// <summary>
-        /// Find the customers rides
+        /// FindAsync the customers rides
         /// </summary>
         /// <param name="customerId"></param>
         /// <returns></returns>
-        public List<Ride> FindCustomerRides(string customerId)
+        public async Task<List<Ride>> FindCustomerRidesAsync(string customerId)
         {
-            return FindByID(customerId).Rides;
+            var customer = await FindByIDAsync(customerId);
+            return customer.Rides;
         }
     }
 }

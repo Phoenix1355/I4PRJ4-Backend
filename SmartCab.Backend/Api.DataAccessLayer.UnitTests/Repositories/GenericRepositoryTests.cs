@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
@@ -38,20 +39,20 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             _factory.Dispose();
         }
         #endregion
-        #region All
+        #region AllAsync
 
 
 
        
         [Test]
-        public void All_NoEntitiesInDatabase_ReturnsEmptyList()
+        public async Task All_NoEntitiesInDatabase_ReturnsEmptyList()
         {
-            var entities = _uut.All();
+            var entities = await _uut.AllAsync();
             Assert.IsEmpty(entities);
         }
 
         [Test]
-        public void All_1EntityInDatabase_ReturnsEntity()
+        public async Task All_1EntityInDatabase_ReturnsEntity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -59,12 +60,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.All();
+            var entities = await _uut.AllAsync();
             Assert.That(entities.Count,Is.EqualTo(1));
         }
 
         [Test]
-        public void All_2EntityInDatabase_Returns2Entity()
+        public async Task All_2EntityInDatabase_Returns2Entity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -73,26 +74,26 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.All();
+            var entities = await _uut.AllAsync();
             Assert.That(entities.Count, Is.EqualTo(2));
         }
 
         #endregion
 
-        #region Find
+        #region FindAsync
 
         
 
             
         [Test]
-        public void Find_NoEntitiesInDatabase_ReturnsEmptyList()
+        public async Task Find_NoEntitiesInDatabase_ReturnsEmptyList()
         {
-            var entities = _uut.Find();
+            var entities = await _uut.FindAsync();
             Assert.IsEmpty(entities);
         }
 
         [Test]
-        public void Find_1EntityInDatabase_ReturnsEntity()
+        public async Task Find_1EntityInDatabase_ReturnsEntity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -100,12 +101,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.Find();
+            var entities = await _uut.FindAsync();
             Assert.That(entities.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public void Find_2EntityInDatabase_Returns2Entity()
+        public async Task Find_2EntityInDatabase_Returns2Entity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -114,12 +115,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.Find();
+            var entities = await _uut.FindAsync();
             Assert.That(entities.Count, Is.EqualTo(2));
         }
 
         [Test]
-        public void Find_2EntityInDatabaseFindsOne_ReturnsMadasEntity()
+        public async Task Find_2EntityInDatabaseFindsOne_ReturnsMadasEntity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -131,18 +132,18 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.Find(entity => entity.Name == "Madas");
+            var entities = await _uut.FindAsync(entity => entity.Name == "Madas");
             Assert.That(entities.Count, Is.EqualTo(1));
         }
         #endregion
 
-        #region FindOnlyOne
+        #region FindOnlyOneAsync
 
         
 
             
         [Test]
-        public void FindOnlyOne_2EntityInDatabaseFindsOne_ReturnsMadasEntity()
+        public async Task FindOnlyOne_2EntityInDatabaseFindsOne_ReturnsMadasEntity()
         {
             using (var context = _factory.CreateContext())
             {
@@ -154,12 +155,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var entities = _uut.FindOnlyOne(entity => entity.Name == "Madas");
+            var entities = await _uut.FindOnlyOneAsync(entity => entity.Name == "Madas");
             Assert.That(entities.Name, Is.EqualTo("Madas"));
         }
 
         [Test]
-        public void FindOnlyOne_2EntityInDatabaseMatchingQuery_ThrowsException()
+        public async Task FindOnlyOne_2EntityInDatabaseMatchingQuery_ThrowsException()
         {
             using (var context = _factory.CreateContext())
             {
@@ -174,7 +175,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            Assert.Throws<UserIdInvalidException>(()=>_uut.FindOnlyOne(entity => entity.Name == "Madas"));   
+            Assert.ThrowsAsync<UserIdInvalidException>(async()=>await _uut.FindOnlyOneAsync(entity => entity.Name == "Madas"));   
         }
 
         #endregion
@@ -182,7 +183,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #region FindById
             
         [Test]
-        public void FindByID_FoundEntityFromElementInDb_ReturnsCustomer()
+        public async Task FindByID_FoundEntityFromElementInDb_ReturnsCustomer()
         {
             var customer = new Customer()
             {
@@ -193,27 +194,30 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.Customers.Add(customer);
                 context.SaveChanges();
             }
-            
-            Assert.That(_uut.FindByID(customer.Id).Name, Is.EqualTo(customer.Name));
+
+            var customerDB = await _uut.FindByIDAsync(customer.Id);
+
+
+            Assert.That(customerDB.Name, Is.EqualTo(customer.Name));
         }
 
         [Test]
-        public void FindByID_CustomerIdNotValid_ThrowsException()
+        public async Task FindByID_CustomerIdNotValid_ThrowsException()
         {
-            Assert.Throws<UserIdInvalidException>(() => _uut.FindByID("Invalid Id"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async() => await _uut.FindByIDAsync("Invalid Id"));
         }
         #endregion
 
-        #region Add
+        #region AddAsync
 
         [Test]
-        public void Add_EntityAdded_EntityAddedToDatabase()
+        public async Task Add_EntityAdded_EntityAddedToDatabase()
         {
             var customer = new Customer()
             {
                 Name = "Madas"
             };
-            _uut.Add(customer);
+            await _uut.AddAsync(customer);
             //To test
             _context.SaveChanges();
 
@@ -225,13 +229,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void Add_EntityAdded_EntityWithValidNameAdded()
+        public async Task Add_EntityAdded_EntityWithValidNameAdded()
         {
             var customer = new Customer()
             {
                 Name = "Madas"
             };
-            _uut.Add(customer);
+            await _uut.AddAsync(customer);
             //To test
             _context.SaveChanges();
 
@@ -247,7 +251,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #region Delete
 
         [Test]
-        public void Delete_DeletedElementFromDatabasee_DeletesTheElement()
+        public async Task Delete_DeletedElementFromDatabasee_DeletesTheElement()
         {
             var customer = new Customer();
             using (var context = _factory.CreateContext())
@@ -265,7 +269,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void Delete_DeletedElementFromDatabaseeFromId_DeletesTheElement()
+        public async Task Delete_DeletedElementFromDatabaseeFromId_DeletesTheElement()
         {
             var customer = new Customer();
             using (var context = _factory.CreateContext())
@@ -273,7 +277,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.Customers.Add(customer);
                 context.SaveChanges();
             }
-            _uut.Delete(customer.Id);
+            await _uut.DeleteAsync(customer.Id);
             _context.SaveChanges();
 
             using (var context = _factory.CreateContext())
@@ -283,9 +287,9 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void Delete_DeleteOnInvalidId_ThrowsException()
+        public async Task Delete_DeleteOnInvalidId_ThrowsException()
         {
-            Assert.Throws<UserIdInvalidException>(()=> _uut.Delete("Invalid Id"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async ()=> await _uut.DeleteAsync("Invalid Id"));
         }
 
         #endregion
@@ -293,7 +297,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #region Update
 
         [Test]
-        public void Update_UpdateElement_DatabaseIsUpdated()
+        public async Task Update_UpdateElement_DatabaseIsUpdated()
         {
             var customer = new Customer()
             {
@@ -306,7 +310,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
             customer.Name = "MadasUpdated";
-            _uut.Update(customer);
+            await _uut.UpdateAsync(customer);
             _context.SaveChanges();
 
             using (var context = _factory.CreateContext())
@@ -316,16 +320,16 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public void Update_UpdateAddedElement_DatabaseIsUpdated()
+        public async Task Update_UpdateAddedElement_DatabaseIsUpdated()
         {
             var customer = new Customer()
             {
                 Name = "Madas"
             };
 
-            _uut.Add(customer);
+            await _uut.AddAsync(customer);
             customer.Name = "MadasUpdated";
-            _uut.Update(customer);
+            await _uut.UpdateAsync(customer);
             _context.SaveChanges();
 
             using (var context = _factory.CreateContext())

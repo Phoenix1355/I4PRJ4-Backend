@@ -12,8 +12,8 @@ namespace Api.DataAccessLayer.Interfaces
     public interface ICustomerRepository : IGenericRepository<Customer>
     {
         Task DepositAsync(string customerId, decimal deposit);
-        void ReservePriceFromCustomer(string customerId, decimal price);
-        Customer FindByEmail(string email);
-        List<Ride> FindCustomerRides(string customerId);
+        Task ReservePriceFromCustomerAsync(string customerId, decimal price);
+        Task<Customer> FindByEmailAsync(string email);
+        Task<List<Ride>> FindCustomerRidesAsync(string customerId);
     }
 }

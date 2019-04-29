@@ -78,11 +78,11 @@ namespace Api.BusinessLogicLayer.Services
             ride.CustomerId = customerId;
 
             //New segment
-            _unitOfWork.CustomerRepository.ReservePriceFromCustomer(ride.CustomerId, ride.Price);
-            ride = (SoloRide)_unitOfWork.RideRepository.Add(ride);
-            var order = _unitOfWork.OrderRepository.Add(new Order());
-            _unitOfWork.OrderRepository.AddRideToOrder(ride, order);
-            _unitOfWork.SaveChanges();
+            await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
+            ride =  (SoloRide) await _unitOfWork.RideRepository.AddAsync(ride);
+            var order = await _unitOfWork.OrderRepository.AddAsync(new Order());
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
+            await _unitOfWork.SaveChangesAsync();
 
 
             var response = _mapper.Map<CreateRideResponse>(ride);

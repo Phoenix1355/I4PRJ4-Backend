@@ -54,20 +54,22 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-        #region FindByEmail
+        #region FindByEmailAsync
 
         [Test]
-        public void FindByEmail_CustomerExist_ReturnsCustomer()
+        public async Task FindByEmail_CustomerExist_ReturnsCustomer()
         {
-            var customer = addTaxiCompanyToTestDatabase();
+            var taxiCompany = addTaxiCompanyToTestDatabase();
 
-            Assert.That(customer.Name, Is.EqualTo(_uut.TaxiCompanyRepository.FindByEmail(customer.Email).Name));
+            var taxiCompanyDB = await _uut.TaxiCompanyRepository.FindByEmail(taxiCompany.Email);
+
+            Assert.That(taxiCompany.Name, Is.EqualTo(taxiCompanyDB.Name));
         }
 
         [Test]
-        public void FindByEmail_CustomerDoesNotExist_ThrowsException()
+        public async Task FindByEmail_CustomerDoesNotExist_ThrowsException()
         {
-            Assert.Throws<UserIdInvalidException>(() => _uut.TaxiCompanyRepository.FindByEmail("ValidEmail@ButNoCustomerInDatabase.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.TaxiCompanyRepository.FindByEmail("ValidEmail@ButNoCustomerInDatabase.com"));
         }
 
         #endregion

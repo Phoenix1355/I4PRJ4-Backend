@@ -10,6 +10,6 @@ namespace Api.DataAccessLayer.Interfaces
     /// </summary>
     public interface ITaxiCompanyRepository : IGenericRepository<TaxiCompany>
     {
-        TaxiCompany FindByEmail(string email);
+        Task<TaxiCompany> FindByEmail(string email);
     }
 }

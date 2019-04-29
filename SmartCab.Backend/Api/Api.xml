@@ -20,7 +20,7 @@
         </member>
         <member name="M:Api.Controllers.RidesController.Post(Api.DataTransferObjects.CreateRideRequest)">
             <summary>
-            Adds a new ride to the database.
+            AddAsyncs a new ride to the database.
             </summary>
             <remarks>
             <para>Iam some remark that can be use to supply some additional information to the consumer of the API.</para>

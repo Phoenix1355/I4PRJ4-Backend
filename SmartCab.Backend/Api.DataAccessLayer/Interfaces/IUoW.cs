@@ -22,6 +22,6 @@ namespace Api.DataAccessLayer.UnitOfWork
         IOrderRepository OrderRepository { get; }
         IIdentityUserRepository IdentityUserRepository { get; }
 
-        void SaveChanges();
+        Task SaveChangesAsync();
     }
 }

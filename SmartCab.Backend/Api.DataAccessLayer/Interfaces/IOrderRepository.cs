@@ -10,7 +10,7 @@ namespace Api.DataAccessLayer.Interfaces
     /// </summary>
     public interface IOrderRepository : IGenericRepository<Order>
     {
-        Order AddRideToOrder(Ride ride, Order order);
-        List<Order> FindOpenOrders();
+        Task<Order> AddRideToOrderAsync(Ride ride, Order order);
+        Task<List<Order>> FindOpenOrdersAsync();
     }
 }

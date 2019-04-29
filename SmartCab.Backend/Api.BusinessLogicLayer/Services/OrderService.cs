@@ -34,7 +34,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A object that wraps a list of orders. </returns>
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
-            var openOrders = _unitOfWork.OrderRepository.FindOpenOrders();
+            var openOrders = await _unitOfWork.OrderRepository.FindOpenOrdersAsync();
             var openOrderDtos = _mapper.Map<List<OrderDto>>(openOrders);
             var response = new OpenOrdersResponse {Orders = openOrderDtos};
             return response;

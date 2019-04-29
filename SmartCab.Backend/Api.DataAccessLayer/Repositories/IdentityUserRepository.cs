@@ -59,7 +59,6 @@ namespace Api.DataAccessLayer.Repositories
                 var error = result.Errors.FirstOrDefault()?.Description;
                 throw new IdentityException(error);
             }
-
             return result;
         }
 
@@ -77,7 +76,6 @@ namespace Api.DataAccessLayer.Repositories
                 var error = result.Errors.FirstOrDefault()?.Description;
                 throw new IdentityException(error);
             }
-
             return result;
         }
 
@@ -94,8 +92,6 @@ namespace Api.DataAccessLayer.Repositories
             {
                 throw new IdentityException("Login failed. Credentials was not found in the database.");
             }
-
-
             return result;
         }
     }

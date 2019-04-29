@@ -40,7 +40,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _factory.Dispose();
         }
@@ -96,7 +96,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             var customer = addCustomerToTestDatabase();
 
             await _uut.CustomerRepository.DepositAsync(customer.Id, deposit);
-            _uut.SaveChanges();
+            _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
@@ -119,7 +119,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             await _uut.CustomerRepository.DepositAsync(customer.Id, 100);
             await _uut.CustomerRepository.DepositAsync(customer.Id, 200);
-            _uut.SaveChanges();
+            _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
@@ -129,7 +129,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
-        #region ReservePriceFromCustomer
+        #region ReservePriceFromCustomerAsync
 
         [Test]
         public async Task ReservePriceFromCustomer_ReservesAmountAfterSaveChanges_AmountExpectedIsReserved()
@@ -138,8 +138,8 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             var amountToReserve = 100;
 
-            _uut.CustomerRepository.ReservePriceFromCustomer(customer.Id, amountToReserve);
-            _uut.SaveChanges();
+            await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve);
+            _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
@@ -154,7 +154,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             var amountToReserve = 100;
 
-            _uut.CustomerRepository.ReservePriceFromCustomer(customer.Id, amountToReserve);
+            await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve);
             
 
             using (var context = _factory.CreateContext())
@@ -170,7 +170,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             var amountToReserve = 100;
 
-            Assert.Throws<InsufficientFundsException>(()=> _uut.CustomerRepository.ReservePriceFromCustomer(customer.Id, amountToReserve));
+            Assert.ThrowsAsync<InsufficientFundsException>(async()=> await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve));
         }
 
         [Test]
@@ -178,26 +178,28 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var amountToReserve = 100;
 
-            Assert.Throws<UserIdInvalidException>(() => _uut.CustomerRepository.ReservePriceFromCustomer("Invalid Id", amountToReserve));
+            Assert.ThrowsAsync<UserIdInvalidException>(async() => await _uut.CustomerRepository.ReservePriceFromCustomerAsync("Invalid Id", amountToReserve));
         }
 
 
         #endregion
 
-        #region FindByEmail
+        #region FindByEmailAsync
 
         [Test]
-        public void FindByEmail_CustomerExist_ReturnsCustomer()
+        public async Task FindByEmail_CustomerExist_ReturnsCustomer()
         {
             var customer = addCustomerToTestDatabase();
 
-            Assert.That(customer.Name,Is.EqualTo(_uut.CustomerRepository.FindByEmail(customer.Email).Name));
+            var customerDB = await _uut.CustomerRepository.FindByEmailAsync(customer.Email);
+
+            Assert.That(customer.Name,Is.EqualTo(customerDB.Name));
         }
 
         [Test]
-        public void FindByEmail_CustomerDoesNotExist_ThrowsException()
+        public async Task FindByEmail_CustomerDoesNotExist_ThrowsException()
         {
-            Assert.Throws<UserIdInvalidException>(()=>_uut.CustomerRepository.FindByEmail("ValidEmail@ButNoCustomerInDatabase.com"));
+            Assert.ThrowsAsync<UserIdInvalidException>(()=>_uut.CustomerRepository.FindByEmailAsync("ValidEmail@ButNoCustomerInDatabase.com"));
         }
 
         #endregion
@@ -205,17 +207,17 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #region FindCustomerRides
 
         [Test]
-        public void FindCustomerRides_CustomerExistWithNoRides_ReturnsEmptyListOfRides()
+        public async Task FindCustomerRides_CustomerExistWithNoRides_ReturnsEmptyListOfRides()
         {
             var customer = addCustomerToTestDatabase();
 
-            var rides = _uut.CustomerRepository.FindCustomerRides(customer.Id);
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer.Id);
 
             Assert.IsEmpty(rides);
         }
 
         [Test]
-        public void FindCustomerRides_CustomerExistWith1Ride_ReturnsListOfRidesContaining1()
+        public async Task FindCustomerRides_CustomerExistWith1Ride_ReturnsListOfRidesContaining1()
         {
             var customer = addCustomerToTestDatabase();
 
@@ -239,13 +241,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.CustomerRepository.FindCustomerRides(customer.Id);
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer.Id);
 
             Assert.That(rides.Count,Is.EqualTo(1));
         }
 
         [Test]
-        public void FindCustomerRides_TwoCustomersExist_ReturnsOnlyRidesOfExpectedCustomer()
+        public async Task FindCustomerRides_TwoCustomersExist_ReturnsOnlyRidesOfExpectedCustomer()
         {
             var customer = addCustomerToTestDatabase();
             var customer2 = addCustomerToTestDatabase();
@@ -270,15 +272,15 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var rides = _uut.CustomerRepository.FindCustomerRides(customer2.Id);
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer2.Id);
 
             Assert.That(rides.Count, Is.EqualTo(0));
         }
 
         [Test]
-        public void FindCustomerRides_CustomerDoesNotExist_ThrowsException()
+        public async Task FindCustomerRides_CustomerDoesNotExist_ThrowsException()
         {
-            Assert.Throws<UserIdInvalidException>(() => _uut.CustomerRepository.FindCustomerRides("Invalid ID"));
+            Assert.ThrowsAsync<UserIdInvalidException>(async() => await _uut.CustomerRepository.FindCustomerRidesAsync("Invalid ID"));
         }
 
         #endregion

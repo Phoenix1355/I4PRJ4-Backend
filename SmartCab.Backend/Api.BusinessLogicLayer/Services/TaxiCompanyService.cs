@@ -58,8 +58,12 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             // Overwrite the taxi company with the one created and create a TaxiCompanyDto
-            await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(taxiCompany, request.Password);
-            await _unitOfWork.IdentityUserRepository.AddToRoleAsync(taxiCompany, nameof(Customer));
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(taxiCompany, request.Password);
+                await _unitOfWork.IdentityUserRepository.AddToRoleAsync(taxiCompany, nameof(Customer));
+            });
+
             var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
 
             // Create the token, wrap it and return the response with the taxiCompanyDto
@@ -87,7 +91,7 @@ namespace Api.BusinessLogicLayer.Services
             var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             // Check if the logged in taxi company is indeed a taxi company. If not, this call will throw an ArgumentException
-            var taxiCompany = _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
+            var taxiCompany =await _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
 
             // Generate the token and return it
             var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));
