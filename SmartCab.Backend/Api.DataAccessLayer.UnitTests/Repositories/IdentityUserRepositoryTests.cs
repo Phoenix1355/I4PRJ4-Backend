@@ -2,6 +2,7 @@
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
+using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 using NUnit.Framework;
@@ -48,43 +49,52 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
 
         [Test]
-        public async Task SigninAsync_SigningIn_DelegatedExpectedFail()
+        public async Task SigninAsync_SigningIn_ThrowsExceptionWhenFailed()
         {
 
             var email = "Dummy Email";
             var password = "Dummy Password";
 
             _mockSignManager.PasswordSignInAsyncReturn = SignInResult.Failed;
-            var response = await _uut.SignInAsync(email, password);
+            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.SignInAsync(email,password));
+        }
 
-            Assert.That(response, Is.EqualTo(SignInResult.Failed));
+        #endregion
+
+        #region AddToRoleAsync
+
+        [Test]
+        public async Task AddToRoleAsync_AddingToRole_DelegatedExpectedValues()
+        {
+            var response = await _uut.AddToRoleAsync(null, null);
+            Assert.That(response, Is.EqualTo(IdentityResult.Success));
         }
 
 
         [Test]
-        public async Task SigninAsync_SigningIn_DelegateExpectedLockedOut()
+        public async Task AddToRoleAsync_AddingToRole_ThrowsExceptionWhenFailed()
         {
-
-            var email = "Hans@mail.com";
-            var password = "Qwer111!";
-
-            _mockSignManager.PasswordSignInAsyncReturn = SignInResult.LockedOut;
-            var response = await _uut.SignInAsync(email, password);
-
-            Assert.That(response, Is.EqualTo(SignInResult.LockedOut));
+            _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddToRoleAsync(null, null));
         }
 
+        #endregion
+
+        #region AddIdentityUserAsync
+
         [Test]
-        public async Task SigninAsync_SigningIn_DelegateExpectedNotAllowed()
+        public async Task AddIdentityUserAsync_AddUser_DelegatedExpectedValues()
         {
+            var response = await _uut.AddIdentityUserAsync(null, null);
+            Assert.That(response, Is.EqualTo(IdentityResult.Success));
+        }
 
-            var email = "Hans@mail.com";
-            var password = "Qwer111!";
 
-            _mockSignManager.PasswordSignInAsyncReturn = SignInResult.NotAllowed;
-            var response = await _uut.SignInAsync(email, password);
-
-            Assert.That(response, Is.EqualTo(SignInResult.NotAllowed));
+        [Test]
+        public async Task AddIdentityUserAsyncc_AddingUser_ThrowsExceptionWhenFailed()
+        {
+            _mockUserManager.CreateAsyncReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddIdentityUserAsync(null, null));
         }
 
         #endregion

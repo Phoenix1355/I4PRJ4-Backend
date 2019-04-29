@@ -56,6 +56,7 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             var result = await _userManager.AddToRoleAsync(user, role);
+            var huh = SignInResult.Success;
             if (!result.Succeeded)
             {
                 var error = result.Errors.FirstOrDefault()?.Description;
