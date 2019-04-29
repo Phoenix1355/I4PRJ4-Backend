@@ -97,6 +97,16 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.ThrowsAsync<IdentityException>(async () => await _uut.AddIdentityUserAsync(null, null));
         }
 
+        [Test]
+        public async Task TransactionWrapper_FunctionExecuted_IncrementExpectedVarByOne()
+        {
+            int i = 0;
+
+            await _uut.TransactionWrapper(async() => { i++; });
+
+            Assert.That(i,Is.EqualTo(1));
+        }
+
         #endregion
 
     }
