@@ -17,10 +17,19 @@ namespace Api.DataAccessLayer.Repositories
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ITaxiCompanyRepository" />
     public class TaxiCompanyRepository : GenericRepository<TaxiCompany>, ITaxiCompanyRepository
     {
+        /// <summary>
+        /// Constructor for Taxicompany repository. 
+        /// </summary>
+        /// <param name="context"></param>
         public TaxiCompanyRepository(ApplicationContext context) : base(context)
         {
         }
 
+        /// <summary>
+        /// Find the taxicompany with a given email otherwise throws exceptions 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public TaxiCompany FindByEmail(string email)
         {
             return FindOnlyOne(taxicompany => taxicompany.Email == email);

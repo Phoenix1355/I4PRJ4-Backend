@@ -11,6 +11,9 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
+    /// <summary>
+    /// Interface for Unit of work pattern. 
+    /// </summary>
     public interface IUoW
     {
         ICustomerRepository CustomerRepository { get; }

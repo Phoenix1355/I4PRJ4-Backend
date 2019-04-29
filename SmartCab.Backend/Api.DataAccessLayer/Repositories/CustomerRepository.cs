@@ -19,7 +19,10 @@ namespace Api.DataAccessLayer.Repositories
     /// <seealso cref="System.IDisposable" />
     public class CustomerRepository : GenericRepository<Customer>,ICustomerRepository
     {
-
+        /// <summary>
+        /// Constructor for customerrepository, sending application context to base constructor
+        /// </summary>
+        /// <param name="context"></param>
         public CustomerRepository(ApplicationContext context) : base(context)
         {
         }
@@ -44,7 +47,12 @@ namespace Api.DataAccessLayer.Repositories
             customer.Balance += deposit;
             Update(customer);
         }
-
+        /// <summary>
+        /// Reserves price if customers balance is high enough to be positive. 
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <param name="price"></param>
+        /// /// <exception cref="UserIdInvalidException">Not enough credit</exception>
         public void ReservePriceFromCustomer(string customerId, decimal price)
         {
             var customer = FindByID(customerId);
@@ -61,11 +69,21 @@ namespace Api.DataAccessLayer.Repositories
             Update(customer);
         }
 
+        /// <summary>
+        /// Find customer by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public Customer FindByEmail(string email)
         {
             return FindOnlyOne(customer => customer.Email == email);
         }
 
+        /// <summary>
+        /// Find the customers rides
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         public List<Ride> FindCustomerRides(string customerId)
         {
             return FindByID(customerId).Rides;

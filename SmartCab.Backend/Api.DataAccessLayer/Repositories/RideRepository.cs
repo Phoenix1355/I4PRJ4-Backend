@@ -18,6 +18,10 @@ namespace Api.DataAccessLayer.Repositories
     /// </summary>
     public class RideRepository : GenericRepository<Ride>, IRideRepository
     {
+        /// <summary>
+        /// Constructor for Ride Repository. 
+        /// </summary>
+        /// <param name="context"></param>
         public RideRepository(ApplicationContext context) : base(context)
         {
         }

@@ -5,6 +5,9 @@ using Api.DataAccessLayer.Repositories;
 
 namespace Api.DataAccessLayer.Interfaces
 {
+    /// <summary>
+    /// Interface for IOrderRepository
+    /// </summary>
     public interface IOrderRepository : IGenericRepository<Order>
     {
         Order AddRideToOrder(Ride ride, Order order);
