@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using CustomExceptions;
@@ -27,6 +29,20 @@ namespace Api.DataAccessLayer.Repositories
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            
+        }
+
+        /// <summary>
+        /// See https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
+        /// </summary>
+        /// <param name="insideTransactionFunction">Function to call inside a transaction</param>
+        public async Task TransactionWrapper(Func<Task> insideTransactionFunction)
+        {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+               await insideTransactionFunction();
+                scope.Complete();
+            }
         }
 
         /// <summary>
@@ -56,7 +72,6 @@ namespace Api.DataAccessLayer.Repositories
         public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             var result = await _userManager.AddToRoleAsync(user, role);
-            var huh = SignInResult.Success;
             if (!result.Succeeded)
             {
                 var error = result.Errors.FirstOrDefault()?.Description;

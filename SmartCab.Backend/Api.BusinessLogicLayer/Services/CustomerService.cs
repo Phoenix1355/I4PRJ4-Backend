@@ -62,8 +62,12 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
-            await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
-            await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
+                await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
+            });
+            
            
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
