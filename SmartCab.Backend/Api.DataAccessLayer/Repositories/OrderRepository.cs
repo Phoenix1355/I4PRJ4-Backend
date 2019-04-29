@@ -28,5 +28,10 @@ namespace Api.DataAccessLayer.Repositories
             order.Rides.Add(ride);
             return Update(order);
         }
+
+        public List<Order> FindOpenOrders()
+        {
+            return Find(order => order.Status == OrderStatus.WaitingForAccept);
+        }
     }
 }

@@ -33,7 +33,6 @@ namespace Api.DataAccessLayer.Repositories
             Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _dbSet;
-
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -60,7 +59,7 @@ namespace Api.DataAccessLayer.Repositories
             var entity = _dbSet.Find(id);
             if (entity == null)
             {
-                throw new UserIdInvalidException("Filter did not result in a unique match");
+                throw new UserIdInvalidException("No entity with given id");
             }
 
             return entity;

@@ -5,9 +5,9 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 
@@ -18,7 +18,7 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class TaxiCompanyService : ITaxiCompanyService
     {
-        private readonly IDataAccessFactory _factory;
+        private readonly IUoW _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
 
@@ -32,11 +32,12 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
         public TaxiCompanyService(
             IMapper mapper,
-            IJwtService jwtService, IDataAccessFactory factory)
+            IJwtService jwtService,
+            IUoW unitOfWork)
         {
             _mapper = mapper;
             _jwtService = jwtService;
-            _factory = factory;
+            _unitOfWork = unitOfWork;
         }
         /// <summary>
         /// Adds a new taxi company to the database asynchronously and returns a JWT token wrapped in a response object.
@@ -58,8 +59,8 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             // Overwrite the taxi company with the one created and create a TaxiCompanyDto
-            await _factory.IdentityUserRepository.AddIdentityUserAsync(taxiCompany, request.Password);
-            await _factory.IdentityUserRepository.AddToRoleAsync(taxiCompany, nameof(Customer));
+            await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(taxiCompany, request.Password);
+            await _unitOfWork.IdentityUserRepository.AddToRoleAsync(taxiCompany, nameof(Customer));
             var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
 
             // Create the token, wrap it and return the response with the taxiCompanyDto
@@ -84,10 +85,10 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<LoginResponseTaxiCompany> LoginTaxiCompanyAsync(LoginRequest request)
         {
             // Check if it's possible to log in
-            var result = await _factory.IdentityUserRepository.SignInAsync(request.Email, request.Password);
+            var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             // Check if the logged in taxi company is indeed a taxi company. If not, this call will throw an ArgumentException
-            var taxiCompany = _factory.UnitOfWork.GenericTaxiCompanyRepository.FindOnlyOne(taxi => taxi.Email == request.Email);
+            var taxiCompany = _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
 
             // Generate the token and return it
             var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));

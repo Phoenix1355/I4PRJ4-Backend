@@ -14,9 +14,9 @@ namespace Api.DataAccessLayer.UnitOfWork
     public class UoW : IUoW
     {
         public ICustomerRepository CustomerRepository { get; }
-        public IGenericRepository<TaxiCompany> GenericTaxiCompanyRepository { get; }
-        public IGenericRepository<Ride> GenericRideRepository { get; }
-        public IGenericRepository<Order> GenericOrderRepository { get; }
+        public ITaxiCompanyRepository TaxiCompanyRepository { get; }
+        public IRideRepository RideRepository { get; }
+        public IOrderRepository OrderRepository { get; }
         private ApplicationContext _context;
         public IIdentityUserRepository IdentityUserRepository { get; }
 
@@ -24,9 +24,9 @@ namespace Api.DataAccessLayer.UnitOfWork
         {
             _context = context;
             CustomerRepository = new CustomerRepository(_context);
-            GenericRideRepository = new GenericRepository<Ride>(_context);
-            GenericOrderRepository = new GenericRepository<Order>(_context);
-            GenericTaxiCompanyRepository = new GenericRepository<TaxiCompany>(_context);
+            RideRepository = new RideRepository(_context);
+            OrderRepository = new OrderRepository(_context);
+            TaxiCompanyRepository = new TaxiCompanyRepository(_context);
             IdentityUserRepository = identityUserRepository;
         }
 

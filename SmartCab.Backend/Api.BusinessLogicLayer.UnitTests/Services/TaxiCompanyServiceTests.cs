@@ -4,9 +4,9 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Services;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
@@ -34,8 +34,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _jwtService = Substitute.For<IJwtService>();
             _taxiCompanyRepository = Substitute.For<ITaxiCompanyRepository>();
             _mapper = Substitute.For<IMapper>();
-            var _factory = Substitute.For<IDataAccessFactory>();
-            _taxiCompanyService = new TaxiCompanyService(_mapper, _jwtService, _factory);
+            var _unitofWork = Substitute.For<IUoW>();
+            _taxiCompanyService = new TaxiCompanyService(_mapper, _jwtService, _unitofWork);
         }
 
         #endregion

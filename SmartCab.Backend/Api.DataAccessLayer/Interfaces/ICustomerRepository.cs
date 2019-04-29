@@ -13,5 +13,7 @@ namespace Api.DataAccessLayer.Interfaces
     {
         Task DepositAsync(string customerId, decimal deposit);
         void ReservePriceFromCustomer(string customerId, decimal price);
+        Customer FindByEmail(string email);
+        List<Ride> FindCustomerRides(string customerId);
     }
 }

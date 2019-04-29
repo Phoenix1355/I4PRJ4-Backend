@@ -7,7 +7,6 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
@@ -30,7 +29,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
-        private IDataAccessFactory _factory;
+        private IUoW _unitOfWork;
 
         [SetUp]
         public void Setup()
@@ -39,8 +38,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            _factory = Substitute.For<IDataAccessFactory>();
-            _customerService = new CustomerService(_jwtService, _mapper, _factory);
+            _unitOfWork = Substitute.For<IUoW>();
+            _customerService = new CustomerService(_jwtService, _mapper, _unitOfWork);
         }
 
         #endregion
@@ -211,7 +210,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _UoW.GenericRideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -221,7 +220,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         {
             List<Ride> rideList = new List<Ride>();
            
-            _UoW.GenericRideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);

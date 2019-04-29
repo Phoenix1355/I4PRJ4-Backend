@@ -18,21 +18,13 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         private TaxiCompanyRepository _uut;
         private InMemorySqlLiteContextFactory _factory;
 
-        // Creating fakes
-        private FakeUserManager _mockUserManager;
-        private FakeSignInManager _mockSignManager;
-
         #region SetUp
 
         [SetUp]
         public void SetUp()
         {
             _factory = new InMemorySqlLiteContextFactory();
-            _mockSignManager = new FakeSignInManager();
-            _mockUserManager = new FakeUserManager();
-            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager, _mockSignManager);
-            var UoW = new UoW(_factory.CreateContext(), identityUserRepository);
-            _uut = new TaxiCompanyRepository(UoW);
+            _uut = new TaxiCompanyRepository(_factory.CreateContext());
         }
         #endregion
         /*

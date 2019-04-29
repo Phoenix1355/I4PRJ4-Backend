@@ -10,7 +10,6 @@ using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
@@ -28,7 +27,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
-        private readonly IDataAccessFactory _factory;
+        private readonly IUoW _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
@@ -40,12 +39,13 @@ namespace Api.BusinessLogicLayer.Services
         public RideService(
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
-            IPriceStrategyFactory priceStrategyFactory, IDataAccessFactory factory)
+            IPriceStrategyFactory priceStrategyFactory,
+            IUoW unitOfWork)
         {
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
-            _factory = factory;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -77,9 +77,13 @@ namespace Api.BusinessLogicLayer.Services
             ride.CustomerId = customerId;
 
             //New segment
-            ride = _factory.RideRepository.AddSoloRideAsync(ride);
+            _unitOfWork.CustomerRepository.ReservePriceFromCustomer(ride.CustomerId, ride.Price);
+            ride = (SoloRide)_unitOfWork.RideRepository.Add(ride);
+            var order = _unitOfWork.OrderRepository.Add(new Order());
+            _unitOfWork.OrderRepository.AddRideToOrder(ride, order);
+            _unitOfWork.SaveChanges();
 
-            
+
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;
         }

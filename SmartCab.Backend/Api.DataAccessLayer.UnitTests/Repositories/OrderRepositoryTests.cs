@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
+using CustomExceptions;
+using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -15,17 +19,18 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     [TestFixture]
     class OrderRepositoryTests
     {
-        /*
+
         #region Setup
 
-        private OrderRepository _uut;
+        private IUoW _uut;
         private InMemorySqlLiteContextFactory _factory;
 
         [SetUp]
         public void SetUp()
         {
             _factory = new InMemorySqlLiteContextFactory();
-            _uut = new OrderRepository(_factory.CreateContext());
+            var identityRepository = Substitute.For<IIdentityUserRepository>();
+            _uut = new UoW(_factory.CreateContext(), identityRepository);
         }
 
         [TearDown]
@@ -35,7 +40,109 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-        
+
+        #region AddRideToOrder
+
+        [Test]
+        public void AddRideToOrder_OrderAndRideExists_1RideAddedToOrder()
+        {
+            Customer customer = new Customer();
+            Order order = new Order();
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Orders.Add(order);
+                context.SaveChanges();
+            }
+
+            SoloRide soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            _uut.OrderRepository.AddRideToOrder(soloRide, order);
+            _uut.SaveChanges();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(order.Id).Rides.Count, Is.EqualTo(1));
+            }
+        }
+
+        [Test]
+        public void AddRideToOrder_RideAlreadyAddedToOrder_ThrowsException()
+        {
+            Customer customer = new Customer();
+            Order order = new Order();
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Orders.Add(order);
+                context.SaveChanges();
+            }
+
+            SoloRide soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            _uut.OrderRepository.AddRideToOrder(soloRide, order);
+            _uut.SaveChanges();
+            Assert.Throws<MultipleOrderException>(()=>_uut.OrderRepository.AddRideToOrder(soloRide,order));
+        }
+
+        [Test]
+        public void AddRideToOrder_OrderAndRideExistsNotSaved_RideNotAddedToOrder()
+        {
+            Customer customer = new Customer();
+            Order order = new Order();
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Orders.Add(order);
+                context.SaveChanges();
+            }
+
+            SoloRide soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            _uut.OrderRepository.AddRideToOrder(soloRide, order);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(order.Id).Rides.Count, Is.EqualTo(0));
+            }
+            ;
+        }
+
+
+        #endregion
+
+
         #region GetOpenOrdersAsync
 
 
@@ -52,7 +159,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
             
             Assert.That(orders.Count, Is.EqualTo(1));
         }
@@ -73,7 +180,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 }
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.Count, Is.EqualTo(5));
         }
@@ -91,7 +198,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.First().Id, Is.EqualTo(order.Id));
         }
@@ -99,7 +206,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void GetOpenOrdersAsync_NoOrder_Returns0()
         {
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
@@ -117,7 +224,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
@@ -135,7 +242,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.Count, Is.EqualTo(0));
         }
@@ -169,7 +276,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.Count, Is.EqualTo(2));
         }
@@ -188,7 +295,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.FirstOrDefault().Price, Is.EqualTo(100));
         }
@@ -198,7 +305,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var orderInDB = CreateTestOrderWithSoloRideInDatabase();
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(1));
         }
@@ -208,7 +315,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var order = CreateTestOrderWithSoloRideInDatabase();
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             var rideInOrder = orders.FirstOrDefault().Rides.FirstOrDefault();
 
@@ -224,7 +331,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             var orderInDB = CreateTestOrderWithSharedRideInDatabase();
 
-            var orders = _uut.GetOpenOrdersAsync().Result;
+            var orders = _uut.OrderRepository.FindOpenOrders();
 
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(2));
         }
@@ -315,6 +422,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-    */
+    
     }
 }

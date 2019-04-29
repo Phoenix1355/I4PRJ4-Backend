@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
@@ -28,7 +27,7 @@ namespace Api.BusinessLogicLayer.Services
 
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
-            var openOrders = _factory.UnitOfWork.GenericOrderRepository.Find(order => order.Status == OrderStatus.WaitingForAccept);
+            var openOrders = _unitOfWork.OrderRepository.FindOpenOrders();
             var openOrderDtos = _mapper.Map<List<OrderDto>>(openOrders);
             var response = new OpenOrdersResponse {Orders = openOrderDtos};
             return response;

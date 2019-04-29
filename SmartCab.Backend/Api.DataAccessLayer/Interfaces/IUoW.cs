@@ -14,9 +14,9 @@ namespace Api.DataAccessLayer.UnitOfWork
     public interface IUoW
     {
         ICustomerRepository CustomerRepository { get; }
-        IGenericRepository<TaxiCompany> GenericTaxiCompanyRepository { get; }
-        IGenericRepository<Ride> GenericRideRepository { get; }
-        IGenericRepository<Order> GenericOrderRepository { get; }
+        ITaxiCompanyRepository TaxiCompanyRepository { get; }
+        IRideRepository RideRepository { get; }
+        IOrderRepository OrderRepository { get; }
         IIdentityUserRepository IdentityUserRepository { get; }
 
         void SaveChanges();

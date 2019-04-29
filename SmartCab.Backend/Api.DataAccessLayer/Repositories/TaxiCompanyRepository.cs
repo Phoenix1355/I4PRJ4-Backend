@@ -15,18 +15,15 @@ namespace Api.DataAccessLayer.Repositories
     /// TaxiCompanyRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ITaxiCompanyRepository" />
-    public class TaxiCompanyRepository : ITaxiCompanyRepository
+    public class TaxiCompanyRepository : GenericRepository<TaxiCompany>, ITaxiCompanyRepository
     {
-        private readonly IUoW _unitOfWork;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TaxiCompanyRepository"/> class.
-        /// </summary>
-        /// <param name="context">The _context - Autoinjected </param>
-        public TaxiCompanyRepository(IUoW unitOfWork)
+        public TaxiCompanyRepository(ApplicationContext context) : base(context)
         {
-            _unitOfWork = unitOfWork;
         }
 
+        public TaxiCompany FindByEmail(string email)
+        {
+            return FindOnlyOne(taxicompany => taxicompany.Email == email);
+        }
     }
 }

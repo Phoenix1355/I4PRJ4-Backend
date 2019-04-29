@@ -65,9 +65,7 @@ namespace Api.BusinessLogicLayer.Services
             //Overwrite the customer with the one created and create a CustomerDto
             await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
             await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
-            
-
-            //customer = await _customerRepository.AddCustomerAsync(customer, request.Password);
+           
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
@@ -95,7 +93,7 @@ namespace Api.BusinessLogicLayer.Services
             var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
-            var customer = _unitOfWork.CustomerRepository.FindOnlyOne(customerFilter => customerFilter.Email == request.Email);
+            var customer = _unitOfWork.CustomerRepository.FindByEmail(request.Email);
 
             //All good, now generate the token and return it
             var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
@@ -135,8 +133,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            //var customerRides = _factory.UnitOfWork.GenericRideRepository.Find(ride => ride.CustomerId == customerId);
-            var customerRides = _unitOfWork.CustomerRepository.FindByID(customerId).Rides;
+            //var customerRides = _factory.UnitOfWork.RideRepository.Find(ride => ride.CustomerId == customerId);
+            var customerRides = _unitOfWork.CustomerRepository.FindCustomerRides(customerId);
+
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

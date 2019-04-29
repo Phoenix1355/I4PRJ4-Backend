@@ -38,17 +38,16 @@ namespace Api.DataAccessLayer.Repositories
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = FindOnlyOne(c => c.Id == customerId);
+            var customer = FindByID(customerId);
             
             //Update customer
             customer.Balance += deposit;
             Update(customer);
-            //_unitOfWork.SaveChanges();
         }
 
         public void ReservePriceFromCustomer(string customerId, decimal price)
         {
-            var customer = FindOnlyOne(customerFilter => customerFilter.Id == customerId);
+            var customer = FindByID(customerId);
 
             if ((customer.Balance - customer.ReservedAmount) >= price)
             {
@@ -60,6 +59,16 @@ namespace Api.DataAccessLayer.Repositories
             }
 
             Update(customer);
+        }
+
+        public Customer FindByEmail(string email)
+        {
+            return FindOnlyOne(customer => customer.Email == email);
+        }
+
+        public List<Ride> FindCustomerRides(string customerId)
+        {
+            return FindByID(customerId).Rides;
         }
     }
 }
