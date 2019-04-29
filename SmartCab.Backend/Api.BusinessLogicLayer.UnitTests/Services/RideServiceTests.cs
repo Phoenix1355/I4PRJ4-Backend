@@ -10,6 +10,7 @@ using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
+using Api.DataAccessLayer.Statuses;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;

@@ -8,6 +8,7 @@ using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -22,6 +23,87 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Constructor for customerrepository, sending application context to base constructor
         /// </summary>
+        /// <param name="context">The context - Autoinjected</param>
+        /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
+        public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+        {
+            _context = context;
+            _identityUserRepository = identityUserRepository;
+        }
+
+        /// <summary>
+        /// Adds the customer asynchronous in a transaction
+        /// </summary>
+        /// <param name="customer">The customer to add</param>
+        /// <param name="password">The users password </param>
+        /// <returns></returns>
+        /// <exception cref="IdentityException"></exception>
+        public async Task<Customer> AddCustomerAsync(Customer customer, string password)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            { 
+                var identityResult = await _identityUserRepository.AddIdentityUserAsync(customer, password);
+                if (identityResult.Succeeded)
+                {
+                    string role = nameof(Customer);
+                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(customer, role);
+                    if (resultAddRole.Succeeded)
+                    {
+                        transaction.Commit();
+                        return customer;
+                    }
+                }
+                transaction.Rollback();
+
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+        }
+
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                var customer = await _context.Customers.FindAsync(customerId);
+
+                if (newCustomer.Name != customer.Name)
+                    customer.Name = newCustomer.Name;
+
+                if (newCustomer.PhoneNumber != customer.PhoneNumber)
+                    customer.PhoneNumber = newCustomer.PhoneNumber;
+
+                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
+
+                if (identityResult.Succeeded)
+                {
+                    _context.Customers.Update(customer);
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                    return customer;
+                }
+                transaction.Rollback();
+
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+        }
+
+        /// <summary>
+        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
+        /// </summary>
+        /// <param name="email">The email.</param>
+        /// <returns></returns>
+        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+        public async Task<Customer> GetCustomerAsync(string email)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
+
+            if (customer == null)
+            {
+                throw new UserIdInvalidException("Customer does not exist.");
+            }
+
+            return customer;
         /// <param name="context"></param>
         public CustomerRepository(ApplicationContext context) : base(context)
         {
