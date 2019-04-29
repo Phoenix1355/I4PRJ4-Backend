@@ -17,13 +17,13 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
-        private readonly IDataAccessFactory _factory;
+        private readonly IUoW _unitOfWork;
 
-        public OrderService(IOrderRepository orderRepository, IMapper mapper, IDataAccessFactory factory)
+        public OrderService(IOrderRepository orderRepository, IMapper mapper,  IUoW unitOfWork)
         {
             _orderRepository = orderRepository;
             _mapper = mapper;
-            _factory = factory;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
