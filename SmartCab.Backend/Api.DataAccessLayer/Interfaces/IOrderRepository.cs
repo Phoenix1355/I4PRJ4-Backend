@@ -12,7 +12,6 @@ namespace Api.DataAccessLayer.Interfaces
     {
         Task<Order> AddRideToOrderAsync(Ride ride, Order order);
         Task<List<Order>> FindOpenOrdersAsync();
-        Task<List<Order>> GetOpenOrdersAsync();
         Task<Order> AcceptOrderAsync(string taxicompanyId, int orderId);
     }
 }

@@ -48,16 +48,8 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <returns>List of orders with status waiting for accept.</returns>
         public async Task<List<Order>> FindOpenOrdersAsync()
-        /// <summary>
-        /// Get all open orders with status WaitingForAccept
-        /// </summary>
-        /// <returns>Returns open orders. </returns>
-        public Task<List<Order>> GetOpenOrdersAsync()
         {
-            var orders = _context.Orders
-                .Where(x => x.Status == OrderStatus.WaitingForAccept) //TODO: Change this method
-                .ToListAsync();
-            return orders;
+            return await FindAsync(order => order.Status == OrderStatus.WaitingForAccept);
         }
 
         /// <summary>

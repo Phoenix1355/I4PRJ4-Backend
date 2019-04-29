@@ -437,7 +437,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            return await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+            return await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
         }
 
         [Test]
@@ -469,7 +469,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            var order =  await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+            var order =  await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
             Assert.That(order.TaxiCompany.Id, Is.EqualTo(taxiCompany.Id));
         }
 
@@ -485,7 +485,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
 
-            var order = await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
+            var order = await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id);
             foreach (var orderRide in order.Rides)
             {
                 Assert.That(orderRide.Status, Is.EqualTo(RideStatus.Accepted));
@@ -504,7 +504,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             int invalidOrderId = -3;
 
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, invalidOrderId));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, invalidOrderId));
         }
 
         [Test]
@@ -514,7 +514,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             string invalidTaxiCompanyId = "Bogus ID";
 
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.AcceptOrderAsync(invalidTaxiCompanyId, orderCreated.Id));
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.OrderRepository.AcceptOrderAsync(invalidTaxiCompanyId, orderCreated.Id));
         }
 
         [TestCase(OrderStatus.Accepted)]
@@ -529,7 +529,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
         }
 
         [TestCase(RideStatus.Accepted)]
@@ -546,7 +546,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => await _uut.OrderRepository.AcceptOrderAsync(taxiCompany.Id, orderCreated.Id));
         }
 
         #endregion

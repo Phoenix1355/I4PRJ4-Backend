@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
+using Api.Requests;
 using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
@@ -128,7 +129,7 @@ namespace Api.BusinessLogicLayer.Services
             var password = request.Password;
             var oldPassword = request.OldPassword;
 
-            var customer = await _customerRepository.EditCustomerAsync(newCustomer, customerId, password, oldPassword);
+            var customer = await _unitOfWork.CustomerRepository.EditCustomerAsync(newCustomer, customerId, password, oldPassword);
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
 

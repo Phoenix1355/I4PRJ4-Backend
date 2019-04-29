@@ -269,7 +269,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             _identityUserRepository.SignInAsync("test@domain.com", "Qwer111!").ReturnsForAnyArgs(SignInResult.Success);
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            //_unitOfWork.CustomerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
             
             var customerDto = new CustomerDto
             {

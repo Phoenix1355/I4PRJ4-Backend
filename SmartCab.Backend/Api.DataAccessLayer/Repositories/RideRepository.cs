@@ -22,8 +22,12 @@ namespace Api.DataAccessLayer.Repositories
         /// Constructor for Ride Repository. 
         /// </summary>
         /// <param name="context"></param>
-        public RideRepository(ApplicationContext context) : base(context)
         /// <returns></returns>
+        public RideRepository(ApplicationContext context) : base(context)
+        {
+
+        }
+        
         public Task<List<SoloRide>> GetOpenSoloRidesAsync()
         {
             var rides = _context.SoloRides
@@ -118,10 +122,6 @@ namespace Api.DataAccessLayer.Repositories
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
             return order;
-        }
-
-        public async Task<Ride> UpdateRideAsync(Ride ride)
-        {
         }
     }
 }

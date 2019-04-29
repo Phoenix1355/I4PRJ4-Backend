@@ -20,48 +20,18 @@ namespace Api.DataAccessLayer.Repositories
     /// <seealso cref="System.IDisposable" />
     public class CustomerRepository : GenericRepository<Customer>,ICustomerRepository
     {
-        /// <summary>
-        /// Constructor for customerrepository, sending application context to base constructor
-        /// </summary>
-        /// <param name="context">The context - Autoinjected</param>
-        /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+
+        public CustomerRepository(ApplicationContext context) : base(context)
         {
-            _context = context;
-            _identityUserRepository = identityUserRepository;
+
         }
 
-        /// <summary>
-        /// Adds the customer asynchronous in a transaction
-        /// </summary>
-        /// <param name="customer">The customer to add</param>
-        /// <param name="password">The users password </param>
-        /// <returns></returns>
-        /// <exception cref="IdentityException"></exception>
-        public async Task<Customer> AddCustomerAsync(Customer customer, string password)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            { 
-                var identityResult = await _identityUserRepository.AddIdentityUserAsync(customer, password);
-                if (identityResult.Succeeded)
-                {
-                    string role = nameof(Customer);
-                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(customer, role);
-                    if (resultAddRole.Succeeded)
-                    {
-                        transaction.Commit();
-                        return customer;
-                    }
-                }
-                transaction.Rollback();
 
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }
-        }
 
         public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
         {
+            return newCustomer;
+            /*
             using (var transaction = _context.Database.BeginTransaction())
             {
                 var customer = await _context.Customers.FindAsync(customerId);
@@ -72,7 +42,7 @@ namespace Api.DataAccessLayer.Repositories
                 if (newCustomer.PhoneNumber != customer.PhoneNumber)
                     customer.PhoneNumber = newCustomer.PhoneNumber;
 
-                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
+                var identityResult = await UnitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
 
                 if (identityResult.Succeeded)
                 {
@@ -85,7 +55,7 @@ namespace Api.DataAccessLayer.Repositories
 
                 var error = identityResult.Errors.FirstOrDefault()?.Description;
                 throw new IdentityException(error);
-            }
+            }*/
         }
 
         /// <summary>
@@ -104,19 +74,16 @@ namespace Api.DataAccessLayer.Repositories
             }
 
             return customer;
-        /// <param name="context"></param>
-        public CustomerRepository(ApplicationContext context) : base(context)
-        {
         }
 
         /// <summary>
-        /// Deposit amount to customer
-        /// </summary>
-        /// <param name="customerId">The customers id</param>
-        /// /// <param name="deposit">The amount to deposit</param>
-        /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task DepositAsync(string customerId, decimal deposit)
+            /// Deposit amount to customer
+            /// </summary>
+            /// <param name="customerId">The customers id</param>
+            /// /// <param name="deposit">The amount to deposit</param>
+            /// <returns></returns>
+            /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+            public async Task DepositAsync(string customerId, decimal deposit)
         {
             if (deposit <=0)
             {
