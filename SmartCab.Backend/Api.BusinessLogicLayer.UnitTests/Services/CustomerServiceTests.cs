@@ -9,7 +9,6 @@ using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
@@ -231,8 +230,68 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         #endregion
 
-        #region DepositAsync
+        #region EditCustomerAsync
+        
+        [Test]
+        public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponse()
+        {
 
+            //Arrange
+            var request = new EditCustomerRequest
+            {
+                Email = "test@domain.com",
+                Name = "Axel",
+                Password = "Qwer111!",
+                RepeatedPassword = "Qwer111!",
+                PhoneNumber = "66666666",
+                OldPassword = "Qwerrr111!"
+            };
+
+            var customer = new Customer
+            {
+                Id = "SomeId",
+                Email = request.Email
+            };
+
+            var loginResponse = new LoginResponse
+            {
+                Customer = new CustomerDto
+                    { Email = customer.Email, Name = customer.Name, PhoneNumber = customer.PhoneNumber },
+                Token = "SomeToken"
+            };
+
+            var loginRequest = new LoginRequest
+            {
+                Email = customer.Email,
+                Password = "Qwer111!"
+            };
+
+            _identityUserRepository.SignInAsync("test@domain.com", "Qwer111!").ReturnsForAnyArgs(SignInResult.Success);
+            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            
+            var customerDto = new CustomerDto
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber
+            };
+
+            var editCustomerResponse = new EditCustomerResponse
+            {
+                Customer = customerDto
+            };
+
+            _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
+
+            //Act
+            var response = await _customerService.EditCustomerAsync(request, customer.Id);
+
+            //Assert
+            Assert.That(response.Customer, Is.EqualTo(editCustomerResponse.Customer));
+        }
+        #endregion
+
+        #region DepositAsync
 
         [Test]
         public void DepositAsync_ReturnedNull_DoesNotThrow()
@@ -242,6 +301,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         #endregion
-    
+
     }
 }

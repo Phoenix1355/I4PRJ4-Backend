@@ -277,6 +277,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(rides.Count, Is.EqualTo(0));
         }
 
+        #region Dispose
         [Test]
         public async Task FindCustomerRides_CustomerDoesNotExist_ThrowsException()
         {

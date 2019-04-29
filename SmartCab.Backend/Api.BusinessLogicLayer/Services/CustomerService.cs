@@ -8,7 +8,6 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitOfWork;
 using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
@@ -108,6 +107,36 @@ namespace Api.BusinessLogicLayer.Services
             };
             return response;
 
+        }
+
+        /// <summary>
+        /// Gets the users info and changes the users password, name, email and phone number.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
+        {
+            var newCustomer = new Customer
+            {
+                Email = request.Email,
+                Name = request.Name,
+                PhoneNumber = request.PhoneNumber,
+            };
+
+            var password = request.Password;
+            var oldPassword = request.OldPassword;
+
+            var customer = await _customerRepository.EditCustomerAsync(newCustomer, customerId, password, oldPassword);
+
+            var customerDto = _mapper.Map<CustomerDto>(customer);
+
+            var response = new EditCustomerResponse
+            {
+                Customer = customerDto
+            };
+
+            return response;
         }
 
 
