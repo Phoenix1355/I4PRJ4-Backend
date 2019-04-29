@@ -82,7 +82,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
             catch (UserIdInvalidException e)
             {
-                Assert.That(e.Message, Is.EqualTo("Filter did not result in a unique match"));
+                Assert.That(e.Message, Is.EqualTo("No entity with given id"));
             }
         }
 

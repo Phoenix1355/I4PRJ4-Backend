@@ -15,7 +15,7 @@ namespace Api.DataAccessLayer.Repositories
     /// <typeparam name="TEntity"></typeparam>
     public interface IGenericRepository<TEntity> where TEntity : class
     {
-        IEnumerable<TEntity> All();
+        List<TEntity> All();
 
         List<TEntity> Find(
             Expression<Func<TEntity, bool>> filter = null);

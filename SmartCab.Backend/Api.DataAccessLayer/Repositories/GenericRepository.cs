@@ -24,7 +24,7 @@ namespace Api.DataAccessLayer.Repositories
             this._dbSet = context.Set<TEntity>();
         }
 
-        public virtual IEnumerable<TEntity> All()
+        public virtual List<TEntity> All()
         {
             return Find();
         }
@@ -46,7 +46,7 @@ namespace Api.DataAccessLayer.Repositories
             IQueryable<TEntity> query = _dbSet;
 
             query = query.Where(filter);
-            if (query.IsNullOrEmpty() || query.Count() > 2)
+            if (query.IsNullOrEmpty() || query.Count() >= 2)
             {
                 throw new UserIdInvalidException("Filter did not result in a unique match");
             }
@@ -73,7 +73,7 @@ namespace Api.DataAccessLayer.Repositories
 
         public virtual void Delete(object id)
         {
-            TEntity entityToDelete = _dbSet.Find(id);
+            TEntity entityToDelete = FindByID(id);
             Delete(entityToDelete);
         }
 
