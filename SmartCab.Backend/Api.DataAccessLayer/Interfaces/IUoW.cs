@@ -13,7 +13,7 @@ namespace Api.DataAccessLayer.UnitOfWork
 {
     public interface IUoW
     {
-        IGenericRepository<Customer> CustomerRepository { get; }
+        ICustomerRepository CustomerRepository { get; }
         IGenericRepository<TaxiCompany> GenericTaxiCompanyRepository { get; }
         IGenericRepository<Ride> GenericRideRepository { get; }
         IGenericRepository<Order> GenericOrderRepository { get; }

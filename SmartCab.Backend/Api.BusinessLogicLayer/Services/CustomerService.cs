@@ -6,7 +6,6 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Factories;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
@@ -123,10 +122,8 @@ namespace Api.BusinessLogicLayer.Services
             var depositAmount = request.Deposit;
 
             //Deposits
-            _UnitOfWork.CustomerRepository.DepositAsync
-
-            await _factory.CustomerRepository.DepositAsync(customerId, depositAmount);
-            _factory.UnitOfWork.SaveChanges();
+            await _unitOfWork.CustomerRepository.DepositAsync(customerId,depositAmount);
+            _unitOfWork.SaveChanges();
             
         }
 
