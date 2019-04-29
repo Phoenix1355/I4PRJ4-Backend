@@ -21,25 +21,22 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
     {
         #region Setup
 
-        private IIdentityUserRepository _identityUserRepository;
         private IJwtService _jwtService;
-        private ITaxiCompanyRepository _taxiCompanyRepository;
+        private IUoW _unitofWork;
         private IMapper _mapper;
         private TaxiCompanyService _taxiCompanyService;
 
         [SetUp]
         public void Setup()
         {
-            _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _jwtService = Substitute.For<IJwtService>();
-            _taxiCompanyRepository = Substitute.For<ITaxiCompanyRepository>();
             _mapper = Substitute.For<IMapper>();
-            var _unitofWork = Substitute.For<IUoW>();
+            _unitofWork = Substitute.For<IUoW>();
             _taxiCompanyService = new TaxiCompanyService(_mapper, _jwtService, _unitofWork);
         }
 
         #endregion
-        /*
+        
         #region AddTaxiCompanyAsync
         
         [Test]
@@ -60,8 +57,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber
             };
-
-            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs(taxiCompany);
+            
+            _unitofWork.TaxiCompanyRepository.Add( null).ReturnsForAnyArgs(taxiCompany);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
@@ -88,7 +85,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs<TaxiCompany>(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.Add(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -119,7 +116,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var taxiCompany = new TaxiCompany
@@ -128,7 +125,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _taxiCompanyRepository.GetTaxiCompanyAsync(null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.FindByEmail(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -157,7 +154,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var taxiCompany = new TaxiCompany
@@ -166,7 +163,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _taxiCompanyRepository.GetTaxiCompanyAsync(null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.FindByEmail(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -196,13 +193,14 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             // Act
             var signInResult = SignInResult.Failed;
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signInResult);
+            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signInResult);
 
+            
             //Assert
             Assert.That(() => _taxiCompanyService.LoginTaxiCompanyAsync(request), Throws.TypeOf<IdentityException>());
         }
 
         #endregion
-    */
+    
     }
 }

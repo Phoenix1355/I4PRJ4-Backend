@@ -25,7 +25,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper = Substitute.For<IMapper>();
             _orderRepository = Substitute.For<IOrderRepository>();
             _unitOfWork = Substitute.For<IUoW>();
-            _orderService = new OrderService(_orderRepository, _mapper, _unitOfWork);
+            _orderService = new OrderService(_mapper, _unitOfWork);
         }
 
         [Test]

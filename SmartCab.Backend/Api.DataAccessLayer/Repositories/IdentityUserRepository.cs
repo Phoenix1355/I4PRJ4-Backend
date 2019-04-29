@@ -80,6 +80,7 @@ namespace Api.DataAccessLayer.Repositories
                 throw new IdentityException("Login failed. Credentials was not found in the database.");
             }
 
+
             return result;
         }
     }

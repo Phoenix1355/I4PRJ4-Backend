@@ -44,7 +44,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         #endregion
 
-        /*
+        
         #region AddCustomerAsync
 
         [Test]
@@ -66,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
+            _unitOfWork.CustomerRepository.Add( null).ReturnsForAnyArgs(customer);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _customerService.AddCustomerAsync(request);
@@ -93,7 +93,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -124,7 +124,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _unitOfWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customer = new Customer
@@ -133,7 +133,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -170,7 +170,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -210,7 +210,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+            _unitOfWork.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -219,8 +219,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ResponseContainsTheList()
         {
             List<Ride> rideList = new List<Ride>();
-           
-            _UoW.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
+
+            _unitOfWork.RideRepository.Find(Arg.Any<Expression<Func<Ride, bool>>>()).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);
@@ -244,6 +244,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         #endregion
-    */
+    
     }
 }
