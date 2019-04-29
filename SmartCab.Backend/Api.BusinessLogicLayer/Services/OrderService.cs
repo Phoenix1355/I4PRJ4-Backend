@@ -14,17 +14,24 @@ namespace Api.BusinessLogicLayer.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
         private readonly IUoW _unitOfWork;
 
-        public OrderService(IOrderRepository orderRepository, IMapper mapper,  IUoW unitOfWork)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
+        public OrderService(IMapper mapper,  IUoW unitOfWork)
         {
-            _orderRepository = orderRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Get all open orders with status waiting for accept. 
+        /// </summary>
+        /// <returns>A object that wraps a list of orders. </returns>
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
             var openOrders = _unitOfWork.OrderRepository.FindOpenOrders();

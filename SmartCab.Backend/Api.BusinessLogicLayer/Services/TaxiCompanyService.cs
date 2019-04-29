@@ -26,10 +26,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <summary>
         /// Constructor for this class.
         /// </summary>
-        /// <param name="identityUserRepository">Used to access the database regarding a taxi company</param>
-        /// <param name="taxiCompanyRepository">Used to access the database regarding a taxi company</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         public TaxiCompanyService(
             IMapper mapper,
             IJwtService jwtService,

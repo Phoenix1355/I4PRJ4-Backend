@@ -32,10 +32,11 @@ namespace Api.BusinessLogicLayer.Services
         /// <summary>
         /// Constructor for this class.
         /// </summary>
-        /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
+
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
         /// <param name="priceStrategyFactory">Used to get the correct strategy for price calculations</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         public RideService(
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 

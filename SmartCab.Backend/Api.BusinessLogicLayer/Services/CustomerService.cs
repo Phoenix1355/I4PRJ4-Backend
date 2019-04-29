@@ -29,8 +29,7 @@ namespace Api.BusinessLogicLayer.Services
         /// Constructor for this class.
         /// </summary>
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
-        /// <param name="customerRepository">Used to access the database when updating/creating customers</param>
-        /// <param name="identityUserRepository">Used to access the database when updating/creating customers</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
             IJwtService jwtService,
