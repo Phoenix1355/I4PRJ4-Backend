@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// GenericCustomerRepository with autoinjection of _context and identityUserRepository. 
+    /// CustomerRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />

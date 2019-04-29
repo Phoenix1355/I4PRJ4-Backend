@@ -24,7 +24,7 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        private readonly IDataAccessFactory _factory;
+        private readonly IUoW _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
@@ -36,14 +36,11 @@ namespace Api.BusinessLogicLayer.Services
         public CustomerService(
             IJwtService jwtService,
             IMapper mapper, 
-            IDataAccessFactory factory)
+            IUoW unitOfWork)
         {
             _jwtService = jwtService;
-
             _mapper = mapper;
-
-            _factory = factory;
-
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -67,8 +64,8 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
-            await _factory.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
-            await _factory.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
+            await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
+            await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
             
 
             //customer = await _customerRepository.AddCustomerAsync(customer, request.Password);
@@ -96,10 +93,10 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
             //Check if its possible to log in
-            var result = await _factory.IdentityUserRepository.SignInAsync(request.Email, request.Password);
+            var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
-            var customer = _factory.UnitOfWork.GenericCustomerRepository.FindOnlyOne(customerFilter => customerFilter.Email == request.Email);
+            var customer = _unitOfWork.CustomerRepository.FindOnlyOne(customerFilter => customerFilter.Email == request.Email);
 
             //All good, now generate the token and return it
             var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
@@ -142,7 +139,7 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
             //var customerRides = _factory.UnitOfWork.GenericRideRepository.Find(ride => ride.CustomerId == customerId);
-            var customerRides = _unitOfWork.GenericCustomerRepository.FindByID(customerId).Rides;
+            var customerRides = _unitOfWork.CustomerRepository.FindByID(customerId).Rides;
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

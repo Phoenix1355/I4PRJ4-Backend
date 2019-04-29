@@ -94,7 +94,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -134,7 +134,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -171,7 +171,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _UoW.GenericCustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
+            _UoW.CustomerRepository.FindOnlyOne(Arg.Any<Expression<Func<Customer, bool>>>()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
