@@ -7,6 +7,7 @@ using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using CustomExceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
@@ -52,6 +53,34 @@ namespace Api.DataAccessLayer.Repositories
                         transaction.Commit();
                         return customer;
                     }
+                }
+                transaction.Rollback();
+
+                var error = identityResult.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+        }
+
+        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
+        {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
+                var customer = await _context.Customers.FindAsync(customerId);
+
+                if (newCustomer.Name != customer.Name)
+                    customer.Name = newCustomer.Name;
+
+                if (newCustomer.PhoneNumber != customer.PhoneNumber)
+                    customer.PhoneNumber = newCustomer.PhoneNumber;
+
+                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
+
+                if (identityResult.Succeeded)
+                {
+                    _context.Customers.Update(customer);
+                    await _context.SaveChangesAsync();
+                    transaction.Commit();
+                    return customer;
                 }
                 transaction.Rollback();
 

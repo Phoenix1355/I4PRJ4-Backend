@@ -86,12 +86,23 @@ namespace Api.Controllers
         /// <param name="request">The data used to update the customer account</param>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already</response>
+        [Authorize(Roles = nameof(Customer))]
+        [Produces("application/json")]
         [Route("[action]")]
         [HttpPut]
         public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditCustomerRequest request)
         {
-            //update customer logic
-            return Ok("Customer account successfully updated.");
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+            
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _customerService.EditCustomerAsync(request, customerId);
+
+            return Ok(response);
         }
 
         /// <summary>
