@@ -6,6 +6,6 @@ namespace Api.DataAccessLayer.Interfaces
 {
     public interface IOrderRepository
     {
-       
+        Order AddRideToOrder(Ride ride, Order order);
     }
 }

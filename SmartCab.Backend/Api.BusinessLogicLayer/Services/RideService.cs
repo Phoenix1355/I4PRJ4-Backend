@@ -78,6 +78,7 @@ namespace Api.BusinessLogicLayer.Services
 
             //New segment
             ride = _factory.RideRepository.AddSoloRideAsync(ride);
+
             
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;

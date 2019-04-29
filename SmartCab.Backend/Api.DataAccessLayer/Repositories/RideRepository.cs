@@ -16,15 +16,11 @@ namespace Api.DataAccessLayer.Repositories
     /// <summary>
     /// This class exposes all the possible request to the database that is related to "Rides"
     /// </summary>
-    public class RideRepository : IRideRepository
+    public class RideRepository : GenericRepository<Ride>,IRideRepository
     {
-        private readonly IUoW _unitOfWork;
-
-        public RideRepository(IUoW unitOfWork)
+        public RideRepository(ApplicationContext context) : base(context)
         {
-            _unitOfWork = unitOfWork;
         }
-
 
         public async Task<SharedRide> CreateSharedRideAsync(SharedRide ride)
         {
@@ -38,8 +34,10 @@ namespace Api.DataAccessLayer.Repositories
             ride = (SoloRide)_unitOfWork.GenericRideRepository.Add(ride);
             var order = _unitOfWork.GenericOrderRepository.Add(new Order());
             _unitOfWork.AddRideToOrder(ride, order);
-            _unitOfWork.SaveChanges();
+            //_unitOfWork.SaveChanges();
             return ride;
         }
+
+
     }
 }

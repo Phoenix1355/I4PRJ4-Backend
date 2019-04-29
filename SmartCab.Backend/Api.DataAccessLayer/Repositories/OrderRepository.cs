@@ -5,17 +5,28 @@ using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
+using CustomExceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : GenericRepository<Order>,IOrderRepository
     {
-        private readonly IUoW _unitOfWork;
-
-        public OrderRepository(IUoW unitOfWork)
+        public OrderRepository(ApplicationContext context) : base(context)
         {
-            _unitOfWork = unitOfWork;
+        }
+
+        public Order AddRideToOrder(Ride ride, Order order)
+        {
+            
+            if (Find(o => o.Rides.Contains(ride)).Count != 0)
+            {
+                throw new MultipleOrderException("Already an order for given ride. ");
+            }
+
+            order.Price += ride.Price;
+            order.Rides.Add(ride);
+            return Update(order);
         }
     }
 }

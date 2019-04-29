@@ -19,8 +19,6 @@ namespace Api.DataAccessLayer.UnitOfWork
         IGenericRepository<Order> GenericOrderRepository { get; }
         IIdentityUserRepository IdentityUserRepository { get; }
 
-        void ReservePriceFromCustomer(string customerId, decimal price);
-        Order AddRideToOrder(Ride ride, Order order);
         void SaveChanges();
     }
 }

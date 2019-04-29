@@ -126,8 +126,11 @@ namespace Api.BusinessLogicLayer.Services
             var depositAmount = request.Deposit;
 
             //Deposits
+            _UnitOfWork.CustomerRepository.DepositAsync
+
             await _factory.CustomerRepository.DepositAsync(customerId, depositAmount);
             _factory.UnitOfWork.SaveChanges();
+            
         }
 
 
@@ -138,8 +141,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            var customerRides = _factory.UnitOfWork.GenericRideRepository.Find(ride => ride.CustomerId == customerId);
-            //var customerRides = _unitOfWork.GenericCustomerRepository.FindByID(customerId).Rides;
+            //var customerRides = _factory.UnitOfWork.GenericRideRepository.Find(ride => ride.CustomerId == customerId);
+            var customerRides = _unitOfWork.GenericCustomerRepository.FindByID(customerId).Rides;
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

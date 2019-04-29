@@ -11,5 +11,6 @@ namespace Api.DataAccessLayer.Interfaces
     public interface ICustomerRepository
     {
         Task DepositAsync(string customerId, decimal deposit);
+        void ReservePriceFromCustomer(string customerId, decimal price);
     }
 }

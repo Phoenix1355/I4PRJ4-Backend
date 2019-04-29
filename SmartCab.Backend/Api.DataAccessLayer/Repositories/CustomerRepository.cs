@@ -17,17 +17,11 @@ namespace Api.DataAccessLayer.Repositories
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
-    public class CustomerRepository : ICustomerRepository
+    public class CustomerRepository : GenericRepository<Customer>,ICustomerRepository
     {
-        private readonly IUoW _unitOfWork;
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
-        /// </summary>
-        /// <param name="context">The _context - Autoinjected</param>
-        /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(IUoW unitOfWork)
+
+        public CustomerRepository(ApplicationContext context) : base(context)
         {
-            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -44,19 +38,28 @@ namespace Api.DataAccessLayer.Repositories
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = _unitOfWork.GenericCustomerRepository.FindOnlyOne(c => c.Id == customerId);
+            var customer = FindOnlyOne(c => c.Id == customerId);
             
             //Update customer
             customer.Balance += deposit;
-            _unitOfWork.GenericCustomerRepository.Update(customer);
-            _unitOfWork.SaveChanges();
+            Update(customer);
+            //_unitOfWork.SaveChanges();
         }
 
+        public void ReservePriceFromCustomer(string customerId, decimal price)
+        {
+            var customer = FindOnlyOne(customerFilter => customerFilter.Id == customerId);
 
-        #region IDisposable implementation
+            if ((customer.Balance - customer.ReservedAmount) >= price)
+            {
+                customer.ReservedAmount += price;
+            }
+            else
+            {
+                throw new InsufficientFundsException("Not enough credit");
+            }
 
-
-
-        #endregion
+            Update(customer);
+        }
     }
 }

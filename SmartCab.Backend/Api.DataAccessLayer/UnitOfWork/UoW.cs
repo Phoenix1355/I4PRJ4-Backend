@@ -30,35 +30,6 @@ namespace Api.DataAccessLayer.UnitOfWork
             IdentityUserRepository = identityUserRepository;
         }
 
-
-        public void ReservePriceFromCustomer(string customerId, decimal price)
-        {
-            var customer = GenericCustomerRepository.FindOnlyOne(customerFilter=>customerFilter.Id == customerId);
-
-            if ((customer.Balance - customer.ReservedAmount) >= price)
-            {
-                customer.ReservedAmount += price;
-            }
-            else
-            {
-                throw new InsufficientFundsException("Not enough credit");
-            }
-
-            GenericCustomerRepository.Update(customer);
-        }
-
-        public Order AddRideToOrder(Ride ride, Order order)
-        {
-            if (_context.Orders.Count(o => o.Rides.Contains(ride)) != 0)
-            {
-                throw new MultipleOrderException("Already an order for given ride. ");
-            }
-
-            order.Price += ride.Price;
-            order.Rides.Add(ride);
-            return GenericOrderRepository.Update(order);
-        }
-
         public void SaveChanges()
         {
             _context.SaveChanges();
