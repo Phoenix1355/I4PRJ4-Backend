@@ -8,7 +8,6 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.Requests;
 using Api.Responses;
 using AutoMapper;
 using CustomExceptions;

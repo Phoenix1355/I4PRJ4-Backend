@@ -1,4 +1,4 @@
-﻿namespace Api.Requests
+﻿namespace Api.BusinessLogicLayer.Requests
 {
     public class EditTaxiCompanyRequest
     {

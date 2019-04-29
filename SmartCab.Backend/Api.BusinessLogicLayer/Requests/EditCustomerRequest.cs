@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Api.BusinessLogicLayer;
 
-namespace Api.Requests
+namespace Api.BusinessLogicLayer.Requests
 {
     public class EditCustomerRequest
     {
@@ -10,7 +9,8 @@ namespace Api.Requests
         public string Name { get; set; }
 
         [Required]
-        [RegularExpression(Constants.EmailRegex, ErrorMessage = Constants.EmailRegexErrorMessage)]
+        [RegularExpression(Constants.EmailRegex, ErrorMessage = Constants.EmailRegexErrorMessage
+        )]
         public string Email { get; set; }
 
         [Required]

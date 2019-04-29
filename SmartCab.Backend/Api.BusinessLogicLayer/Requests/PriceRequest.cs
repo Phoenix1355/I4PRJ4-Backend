@@ -1,6 +1,6 @@
 ﻿using Api.DataAccessLayer.Models;
 
-namespace Api.Requests
+namespace Api.BusinessLogicLayer.Requests
 {
     public class PriceRequest
     {

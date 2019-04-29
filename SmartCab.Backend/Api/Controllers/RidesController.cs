@@ -12,7 +12,6 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.ErrorHandling;
-using Api.Requests;
 using AutoMapper;
 using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using CustomExceptions;

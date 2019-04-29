@@ -6,7 +6,6 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.Controllers;
-using Api.Requests;
 using Api.Responses;
 using CustomExceptions;
 using Microsoft.AspNetCore.Http;
