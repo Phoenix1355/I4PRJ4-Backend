@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,56 +14,25 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// CustomerRepository with autoinjection of context and identityUserRepository. 
+    /// CustomerRepository with autoinjection of _context and identityUserRepository. 
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
-    public class CustomerRepository : ICustomerRepository, IDisposable
+    public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
     {
-        private readonly ApplicationContext _context;
-        private readonly IIdentityUserRepository _identityUserRepository;
         /// <summary>
-        /// Initializes a new instance of the <see cref="CustomerRepository"/> class.
+        /// Constructor for this class.
         /// </summary>
-        /// <param name="context">The context - Autoinjected</param>
-        /// <param name="identityUserRepository">The application user repository - Autoinjected</param>
-        public CustomerRepository(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+        /// <param name="context">The context used to access the database.</param>
+        public CustomerRepository(ApplicationContext context) : base(context)
         {
-            _context = context;
-            _identityUserRepository = identityUserRepository;
-        }
 
-        /// <summary>
-        /// Adds the customer asynchronous in a transaction
-        /// </summary>
-        /// <param name="customer">The customer to add</param>
-        /// <param name="password">The users password </param>
-        /// <returns></returns>
-        /// <exception cref="IdentityException"></exception>
-        public async Task<Customer> AddCustomerAsync(Customer customer, string password)
-        {
-            using (var transaction = _context.Database.BeginTransaction())
-            { 
-                var identityResult = await _identityUserRepository.AddIdentityUserAsync(customer, password);
-                if (identityResult.Succeeded)
-                {
-                    string role = nameof(Customer);
-                    var resultAddRole = await _identityUserRepository.AddToRoleAsync(customer, role);
-                    if (resultAddRole.Succeeded)
-                    {
-                        transaction.Commit();
-                        return customer;
-                    }
-                }
-                transaction.Rollback();
-
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }
         }
 
         public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
         {
+            return newCustomer;
+            /*
             using (var transaction = _context.Database.BeginTransaction())
             {
                 var customer = await _context.Customers.FindAsync(customerId);
@@ -73,7 +43,7 @@ namespace Api.DataAccessLayer.Repositories
                 if (newCustomer.PhoneNumber != customer.PhoneNumber)
                     customer.PhoneNumber = newCustomer.PhoneNumber;
 
-                var identityResult = await _identityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
+                var identityResult = await UnitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
 
                 if (identityResult.Succeeded)
                 {
@@ -86,89 +56,75 @@ namespace Api.DataAccessLayer.Repositories
 
                 var error = identityResult.Errors.FirstOrDefault()?.Description;
                 throw new IdentityException(error);
-            }
+            }*/
         }
 
         /// <summary>
-        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
+        /// Deposits the given amount to a customers account.
         /// </summary>
-        /// <param name="email">The email.</param>
+        /// <param name="customerId">The customers id.</param>
+        /// /// <param name="deposit">The amount to deposit.</param>
         /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<Customer> GetCustomerAsync(string email)
-        {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-
-            return customer;
-        }
-
-        /// <summary>
-        /// Deposit amount to customer
-        /// </summary>
-        /// <param name="customerId">The customers id</param>
-        /// /// <param name="deposit">The amount to deposit</param>
-        /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
+        /// <exception cref="NegativeDepositException">Cannot deposit negative amount.</exception>
         public async Task DepositAsync(string customerId, decimal deposit)
         {
-            if (deposit <=0)
+            if (deposit <= 0)
             {
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
-            var customer = await _context.Customers.FindAsync(customerId);
+            var customer = await FindByIDAsync(customerId);
 
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-            
             //Update customer
             customer.Balance += deposit;
-            _context.Customers.Update(customer);
-            await _context.SaveChangesAsync();
+            Update(customer);
         }
 
         /// <summary>
-        /// Returns the rides from the database connected to the customer. 
+        /// Reserves an amount equal to the price
         /// </summary>
-        /// <param name="customerId">Id of requesting customer</param>
-        /// <returns>List of rides associated to customer</returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<List<Ride>> GetRidesAsync(string customerId)
+        /// <remarks>
+        /// Only succeeds if the customers has enough funds available on his/her account.<br/>
+        /// Throws an InsufficientFundsException when failing to reserve the money.
+        /// </remarks>
+        /// <param name="customerId"></param>
+        /// <param name="price"></param>
+        /// <exception cref="InsufficientFundsException">Not enough credit</exception>
+        public async Task ReservePriceFromCustomerAsync(string customerId, decimal price)
         {
-            var customer = await _context.Customers.FindAsync(customerId);
+            var customer = await FindByIDAsync(customerId);
 
-            if (customer == null)
+            if ((customer.Balance - customer.ReservedAmount) >= price)
             {
-                throw new UserIdInvalidException("Customer does not exist.");
+                customer.ReservedAmount += price;
+            }
+            else
+            {
+                throw new InsufficientFundsException("Not enough credit");
             }
 
+            Update(customer);
+        }
+
+        /// <summary>
+        /// FindAsync customer by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public Task<Customer> FindByEmailAsync(string email)
+        {
+            return FindOnlyOneAsync(customer => customer.Email == email);
+        }
+
+        /// <summary>
+        /// FindAsync the customers rides
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
+        public async Task<List<Ride>> FindCustomerRidesAsync(string customerId)
+        {
+            var customer = await FindByIDAsync(customerId);
             return customer.Rides;
         }
-
-        #region IDisposable implementation
-
-        //Dispose pattern:
-        //https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose#basic_pattern
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _context?.Dispose();
-        }
-
-        #endregion
     }
 }

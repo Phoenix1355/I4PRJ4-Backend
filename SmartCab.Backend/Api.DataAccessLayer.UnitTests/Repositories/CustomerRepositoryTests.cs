@@ -5,9 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
@@ -24,124 +27,48 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
     public class CustomerRepositoryTests
     {
         #region Setup
-        private CustomerRepository _uut;
+
+        private IUnitOfWork _uut;
         private InMemorySqlLiteContextFactory _factory;
-        private FakeSignInManager _mockSignManager;
-        private FakeUserManager _mockUserManager;
 
         [SetUp]
         public void SetUp()
         {
             _factory = new InMemorySqlLiteContextFactory();
-            _mockSignManager = new FakeSignInManager();
-            _mockUserManager = new FakeUserManager();
-            IdentityUserRepository identityUserRepository = new IdentityUserRepository(_mockUserManager,_mockSignManager);
-            _uut = new CustomerRepository(_factory.CreateContext(), identityUserRepository); 
+            var identityRepository = Substitute.For<IIdentityUserRepository>();
+            _uut = new UnitOfWork.UnitOfWork(_factory.CreateContext(), identityRepository);
         }
 
         [TearDown]
-        public void TearDown()
+        public async Task TearDown()
         {
             _factory.Dispose();
         }
 
         #endregion
 
-        #region  AddCustomerAsync
+        #region Helper functions
 
+        
 
-        [Test]
-        public async Task AddCustomerAsync_CustomerValid_CustomerExistsInDatabase()
+        
+        private Customer addCustomerToTestDatabase(int balance = 0)
         {
             Customer customer = new Customer
             {
+                Email = "valid@email.com",
                 Name = "Name",
                 PhoneNumber = "12345678",
+                Balance = balance
             };
-            //As function now relies on Identity framework, insert it manually. 
+
             using (var context = _factory.CreateContext())
             {
                 context.Customers.Add(customer);
                 context.SaveChanges();
             }
 
-
-            await _uut.AddCustomerAsync(customer, "Qwer111!");
-
-
-
-            using (var context = _factory.CreateContext())
-            {
-                var customerFromDatabase = context.Customers.FirstOrDefault(customerFromDB => customer.Id.Equals(customerFromDB.Id));
-
-                Assert.That(customerFromDatabase.Name, Is.EqualTo("Name"));
-            }
-            
-        }
-
-        [Test]
-        public void AddCustomerAsync_CustomerInvalid_CustomerAlreadyExistsInDatabase()
-        {
-            Customer customerToAddToDatabase = new Customer
-            {
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
-
-            _mockUserManager.AddToRoleAsyncReturn = IdentityResult.Failed();
-
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customerToAddToDatabase);
-                context.SaveChanges();
-            }
-
-
-            Assert.ThrowsAsync<IdentityException>(async ()=>await _uut.AddCustomerAsync(customerToAddToDatabase, "Qwer111!"));
-        }
-
-        #endregion
-
-        #region GetCustomerAsync
-
-        [Test]
-        public async Task GetCustomerAsync_CustomerInDatabase_ReturnsCustomer()
-        {
-            Customer customerAddedToDatabase = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
-
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customerAddedToDatabase);
-                context.SaveChanges();
-            }
-
-
-            var customerReturned = await _uut.GetCustomerAsync(customerAddedToDatabase.Email);
-            Assert.That(customerReturned.Name, Is.EqualTo("Name"));
-        }
-
-        [Test]
-        public void GetCustomerAsync_NoCustomer_ThrowsNotFound()
-        {
-            Assert.ThrowsAsync<UserIdInvalidException>( async () => await _uut.GetCustomerAsync("Not valid Id"));
-        }
-
-        [Test]
-        public async Task GetCustomerAsync_NoCustomer_ThrowsContainsMessage()
-        {
-            try
-            {
-                await _uut.GetCustomerAsync("Not valid Id");
-            }
-            catch (UserIdInvalidException e)
-            {
-                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
-            }
+            return customer;
         }
         #endregion
 
@@ -151,45 +78,29 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             try
             {
-                await _uut.DepositAsync("Not valid Id", 1);
-
+                await _uut.CustomerRepository.DepositAsync("Not valid Id", 1);
             }
             catch (UserIdInvalidException e)
             {
-                Assert.That(e.Message, Is.EqualTo("Customer does not exist."));
+                Assert.That(e.Message, Is.EqualTo("No entity with given id"));
             }
-
         }
 
-        [Test]
-        public void DepositAsync_NoCustomer_ThrowsUserIdInvalidException()
-        {
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetCustomerAsync("Not valid Id"));
-        }
-
+       
+        
         [TestCase(1)]
         [TestCase(100)]
         [TestCase(100000)]
         public async Task DepositAsync_DepositAmounts_CustomerAccountHasReceivedExpectedBalanace(decimal deposit)
         {
-            Customer customerAddedToDatabase = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
+            var customer = addCustomerToTestDatabase();
+
+            await _uut.CustomerRepository.DepositAsync(customer.Id, deposit);
+            _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
-                context.Customers.Add(customerAddedToDatabase);
-                context.SaveChanges();
-            }
-
-            await _uut.DepositAsync(customerAddedToDatabase.Id, deposit);
-
-            using (var context = _factory.CreateContext())
-            {
-                Assert.That(context.Customers.FirstOrDefault().Balance,Is.EqualTo(deposit));
+                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(deposit));
             }
         }
 
@@ -198,228 +109,182 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [TestCase(-100000)]
         public async Task DepositAsync_DepositAmountsNegativeAmount_ThrowsNegativeDepositException(decimal deposit)
         {
-            Assert.ThrowsAsync<NegativeDepositException>(async () => await _uut.DepositAsync("No Id as validation occurs first", deposit));
+            Assert.ThrowsAsync<NegativeDepositException>(async () => await _uut.CustomerRepository.DepositAsync("No Id as validation occurs first", deposit));
         }
 
         [Test]
         public async Task DepositAsync_DepositAmountTwice_CustomerAccountHasReceivedExpectedAmount()
         {
-            Customer customerAddedToDatabase = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
+            var customer = addCustomerToTestDatabase();
+
+            await _uut.CustomerRepository.DepositAsync(customer.Id, 100);
+            await _uut.CustomerRepository.DepositAsync(customer.Id, 200);
+            _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
-                context.Customers.Add(customerAddedToDatabase);
-                context.SaveChanges();
-            }
-
-            await _uut.DepositAsync(customerAddedToDatabase.Id, 100);
-            await _uut.DepositAsync(customerAddedToDatabase.Id, 200);
-
-            using (var context = _factory.CreateContext())
-            {
-                Assert.That(context.Customers.Find(customerAddedToDatabase.Id).Balance, Is.EqualTo(300));
+                Assert.That(context.Customers.Find(customer.Id).Balance, Is.EqualTo(300));
             }
         }
 
         #endregion
 
-        #region GetRidesAsync
+        #region ReservePriceFromCustomerAsync
 
         [Test]
-        public async Task GetRidesAsync_ParamterNull_ThrowsException()
+        public async Task ReservePriceFromCustomer_ReservesAmountAfterSaveChanges_AmountExpectedIsReserved()
         {
-            Assert.ThrowsAsync<UserIdInvalidException>(async ()=> await _uut.GetRidesAsync(null));
-        }
+            var customer = addCustomerToTestDatabase(1000);
 
-        [Test]
-        public async Task GetRidesAsync_ParameterEmpty_ThrowsException()
-        {
-            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _uut.GetRidesAsync(""));
-        }
+            var amountToReserve = 100;
 
-        [Test]
-        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsEmptyList()
-        {
-            var customer = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
+            await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve);
+            _uut.SaveChangesAsync();
+
             using (var context = _factory.CreateContext())
             {
-
-                context.Customers.Add(customer);
-                context.SaveChanges();
+                Assert.That(context.Customers.Find(customer.Id).ReservedAmount,Is.EqualTo(amountToReserve));
             }
-
-            var response = await _uut.GetRidesAsync(customer.Id);
-            Assert.That(response,Is.Empty);
         }
 
         [Test]
-        public async Task GetRidesAsync_CustomerExistButNoRides_ReturnsListWithOne()
+        public async Task ReservePriceFromCustomer_DoesNotReservesAmountWithoutSaveChanges_AmountExpectedIsNotReserved()
         {
-            var customer = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
+            var customer = addCustomerToTestDatabase(1000);
 
-            customer.Rides = new List<Ride>();
-            var soloRide = new SoloRide()
-            {
-                CustomerId = customer.Id,
-                DepartureTime = DateTime.Now,
-                ConfirmationDeadline = DateTime.Now,
-                PassengerCount = 0,
-                CreatedOn = DateTime.Now,
-                Price = 100,
-                Status = RideStatus.WaitingForAccept,
-                EndDestination = new Address("City", 8200, "Street", 21),
-                StartDestination = new Address("City", 8200, "Street", 21)
-            };
+            var amountToReserve = 100;
 
-            customer.Rides.Add(soloRide);
+            await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve);
+            
+
             using (var context = _factory.CreateContext())
             {
-                context.Customers.Add(customer);
-                context.SaveChanges();
+                Assert.That(context.Customers.Find(customer.Id).ReservedAmount, Is.EqualTo(0));
             }
-
-            var response = await _uut.GetRidesAsync(customer.Id);
-            Assert.That(response.Count, Is.EqualTo(1));
         }
 
         [Test]
-        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnExpectedCustomer()
+        public async Task ReservePriceFromCustomer_NotEnoughFundsToReserve_ThrowsException()
         {
-            var customer = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "ExpectedCustomer",
-                PhoneNumber = "12345678",
-            };
+            var customer = addCustomerToTestDatabase(0);
 
-            customer.Rides = new List<Ride>();
-            var soloRide = new SoloRide()
-            {
-                CustomerId = customer.Id,
-                DepartureTime = DateTime.Now,
-                ConfirmationDeadline = DateTime.Now,
-                PassengerCount = 0,
-                CreatedOn = DateTime.Now,
-                Price = 200,
-                Status = RideStatus.WaitingForAccept,
-                EndDestination = new Address("City", 8200, "Street", 21),
-                StartDestination = new Address("City", 8200, "Street", 21)
-            };
+            var amountToReserve = 100;
 
-            var customer2 = new Customer
-            {
-                Email = "valid2@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
-            customer2.Rides = new List<Ride>();
-            customer.Rides = new List<Ride>();
-            var soloRide2 = new SoloRide()
-            {
-                CustomerId = customer.Id,
-                DepartureTime = DateTime.Now,
-                ConfirmationDeadline = DateTime.Now,
-                PassengerCount = 0,
-                CreatedOn = DateTime.Now,
-                Price = 100,
-                Status = RideStatus.WaitingForAccept,
-                EndDestination = new Address("City", 8200, "Street", 21),
-                StartDestination = new Address("City", 8200, "Street", 21)
-            };
-            customer2.Rides.Add(soloRide2);
-
-            customer.Rides.Add(soloRide);
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customer);
-                context.Customers.Add(customer2);
-                context.SaveChanges();
-            }
-
-            var response = await _uut.GetRidesAsync(customer.Id);
-            Assert.That(response.First().Customer.Name, Is.EqualTo("ExpectedCustomer"));
+            Assert.ThrowsAsync<InsufficientFundsException>(async()=> await _uut.CustomerRepository.ReservePriceFromCustomerAsync(customer.Id, amountToReserve));
         }
 
         [Test]
-        public async Task GetRidesAsync_TwoCustomerExistWithRides_ReturnsListWithOneForRightCustomer()
+        public async Task ReservePriceFromCustomer_CustomerDoesNotExist_ThrowsException()
         {
-            var customer = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "ExpectedCustomer",
-                PhoneNumber = "12345678",
-            };
+            var amountToReserve = 100;
 
-            customer.Rides = new List<Ride>();
-            var soloRide = new SoloRide()
-            {
-                CustomerId = customer.Id,
-                DepartureTime = DateTime.Now,
-                ConfirmationDeadline = DateTime.Now,
-                PassengerCount = 0,
-                CreatedOn = DateTime.Now,
-                Price = 200,
-                Status = RideStatus.WaitingForAccept,
-                EndDestination = new Address("City", 8200, "Street", 21),
-                StartDestination = new Address("City", 8200, "Street", 21)
-            };
-
-            var customer2 = new Customer
-            {
-                Email = "valid2@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
-            customer2.Rides = new List<Ride>();
-            customer.Rides = new List<Ride>();
-            var soloRide2 = new SoloRide()
-            {
-                CustomerId = customer.Id,
-                DepartureTime = DateTime.Now,
-                ConfirmationDeadline = DateTime.Now,
-                PassengerCount = 0,
-                CreatedOn = DateTime.Now,
-                Price = 100,
-                Status = RideStatus.WaitingForAccept,
-                EndDestination = new Address("City", 8200, "Street", 21),
-                StartDestination = new Address("City", 8200, "Street", 21)
-            };
-            customer2.Rides.Add(soloRide2);
-
-            customer.Rides.Add(soloRide);
-            using (var context = _factory.CreateContext())
-            {
-                context.Customers.Add(customer);
-                context.Customers.Add(customer2);
-                context.SaveChanges();
-            }
-
-            var response = await _uut.GetRidesAsync(customer.Id);
-            Assert.That(response.Count, Is.EqualTo(1));
+            Assert.ThrowsAsync<UserIdInvalidException>(async() => await _uut.CustomerRepository.ReservePriceFromCustomerAsync("Invalid Id", amountToReserve));
         }
+
+
         #endregion
+
+        #region FindByEmailAsync
+
+        [Test]
+        public async Task FindByEmail_CustomerExist_ReturnsCustomer()
+        {
+            var customer = addCustomerToTestDatabase();
+
+            var customerDB = await _uut.CustomerRepository.FindByEmailAsync(customer.Email);
+
+            Assert.That(customer.Name,Is.EqualTo(customerDB.Name));
+        }
+
+        [Test]
+        public async Task FindByEmail_CustomerDoesNotExist_ThrowsException()
+        {
+            Assert.ThrowsAsync<UserIdInvalidException>(()=>_uut.CustomerRepository.FindByEmailAsync("ValidEmail@ButNoCustomerInDatabase.com"));
+        }
+
+        #endregion
+
+        #region FindCustomerRides
+
+        [Test]
+        public async Task FindCustomerRides_CustomerExistWithNoRides_ReturnsEmptyListOfRides()
+        {
+            var customer = addCustomerToTestDatabase();
+
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer.Id);
+
+            Assert.IsEmpty(rides);
+        }
+
+        [Test]
+        public async Task FindCustomerRides_CustomerExistWith1Ride_ReturnsListOfRidesContaining1()
+        {
+            var customer = addCustomerToTestDatabase();
+
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Update(customer);
+                context.SaveChanges();
+            }
+
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer.Id);
+
+            Assert.That(rides.Count,Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task FindCustomerRides_TwoCustomersExist_ReturnsOnlyRidesOfExpectedCustomer()
+        {
+            var customer = addCustomerToTestDatabase();
+            var customer2 = addCustomerToTestDatabase();
+
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.WaitingForAccept,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+
+            customer.Rides.Add(soloRide);
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Update(customer);
+                context.SaveChanges();
+            }
+
+            var rides = await _uut.CustomerRepository.FindCustomerRidesAsync(customer2.Id);
+
+            Assert.That(rides.Count, Is.EqualTo(0));
+        }
 
         #region Dispose
         [Test]
-        public void Dispose_DisposeOfObject_Disposes()
+        public async Task FindCustomerRides_CustomerDoesNotExist_ThrowsException()
         {
-            _uut.Dispose();
+            Assert.ThrowsAsync<UserIdInvalidException>(async() => await _uut.CustomerRepository.FindCustomerRidesAsync("Invalid ID"));
         }
+
+        #endregion
         #endregion
 
         #region EditCustomerAsync

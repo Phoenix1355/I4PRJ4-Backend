@@ -93,7 +93,7 @@ namespace Api.IntegrationTests.Customer
 
         
         [TestCase("","")]
-        [TestCase("111111", "111111")]
+        [TestCase("1111113", "1111131")]
         [TestCase("111111#", "111111#")]
         [TestCase("12345678", "12345678")]
         [TestCase("232425aA", "2324252aA")]

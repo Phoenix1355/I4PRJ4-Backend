@@ -7,6 +7,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 
@@ -17,28 +18,25 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class TaxiCompanyService : ITaxiCompanyService
     {
-        private readonly IIdentityUserRepository _identityUserRepository;
-        private readonly ITaxiCompanyRepository _taxiCompanyRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
+
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
-        /// <param name="identityUserRepository">Used to access the database regarding a taxi company</param>
-        /// <param name="taxiCompanyRepository">Used to access the database regarding a taxi company</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         public TaxiCompanyService(
-            IIdentityUserRepository identityUserRepository,
-            ITaxiCompanyRepository taxiCompanyRepository,
             IMapper mapper,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IUnitOfWork unitOfWork)
         {
-            _identityUserRepository = identityUserRepository;
-            _taxiCompanyRepository = taxiCompanyRepository;
             _mapper = mapper;
             _jwtService = jwtService;
+            _unitOfWork = unitOfWork;
         }
         /// <summary>
         /// Adds a new taxi company to the database asynchronously and returns a JWT token wrapped in a response object.
@@ -60,7 +58,12 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             // Overwrite the taxi company with the one created and create a TaxiCompanyDto
-            taxiCompany = await _taxiCompanyRepository.AddTaxiCompanyAsync(taxiCompany, request.Password);
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(taxiCompany, request.Password);
+                await _unitOfWork.IdentityUserRepository.AddToRoleAsync(taxiCompany, nameof(Customer));
+            });
+
             var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
 
             // Create the token, wrap it and return the response with the taxiCompanyDto
@@ -84,26 +87,22 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A JWT token and certain information about the logged in taxi company.</returns>
         public async Task<LoginResponseTaxiCompany> LoginTaxiCompanyAsync(LoginRequest request)
         {
-            // Check if it's possible to log in
-            var result = await _identityUserRepository.SignInAsync(request.Email, request.Password);
+            //Check if its possible to log in. If not an identity exception will be thrown
+            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
-            if (result.Succeeded)
+            //Check if the logged in user is indeed a customer. If not this call will throw an UserIdInvalidException
+            var taxiCompany = await _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
+
+            //All good, now generate the token and return it with a taxiCompanyDto
+            var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));
+            var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
+            var response = new LoginResponseTaxiCompany()
             {
-                // Check if the logged in taxi company is indeed a taxi company. If not, this call will throw an ArgumentException
-                var taxiCompany = await _taxiCompanyRepository.GetTaxiCompanyAsync(request.Email);
+                Token = token,
+                TaxiCompany = taxiCompanyDto
+            };
 
-                // Generate the token and return it
-                var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));
-                var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
-                var response = new LoginResponseTaxiCompany()
-                {
-                    Token = token,
-                    TaxiCompany = taxiCompanyDto
-                };
-                return response;
-            }
-            // Log in failed
-            throw new IdentityException("Login failed. Credentials were not found in the database.");
+            return response;
         }
     }
 }

@@ -12,6 +12,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.Statuses;
 using AutoMapper;
 using CustomExceptions;
@@ -24,28 +25,29 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class RideService : IRideService
     {
-        private readonly IRideRepository _rideRepository;
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
-        /// <param name="rideRepository">Repository used to query the database when working with rides.</param>
+
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="googleMapsApiService">Used to send requests to the Google Maps Api</param>
         /// <param name="priceStrategyFactory">Used to get the correct strategy for price calculations</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         public RideService(
-            IRideRepository rideRepository,
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
-            IPriceStrategyFactory priceStrategyFactory)
+            IPriceStrategyFactory priceStrategyFactory,
+            IUnitOfWork unitOfWork)
         {
-            _rideRepository = rideRepository;
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -76,7 +78,15 @@ namespace Api.BusinessLogicLayer.Services
             
             ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
-            ride = await _rideRepository.AddSoloRideAsync(ride);
+
+            //Reserve the money, create the order and return the created order
+            await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
+            ride =  (SoloRide) _unitOfWork.RideRepository.Add(ride);
+            
+            var order =  _unitOfWork.OrderRepository.Add(new Order());
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
+            await _unitOfWork.SaveChangesAsync();
+
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;
         }
@@ -90,9 +100,6 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
         {
             throw new NotImplementedException("Not currently implemented.");
-            //Follows the same flow as when creating a solo ride.
-            //The match is made by the system later on and not in this method
-            //The match should be done by the system continuously 
         }
 
         /// <summary>

@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Repositories;
 
 namespace Api.DataAccessLayer.Interfaces
 {
     /// <summary>
     /// Defines the interface to the database in relation to "Rides".
     /// </summary>
-    public interface IRideRepository
+    public interface IRideRepository : IGenericRepository<Ride>
     {
-        Task<List<Ride>> GetAllRidesAsync();
-        Task<SoloRide> AddSoloRideAsync(SoloRide id);
-        Task<Ride> UpdateRideAsync(Ride ride);
-        Task<Ride> DeleteRideAsync(int id);
-        Task<List<SoloRide>> GetOpenSoloRidesAsync();
-
-
+        /// <summary>
+        /// Updates the status of all supplied rides to "Accepted".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        void SetAllRidesToAccepted(List<Ride> rides);
     }
 }

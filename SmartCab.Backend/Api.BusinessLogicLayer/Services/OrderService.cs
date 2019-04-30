@@ -6,6 +6,8 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Statuses;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 
 namespace Api.BusinessLogicLayer.Services
@@ -15,18 +17,18 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class OrderService : IOrderService
     {
-        private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
-        /// Constructor for this class
+        /// 
         /// </summary>
-        /// <param name="orderRepository">The repository used to get and edit orders.</param>
-        /// <param name="mapper">A mapper used to map object to/from data transfer objects (DTO's)</param>
-        public OrderService(IOrderRepository orderRepository, IMapper mapper)
+        /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
+        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork)
         {
-            _orderRepository = orderRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>An object containing all open orders stored in the system</returns>
         public async Task<OpenOrdersResponse> GetOpenOrdersAsync()
         {
-            var openOrders = await _orderRepository.GetOpenOrdersAsync();
+            var openOrders = await _unitOfWork.OrderRepository.FindOpenOrdersAsync();
             var openOrderDtos = _mapper.Map<List<OrderDto>>(openOrders);
             var response = new OpenOrdersResponse {Orders = openOrderDtos};
             return response;
@@ -54,8 +56,13 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response containing the updated order.</returns>
         public async Task<AcceptOrderResponse> AcceptOrderAsync(string taxiCompanyId, int orderId)
         {
-            var order = await _orderRepository.AcceptOrderAsync(taxiCompanyId, orderId);
-            //TODO: push out notifications to associated customers (Debit customers should happen in the dataaccess layer as par of a transaction)
+            var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
+            _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
+            _unitOfWork.OrderRepository.SetOrderToAccepted(order, taxiCompanyId);
+            //TODO: Implement UC14 (debit customer)
+            //TODO: Implement UC15 (Notify customer)
+            await _unitOfWork.SaveChangesAsync();
+
             var orderDto = _mapper.Map<OrderDto>(order);
             var response = new AcceptOrderResponse {Order = orderDto};
             return response;

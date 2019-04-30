@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Repositories;
 using CustomExceptions;
 
 namespace Api.DataAccessLayer.Interfaces
@@ -7,9 +8,8 @@ namespace Api.DataAccessLayer.Interfaces
     /// <summary>
     /// Interface for TaxiCompanyRepository
     /// </summary>
-    public interface ITaxiCompanyRepository
+    public interface ITaxiCompanyRepository : IGenericRepository<TaxiCompany>
     {
-        Task<TaxiCompany> GetTaxiCompanyAsync(string email);
-        Task<TaxiCompany> AddTaxiCompanyAsync(TaxiCompany taxicompany, string password);
+        Task<TaxiCompany> FindByEmail(string email);
     }
 }

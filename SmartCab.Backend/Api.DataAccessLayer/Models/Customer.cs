@@ -14,6 +14,12 @@ namespace Api.DataAccessLayer.Models
     /// </remarks>
     public class Customer : IdentityUser
     {
+        public Customer()
+        {
+            Rides = new List<Ride>();
+            Balance = 0;
+            ReservedAmount = 0;
+        }
         [Required]
         public string Name { get; set; }
 

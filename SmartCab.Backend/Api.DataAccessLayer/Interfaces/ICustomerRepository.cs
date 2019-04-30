@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.Repositories;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,12 +10,11 @@ namespace Api.DataAccessLayer.Interfaces
     /// <summary>
     /// Interface for CustomerRepository, containing relevant methods. 
     /// </summary>
-    public interface ICustomerRepository
+    public interface ICustomerRepository : IGenericRepository<Customer>
     {
-        Task<Customer> AddCustomerAsync(Customer customer, string password);
-        Task<Customer> GetCustomerAsync(string email);
         Task DepositAsync(string customerId, decimal deposit);
-        Task<List<Ride>> GetRidesAsync(string customerId);
-        Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword);
+        Task ReservePriceFromCustomerAsync(string customerId, decimal price);
+        Task<Customer> FindByEmailAsync(string email);
+        Task<List<Ride>> FindCustomerRidesAsync(string customerId);
     }
 }

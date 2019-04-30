@@ -13,6 +13,12 @@ namespace Api.DataAccessLayer.Models
     /// </remarks>
     public class Order
     {
+        public Order()
+        {
+            Price = 0;
+            Rides = new List<Ride>();
+            Status = OrderStatus.WaitingForAccept;
+        }
         public int Id { get; set; }
         [Required]
         public OrderStatus Status { get; set; }

@@ -8,10 +8,12 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.Requests;
 using Api.Responses;
 using AutoMapper;
 using CustomExceptions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -21,27 +23,23 @@ namespace Api.BusinessLogicLayer.Services
     public class CustomerService : ICustomerService
     {
         private readonly IJwtService _jwtService;
-        private readonly IIdentityUserRepository _identityUserRepository;
-        private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
         /// </summary>
         /// <param name="jwtService">Used to generate Json Web Tokens</param>
-        /// <param name="customerRepository">Used to access the database when updating/creating customers</param>
-        /// <param name="identityUserRepository">Used to access the database when updating/creating customers</param>
+        /// <param name="unitOfWork">Used to access the database repositories</param>
         /// <param name="mapper">Mapper used to map between domain models and data transfer objects</param>
         public CustomerService(
             IJwtService jwtService,
-            ICustomerRepository customerRepository,
-            IIdentityUserRepository identityUserRepository,
-            IMapper mapper)
+            IMapper mapper, 
+            IUnitOfWork unitOfWork)
         {
             _jwtService = jwtService;
-            _customerRepository = customerRepository;
-            _identityUserRepository = identityUserRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -54,7 +52,6 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
-
             //Create the customer
             var customer = new Customer
             {
@@ -65,7 +62,12 @@ namespace Api.BusinessLogicLayer.Services
             };
 
             //Overwrite the customer with the one created and create a CustomerDto
-            customer = await _customerRepository.AddCustomerAsync(customer, request.Password);
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.Password);
+                await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
+            });
+            
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
@@ -89,27 +91,22 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A JWT token and certain information about the logged in user.</returns>
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
-            //Check if its possible to log in
-            var result = await _identityUserRepository.SignInAsync(request.Email, request.Password);
+            //Check if its possible to log in. If not an identity exception will be thrown
+            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
-            if (result.Succeeded)
+            //Check if the logged in user is indeed a customer. If not this call will throw an UserIdInvalidException
+            var customer = await _unitOfWork.CustomerRepository.FindByEmailAsync(request.Email);
+
+            //All good, now generate the token and return it with a customerDto
+            var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
+            var customerDto = _mapper.Map<CustomerDto>(customer);
+            var response = new LoginResponse
             {
-                //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
-                var customer = await _customerRepository.GetCustomerAsync(request.Email);
+                Token = token,
+                Customer = customerDto
+            };
 
-                //All good, now generate the token and return it
-                var token = _jwtService.GenerateJwtToken(customer.Id, request.Email, nameof(Customer));
-                var customerDto = _mapper.Map<CustomerDto>(customer);
-                var response = new LoginResponse
-                {
-                    Token = token,
-                    Customer = customerDto
-                };
-                return response;
-            }
-
-            //Log in failed
-            throw new IdentityException("Login failed. Credentials was not found in the database.");
+            return response;
         }
 
         /// <summary>
@@ -120,44 +117,51 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
-            var newCustomer = new Customer
-            {
-                Email = request.Email,
-                Name = request.Name,
-                PhoneNumber = request.PhoneNumber,
-            };
+            //First sign in to ensure, that the old password is correct (throws identity exception if login fails)
+            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.OldPassword);
+
+            
+
+            var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
+            customer.Name = request.Name;
+            customer.PhoneNumber = request.PhoneNumber;
 
             var password = request.Password;
             var oldPassword = request.OldPassword;
 
-            var customer = await _customerRepository.EditCustomerAsync(newCustomer, customerId, password, oldPassword);
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, request.Email, password, oldPassword);
+                _unitOfWork.CustomerRepository.Update(customer);
+                await _unitOfWork.SaveChangesAsync();
+            });
+            
+            
+
 
             var customerDto = _mapper.Map<CustomerDto>(customer);
-
             var response = new EditCustomerResponse
             {
                 Customer = customerDto
             };
-
             return response;
         }
 
-
         /// <summary>
-        /// Deposits amount.
+        /// Deposits an amount to the a customers account.
         /// </summary>
         /// <param name="request">The request containing the amount to deposit.</param>
-        /// /// <param name="customerId">Id of the customer to deposit to.</param>
-        /// <returns>A customer wrapped in a responseobject.</returns>
+        /// <param name="customerId">Id of the customer to deposit to.</param>
+        /// <returns>A customer wrapped in a response object.</returns>
         public async Task DepositAsync(DepositRequest request, string customerId)
         {
             //Amount to deposit
             var depositAmount = request.Deposit;
 
             //Deposits
-            await _customerRepository.DepositAsync(customerId, depositAmount);
+            await _unitOfWork.CustomerRepository.DepositAsync(customerId, depositAmount);
+            await _unitOfWork.SaveChangesAsync();
         }
-
 
         /// <summary>
         /// Gets the rides associated to the customerId and wraps it into a CustomerRidesResponse object as RideDtos. 
@@ -166,7 +170,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<CustomerRidesResponse> GetRidesAsync(string customerId)
         {
-            var customerRides = await _customerRepository.GetRidesAsync(customerId);
+            var customerRides = await _unitOfWork.CustomerRepository.FindCustomerRidesAsync(customerId);
+
             var customerRidesDto = _mapper.Map<List<RideDto>>(customerRides);
             var response = new CustomerRidesResponse
             {

@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using CustomExceptions;
@@ -31,6 +35,22 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
+        /// This methods wraps a function inside a transaction.
+        /// </summary>
+        /// <remarks>
+        /// /// See https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
+        /// </remarks>
+        /// <param name="insideTransactionFunction">Function to call inside a transaction</param>
+        public async Task TransactionWrapper(Func<Task> insideTransactionFunction)
+        {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+               await insideTransactionFunction();
+               scope.Complete();
+            }
+        }
+
+        /// <summary>
         /// Adds the IdentityUser asynchronous.
         /// </summary>
         /// <param name="user">The user to create</param>
@@ -38,7 +58,13 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> AddIdentityUserAsync(IdentityUser user, string password)
         {
-            return await _userManager.CreateAsync(user, password);
+            var result =  await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+            return result;
         }
 
         /// <summary>
@@ -47,9 +73,16 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user">The user to add the role to</param>
         /// <param name="role">The role.</param>
         /// <returns></returns>
+        /// <exception cref="IdentityException"></exception>
         public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
-            return await _userManager.AddToRoleAsync(user, role);
+            var result = await _userManager.AddToRoleAsync(user, role);
+            if (!result.Succeeded)
+            {
+                var error = result.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
+            return result;
         }
 
         /// <summary>
@@ -58,9 +91,15 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="email">The email.</param>
         /// <param name="password">The password.</param>
         /// <returns></returns>
+        /// <exception cref="IdentityException">Login failed. Credentials was not found in the database.</exception>
         public async Task<SignInResult> SignInAsync(string email, string password)
         {
-            return await _signInManager.PasswordSignInAsync(email, password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+            if (!result.Succeeded)
+            {
+                throw new IdentityException("Login failed. Credentials was not found in the database.");
+            }
+            return result;
         }
 
         /// <summary>
@@ -72,12 +111,12 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="password"></param>
         /// <param name="oldPassword"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, Customer newCustomer, string password, string oldPassword)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string email, string password, string oldPassword)
         {
             IdentityResult resultEmail, resultPassword;
 
-            if (newCustomer.Email != user.Email)
-                resultEmail = await ChangeEmail(user, newCustomer);
+            if (email != user.Email)
+                resultEmail = await ChangeEmail(user, email);
             else
                 resultEmail = IdentityResult.Success;
 
@@ -113,14 +152,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user"></param>
         /// <param name="newCustomer"></param>
         /// <returns></returns>
-        private async Task<IdentityResult> ChangeEmail(IdentityUser user, Customer newCustomer)
+        private async Task<IdentityResult> ChangeEmail(IdentityUser user, string email)
         {
-            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
-            var response = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
+            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, email);
+            var response = await _userManager.ChangeEmailAsync(user, email, emailConfirmationCode);
             await _userManager.UpdateAsync(user);
             await _userManager.UpdateNormalizedEmailAsync(user);
 
-            await _userManager.SetUserNameAsync(user, newCustomer.Email);
+            await _userManager.SetUserNameAsync(user, email);
             await _userManager.UpdateNormalizedUserNameAsync(user);
 
             return response;

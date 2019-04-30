@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
@@ -8,6 +9,7 @@ using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using Api.Requests;
 using AutoMapper;
 using CustomExceptions;
@@ -28,6 +30,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
+        private IUnitOfWork _unitOfWork;
 
         [SetUp]
         public void Setup()
@@ -36,11 +39,12 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            _customerService = new CustomerService(_jwtService, _customerRepository, _identityUserRepository, _mapper);
+            _unitOfWork = Substitute.For<IUnitOfWork>();
+            _customerService = new CustomerService(_jwtService, _mapper, _unitOfWork);
         }
 
-            #endregion
-
+        #endregion
+        
         #region AddCustomerAsync
 
         [Test]
@@ -62,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs(customer);
+            _unitOfWork.CustomerRepository.Add( null).ReturnsForAnyArgs(customer);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _customerService.AddCustomerAsync(request);
@@ -89,7 +93,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _customerRepository.AddCustomerAsync(null, null).ReturnsForAnyArgs<Customer>(customer);
+            _unitOfWork.CustomerRepository.FindOnlyOneAsync(Arg.Any<Expression< Func<Customer, bool> >> ()).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -120,7 +124,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customer = new Customer
@@ -129,7 +132,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            _unitOfWork.CustomerRepository.FindByEmailAsync(null).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -157,7 +160,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var customer = new Customer
@@ -166,7 +168,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            _unitOfWork.CustomerRepository.FindByEmailAsync(null).ReturnsForAnyArgs<Customer>(customer);
 
             var customerDto = new CustomerDto
             {
@@ -183,20 +185,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             Assert.That(response.Customer, Is.EqualTo(customerDto));
         }
 
-        [Test]
-        public void LoginCustomerAsync_EmailAndPasswordCombinationNotFound_ThrowsIdentityException()
-        {
-            var request = new LoginRequest
-            {
-                Email = "test@domain.com",
-                Password = "Password1!"
-            };
-
-            var signinResult = SignInResult.Failed;
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signinResult);
-
-            Assert.That(() => _customerService.LoginCustomerAsync(request), Throws.TypeOf<IdentityException>());
-        }
 
         #endregion
 
@@ -220,7 +208,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ReceivesExpectedInput()
         {
             List<Ride> rideList = new List<Ride>();
-            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+            _unitOfWork.CustomerRepository.FindCustomerRidesAsync(null).ReturnsForAnyArgs<List<Ride>>(rideList);
             await _customerService.GetRidesAsync(null);
             _mapper.Received().Map<List<RideDto>>(rideList);
         }
@@ -229,7 +217,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public async Task GetRidesAsync__NoRidesFromDatabase_ResponseContainsTheList()
         {
             List<Ride> rideList = new List<Ride>();
-            _customerRepository.GetRidesAsync(Arg.Any<string>()).ReturnsForAnyArgs(rideList);
+
+            _unitOfWork.CustomerRepository.FindCustomerRidesAsync(null).ReturnsForAnyArgs<List<Ride>>(rideList);
 
             List<RideDto> rideListDto = new List<RideDto>();
             _mapper.Map<List<RideDto>>(Arg.Any<List<Ride>>()).ReturnsForAnyArgs(rideListDto);
@@ -247,7 +236,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [Test]
         public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponse()
         {
-
+            
             //Arrange
             var request = new EditCustomerRequest
             {
@@ -279,7 +268,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             _identityUserRepository.SignInAsync("test@domain.com", "Qwer111!").ReturnsForAnyArgs(SignInResult.Success);
-            _customerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            //_unitOfWork.CustomerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
             
             var customerDto = new CustomerDto
             {
@@ -292,7 +281,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Customer = customerDto
             };
-
+            _unitOfWork.CustomerRepository.FindByIDAsync(null).ReturnsForAnyArgs(customer);
             _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
 
             //Act
@@ -300,6 +289,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             //Assert
             Assert.That(response.Customer, Is.EqualTo(editCustomerResponse.Customer));
+            
         }
         #endregion
 
@@ -308,6 +298,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [Test]
         public void DepositAsync_ReturnedNull_DoesNotThrow()
         {
+            Console.WriteLine("hej");
             Assert.DoesNotThrowAsync(async () => await _customerService.GetRidesAsync(null));
         }
 

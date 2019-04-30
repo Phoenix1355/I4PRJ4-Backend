@@ -6,6 +6,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
@@ -20,26 +21,24 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
     {
         #region Setup
 
-        private IIdentityUserRepository _identityUserRepository;
         private IJwtService _jwtService;
-        private ITaxiCompanyRepository _taxiCompanyRepository;
+        private IUnitOfWork _unitofWork;
         private IMapper _mapper;
         private TaxiCompanyService _taxiCompanyService;
 
         [SetUp]
         public void Setup()
         {
-            _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _jwtService = Substitute.For<IJwtService>();
-            _taxiCompanyRepository = Substitute.For<ITaxiCompanyRepository>();
             _mapper = Substitute.For<IMapper>();
-            _taxiCompanyService = new TaxiCompanyService(_identityUserRepository, _taxiCompanyRepository, _mapper, _jwtService);
+            _unitofWork = Substitute.For<IUnitOfWork>();
+            _taxiCompanyService = new TaxiCompanyService(_mapper, _jwtService, _unitofWork);
         }
 
         #endregion
-
+        
         #region AddTaxiCompanyAsync
-
+        
         [Test]
         public async Task AddTaxiCompanyAsync_AddingTaxiCompanySucceeds_ReturnsARegisterResponseTaxiCompanyThatContainsTheExpectedToken()
         {
@@ -58,8 +57,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Name = request.Name,
                 PhoneNumber = request.PhoneNumber
             };
-
-            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs(taxiCompany);
+            
+            _unitofWork.TaxiCompanyRepository.Add( null).ReturnsForAnyArgs(taxiCompany);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
@@ -86,7 +85,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _taxiCompanyRepository.AddTaxiCompanyAsync(null, null).ReturnsForAnyArgs<TaxiCompany>(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.Add(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -117,7 +116,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var taxiCompany = new TaxiCompany
@@ -126,7 +125,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _taxiCompanyRepository.GetTaxiCompanyAsync(null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.FindByEmail(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -155,7 +154,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
 
             var token = "Token";
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
+            _unitofWork.IdentityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(SignInResult.Success);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs(token);
 
             var taxiCompany = new TaxiCompany
@@ -164,7 +163,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Email = request.Email
             };
 
-            _taxiCompanyRepository.GetTaxiCompanyAsync(null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.FindByEmail(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {
@@ -181,25 +180,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             // Assert
             Assert.That(response.TaxiCompany, Is.EqualTo(taxiCompanyDto));
         }
-
-        [Test]
-        public void LoginTaxiCompanyAsync_EmailAndPasswordCombinationNotFound_ThrowsIdentityException()
-        {
-            // Assert
-            var request = new LoginRequest
-            {
-                Email = "test@domain.com",
-                Password = "Password1!"
-            };
-
-            // Act
-            var signInResult = SignInResult.Failed;
-            _identityUserRepository.SignInAsync(null, null).ReturnsForAnyArgs(signInResult);
-
-            //Assert
-            Assert.That(() => _taxiCompanyService.LoginTaxiCompanyAsync(request), Throws.TypeOf<IdentityException>());
-        }
-
         #endregion
+    
     }
 }

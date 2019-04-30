@@ -4,7 +4,9 @@ using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
+using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
+using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 using NSubstitute;
 using NUnit.Framework;
@@ -17,13 +19,15 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IMapper _mapper;
         private IOrderRepository _orderRepository;
         private OrderService _orderService;
+        private IUnitOfWork _unitOfWork;
 
         [SetUp]
         public void Setup()
         {
             _mapper = Substitute.For<IMapper>();
             _orderRepository = Substitute.For<IOrderRepository>();
-            _orderService = new OrderService(_orderRepository, _mapper);
+            _unitOfWork = Substitute.For<IUnitOfWork>();
+            _orderService = new OrderService(_mapper, _unitOfWork);
         }
 
         [Test]
@@ -56,6 +60,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Status = RideStatus.WaitingForAccept.ToString()
             };
             _mapper.Map<OrderDto>(null).ReturnsForAnyArgs(orderDto);
+            var order = new Order();
+            var taxicompany = new TaxiCompany();
+            _unitOfWork.OrderRepository.FindByIDAsync(null).ReturnsForAnyArgs(order);
+            _unitOfWork.TaxiCompanyRepository.FindByIDAsync(null).ReturnsForAnyArgs(taxicompany);
+
             var expectedResponse = new AcceptOrderResponse {Order = orderDto};
 
             var response = await _orderService.AcceptOrderAsync(taxiCompanyId, orderId);
