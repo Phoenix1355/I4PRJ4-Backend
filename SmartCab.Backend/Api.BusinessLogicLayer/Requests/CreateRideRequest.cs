@@ -28,8 +28,6 @@ namespace Api.BusinessLogicLayer.Requests
 
         [Required]
         public Address EndDestination { get; set; }
-
-        [Required]
         public string DeviceId { get; set; }
     }
 }
