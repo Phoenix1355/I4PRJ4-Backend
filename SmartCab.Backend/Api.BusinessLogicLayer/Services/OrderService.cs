@@ -59,8 +59,7 @@ namespace Api.BusinessLogicLayer.Services
             var taxiCompany = await _unitOfWork.TaxiCompanyRepository.FindByIDAsync(taxiCompanyId);
             var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
             await _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
-            order.TaxiCompanyId = taxiCompany.Id;
-            await _unitOfWork.OrderRepository.SetOrderToAccepted(order);
+            await _unitOfWork.OrderRepository.SetOrderToAccepted(order, order.TaxiCompanyId);
             await _unitOfWork.SaveChangesAsync();
             //Set status on orders connected rides. 
 

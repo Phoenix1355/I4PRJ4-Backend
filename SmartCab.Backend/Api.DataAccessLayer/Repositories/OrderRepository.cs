@@ -56,13 +56,15 @@ namespace Api.DataAccessLayer.Repositories
         /// Updates the status of the order to "Accepted".
         /// </summary>
         /// <param name="order">The order that should have its status updated.</param>
-        public Task<Order> SetOrderToAccepted(Order order)
+        /// <param name="taxiCompanyId">The taxicompany that accepted the order.</param>
+        public Task<Order> SetOrderToAccepted(Order order, string taxiCompanyId)
         {
             if (order.Status != OrderStatus.WaitingForAccept)
             {
                 throw new UnexpectedStatusException("Order is not waiting for accept, cannot be accepted");
             }
             //Set status
+            order.TaxiCompanyId = taxiCompanyId;
             order.Status = OrderStatus.Accepted;
             return UpdateAsync(order);
         }
