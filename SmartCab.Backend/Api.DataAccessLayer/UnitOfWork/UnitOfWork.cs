@@ -11,7 +11,13 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
-    public class UoW : IUoW
+    /// <summary>
+    /// This class is used by the service layer to access the database.
+    /// </summary>
+    /// <remarks>
+    /// This approach makes it possible to make several queries without saving the changes in between.<br/>
+    /// </remarks>
+    public class UnitOfWork : IUnitOfWork
     {
         public ICustomerRepository CustomerRepository { get; }
         public ITaxiCompanyRepository TaxiCompanyRepository { get; }
@@ -20,7 +26,12 @@ namespace Api.DataAccessLayer.UnitOfWork
         private ApplicationContext _context;
         public IIdentityUserRepository IdentityUserRepository { get; }
 
-        public UoW(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+        /// <summary>
+        /// Constructor for this class.
+        /// </summary>
+        /// <param name="context">The context used to access the database.</param>
+        /// <param name="identityUserRepository">The repository used for operations related to the Identity framework.</param>
+        public UnitOfWork(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
             _context = context;
             CustomerRepository = new CustomerRepository(_context);
@@ -30,6 +41,10 @@ namespace Api.DataAccessLayer.UnitOfWork
             IdentityUserRepository = identityUserRepository;
         }
 
+        /// <summary>
+        /// Saves all changes made to the context.
+        /// </summary>
+        /// <returns></returns>
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

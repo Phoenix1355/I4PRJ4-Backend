@@ -27,7 +27,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IPriceStrategy _sharedRidePriceStrategy;
         private IPriceStrategyFactory _priceStrategyFactory;
         private RideService _rideService;
-        private IUoW _unitOfWork;
+        private IUnitOfWork _unitOfWork;
         private Address _anAddress; //An address object to be reused throughout the tests
 
         [SetUp]
@@ -39,7 +39,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _soloRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _priceStrategyFactory = Substitute.For<IPriceStrategyFactory>();
-            _unitOfWork = Substitute.For<IUoW>();
+            _unitOfWork = Substitute.For<IUnitOfWork>();
             _rideService = new RideService(_mapper, _googleMapsApiService, _priceStrategyFactory, _unitOfWork);
             _anAddress = new Address("city", 1000, "street", 1);
         }

@@ -11,8 +11,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
-    /// See https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
+    /// This class is a generic repository which contains methods that all repositories often use.
     /// </summary>
+    /// <remarks>
+    /// See https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
+    /// </remarks>
     /// <typeparam name="TEntity"></typeparam>
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
@@ -25,8 +28,8 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="context"></param>
         public GenericRepository(ApplicationContext context)
         {
-            this._context = context;
-            this._dbSet = context.Set<TEntity>();
+            _context = context;
+            _dbSet = context.Set<TEntity>();
         }
 
         /// <summary>
@@ -60,8 +63,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="filter"></param>
         /// <returns></returns>
         /// <exception cref="UserIdInvalidException">Filter did not result in a unique match</exception>
-        public virtual Task<TEntity> FindOnlyOneAsync(
-            Expression<Func<TEntity, bool>> filter)
+        public virtual Task<TEntity> FindOnlyOneAsync(Expression<Func<TEntity, bool>> filter)
         {
             IQueryable<TEntity> query = _dbSet;
 
@@ -132,8 +134,6 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns>Returns the entity</returns>
         public virtual async Task<TEntity> UpdateAsync(TEntity entityToUpdate)
         {
-            Console.WriteLine("Attention grapper: HEJ");
-            Console.WriteLine(_context.Entry(entityToUpdate).State);
             if (_context.Entry(entityToUpdate).State == EntityState.Added)
             {
                 _dbSet.Remove(entityToUpdate);

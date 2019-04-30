@@ -22,7 +22,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         #region Setup
 
         private IJwtService _jwtService;
-        private IUoW _unitofWork;
+        private IUnitOfWork _unitofWork;
         private IMapper _mapper;
         private TaxiCompanyService _taxiCompanyService;
 
@@ -31,7 +31,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         {
             _jwtService = Substitute.For<IJwtService>();
             _mapper = Substitute.For<IMapper>();
-            _unitofWork = Substitute.For<IUoW>();
+            _unitofWork = Substitute.For<IUnitOfWork>();
             _taxiCompanyService = new TaxiCompanyService(_mapper, _jwtService, _unitofWork);
         }
 

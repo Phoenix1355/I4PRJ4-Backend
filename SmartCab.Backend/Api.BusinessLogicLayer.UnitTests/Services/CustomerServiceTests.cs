@@ -30,7 +30,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private ICustomerRepository _customerRepository;
         private IMapper _mapper;
         private CustomerService _customerService;
-        private IUoW _unitOfWork;
+        private IUnitOfWork _unitOfWork;
 
         [SetUp]
         public void Setup()
@@ -39,12 +39,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _identityUserRepository = Substitute.For<IIdentityUserRepository>();
             _customerRepository = Substitute.For<ICustomerRepository>();
             _mapper = Substitute.For<IMapper>();
-            _unitOfWork = Substitute.For<IUoW>();
+            _unitOfWork = Substitute.For<IUnitOfWork>();
             _customerService = new CustomerService(_jwtService, _mapper, _unitOfWork);
         }
 
         #endregion
-
         
         #region AddCustomerAsync
 

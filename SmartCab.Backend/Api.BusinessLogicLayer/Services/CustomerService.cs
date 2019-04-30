@@ -24,7 +24,7 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
-        private readonly IUoW _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
@@ -35,7 +35,7 @@ namespace Api.BusinessLogicLayer.Services
         public CustomerService(
             IJwtService jwtService,
             IMapper mapper, 
-            IUoW unitOfWork)
+            IUnitOfWork unitOfWork)
         {
             _jwtService = jwtService;
             _mapper = mapper;

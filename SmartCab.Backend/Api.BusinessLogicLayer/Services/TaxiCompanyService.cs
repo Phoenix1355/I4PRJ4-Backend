@@ -18,7 +18,7 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class TaxiCompanyService : ITaxiCompanyService
     {
-        private readonly IUoW _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
 
@@ -32,7 +32,7 @@ namespace Api.BusinessLogicLayer.Services
         public TaxiCompanyService(
             IMapper mapper,
             IJwtService jwtService,
-            IUoW unitOfWork)
+            IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _jwtService = jwtService;

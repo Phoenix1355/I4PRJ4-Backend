@@ -14,7 +14,7 @@ namespace Api.DataAccessLayer.UnitOfWork
     /// <summary>
     /// Interface for Unit of work pattern. 
     /// </summary>
-    public interface IUoW
+    public interface IUnitOfWork
     {
         ICustomerRepository CustomerRepository { get; }
         ITaxiCompanyRepository TaxiCompanyRepository { get; }

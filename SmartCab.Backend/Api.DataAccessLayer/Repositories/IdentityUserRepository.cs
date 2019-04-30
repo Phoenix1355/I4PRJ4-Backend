@@ -32,19 +32,21 @@ namespace Api.DataAccessLayer.Repositories
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            
         }
 
         /// <summary>
-        /// See https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
+        /// This methods wraps a function inside a transaction.
         /// </summary>
+        /// <remarks>
+        /// /// See https://stackoverflow.com/questions/36636272/transactions-with-asp-net-identity-usermanager
+        /// </remarks>
         /// <param name="insideTransactionFunction">Function to call inside a transaction</param>
         public async Task TransactionWrapper(Func<Task> insideTransactionFunction)
         {
             using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                await insideTransactionFunction();
-                scope.Complete();
+               scope.Complete();
             }
         }
 
@@ -71,6 +73,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user">The user to add the role to</param>
         /// <param name="role">The role.</param>
         /// <returns></returns>
+        /// <exception cref="IdentityException"></exception>
         public async Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             var result = await _userManager.AddToRoleAsync(user, role);
@@ -88,6 +91,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="email">The email.</param>
         /// <param name="password">The password.</param>
         /// <returns></returns>
+        /// <exception cref="IdentityException">Login failed. Credentials was not found in the database.</exception>
         public async Task<SignInResult> SignInAsync(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, false);

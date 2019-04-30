@@ -226,7 +226,7 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-            services.AddScoped<IUoW,UoW>();
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
         }
 
         /// <summary>
