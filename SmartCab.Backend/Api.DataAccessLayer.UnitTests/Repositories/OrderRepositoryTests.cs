@@ -430,19 +430,52 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public async Task SetOrderToAccepted_OrderExistsSoloRideWaitingForAcceptStatus_OrderIsAccepted()
         {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
             var orderCreated = CreateTestOrderWithSoloRideInDatabase();
-            var order = await _uut.OrderRepository.SetOrderToAccepted(orderCreated); ;
+            var order = await _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
             Assert.That(order.Status,Is.EqualTo(OrderStatus.Accepted));
+        }
+
+        [Test]
+        public async Task SetOrderToAccepted_OrderExistsSoloRideWaitingForAcceptStatus_OrderIsAcceptedByExpectedId()
+        {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase();
+            var order = await _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
+            await _uut.SaveChangesAsync();
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(order.Id).TaxiCompanyId, Is.EqualTo(taxi.Id));
+            }
         }
 
         [Test]
         public async Task AcceptOrder_OrderExistsSoloRideNotWaitingForAcceptstatus_ThrowsException()
         {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
             var order = new Order()
             {
                 Status = OrderStatus.Accepted
             };
-            Assert.ThrowsAsync<UnexpectedStatusException>(async()=> await _uut.OrderRepository.SetOrderToAccepted(order)); ;
+            Assert.ThrowsAsync<UnexpectedStatusException>(async()=> await _uut.OrderRepository.SetOrderToAccepted(order, taxi.Id)); ;
         }
         #endregion
 
