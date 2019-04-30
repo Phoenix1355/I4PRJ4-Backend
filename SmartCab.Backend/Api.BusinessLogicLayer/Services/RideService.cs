@@ -79,13 +79,12 @@ namespace Api.BusinessLogicLayer.Services
             ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
 
-            //New segment
+            //Reserve the money, create the order and return the created order
             await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
             ride =  (SoloRide) await _unitOfWork.RideRepository.AddAsync(ride);
             var order = await _unitOfWork.OrderRepository.AddAsync(new Order());
             await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
             await _unitOfWork.SaveChangesAsync();
-
 
             var response = _mapper.Map<CreateRideResponse>(ride);
             return response;
@@ -100,9 +99,6 @@ namespace Api.BusinessLogicLayer.Services
         private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
         {
             throw new NotImplementedException("Not currently implemented.");
-            //Follows the same flow as when creating a solo ride.
-            //The match is made by the system later on and not in this method
-            //The match should be done by the system continuously 
         }
 
         /// <summary>
