@@ -77,7 +77,7 @@ namespace Api.DataAccessLayer.Repositories
 
             //Update customer
             customer.Balance += deposit;
-            await UpdateAsync(customer);
+            UpdateAsync(customer);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Api.DataAccessLayer.Repositories
                 throw new InsufficientFundsException("Not enough credit");
             }
 
-            await UpdateAsync(customer);
+            UpdateAsync(customer);
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async Task<Customer> FindByEmailAsync(string email)
+        public Task<Customer> FindByEmailAsync(string email)
         {
-            return await FindOnlyOneAsync(customer => customer.Email == email);
+            return FindOnlyOneAsync(customer => customer.Email == email);
         }
 
         /// <summary>

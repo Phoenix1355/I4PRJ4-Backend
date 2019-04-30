@@ -100,7 +100,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns>Returns the added entity</returns>
         public virtual async Task<TEntity> AddAsync(TEntity entity)
         {
-            await _dbSet.AddAsync(entity);
+            _dbSet.AddAsync(entity);
             return entity;
         }
 
@@ -137,7 +137,7 @@ namespace Api.DataAccessLayer.Repositories
             if (_context.Entry(entityToUpdate).State == EntityState.Added)
             {
                 _dbSet.Remove(entityToUpdate);
-                await _dbSet.AddAsync(entityToUpdate);
+                _dbSet.AddAsync(entityToUpdate);
                 return entityToUpdate;
             }
             _dbSet.Update(entityToUpdate);

@@ -40,16 +40,17 @@ namespace Api.DataAccessLayer.Repositories
 
             order.Price += ride.Price;
             order.Rides.Add(ride);
-            return await UpdateAsync(order);
+            UpdateAsync(order);
+            return order;
         }
 
         /// <summary>
         /// Finds all orders with the status waiting for accept. 
         /// </summary>
         /// <returns>List of orders with status waiting for accept.</returns>
-        public async Task<List<Order>> FindOpenOrdersAsync()
+        public Task<List<Order>> FindOpenOrdersAsync()
         {
-            return await FindAsync(order => order.Status == OrderStatus.WaitingForAccept);
+            return FindAsync(order => order.Status == OrderStatus.WaitingForAccept);
         }
 
         /// <summary>

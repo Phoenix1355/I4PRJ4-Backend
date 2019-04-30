@@ -30,9 +30,9 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async Task<TaxiCompany> FindByEmail(string email)
+        public Task<TaxiCompany> FindByEmail(string email)
         {
-            return await FindOnlyOneAsync(taxiCompany => taxiCompany.Email == email);
+            return FindOnlyOneAsync(taxiCompany => taxiCompany.Email == email);
         }
     }
 }

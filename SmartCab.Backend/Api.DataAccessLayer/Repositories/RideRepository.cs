@@ -42,7 +42,7 @@ namespace Api.DataAccessLayer.Repositories
                     throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
                 }
                 ride.Status = RideStatus.Accepted;
-                await UpdateAsync(ride);
+                UpdateAsync(ride);
             }
         }
     }
