@@ -82,6 +82,7 @@ namespace Api.BusinessLogicLayer.Services
             //Reserve the money, create the order and return the created order
             await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
             ride =  (SoloRide) _unitOfWork.RideRepository.Add(ride);
+            
             var order =  _unitOfWork.OrderRepository.Add(new Order());
             await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
             await _unitOfWork.SaveChangesAsync();

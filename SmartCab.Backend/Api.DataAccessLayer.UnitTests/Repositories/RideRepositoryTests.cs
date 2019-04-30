@@ -83,7 +83,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            await _uut.RideRepository.SetAllRidesToAccepted(rides);
+            _uut.RideRepository.SetAllRidesToAccepted(rides);
             await _uut.SaveChangesAsync();
             using (var context = _factory.CreateContext())
             {
@@ -137,7 +137,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
             }
 
-            Assert.ThrowsAsync<UnexpectedStatusException>(async()=>await _uut.RideRepository.SetAllRidesToAccepted(rides));
+            Assert.Throws<UnexpectedStatusException>(()=>_uut.RideRepository.SetAllRidesToAccepted(rides));
         }
 
 

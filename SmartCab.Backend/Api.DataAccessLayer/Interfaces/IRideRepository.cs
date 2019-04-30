@@ -14,6 +14,6 @@ namespace Api.DataAccessLayer.Interfaces
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
-        Task SetAllRidesToAccepted(List<Ride> rides);
+        void SetAllRidesToAccepted(List<Ride> rides);
     }
 }
