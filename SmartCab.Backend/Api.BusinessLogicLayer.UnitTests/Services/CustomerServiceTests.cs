@@ -44,7 +44,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         #endregion
-
         
         #region AddCustomerAsync
 

@@ -53,6 +53,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="origin">The origin</param>
         /// <param name="destination">The destination</param>
         /// <returns>The distance between origin and destination in kilometers.</returns>
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="GoogleMapsApiException"></exception>
         public async Task<decimal> GetDistanceInKmAsync(string origin, string destination)
         {
 
@@ -89,6 +91,8 @@ namespace Api.BusinessLogicLayer.Services
         /// The validation will for example fail if the street number is missing.
         /// </remarks>
         /// <param name="address">The address that should be validated.</param>
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="GoogleMapsApiException"></exception>
         public async Task ValidateAddressAsync(string address)
         {
             var uri = new Uri(GetGeocodingRequestUrl(address));
