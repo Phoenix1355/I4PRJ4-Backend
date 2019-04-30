@@ -69,7 +69,6 @@ namespace Api.BusinessLogicLayer.Services
                 await _unitOfWork.IdentityUserRepository.AddToRoleAsync(customer, nameof(Customer));
             });
             
-           
             var customerDto = _mapper.Map<CustomerDto>(customer);
 
             //Create the token, wrap it and return the response with the customerDto
@@ -93,8 +92,8 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A JWT token and certain information about the logged in user.</returns>
         public async Task<LoginResponse> LoginCustomerAsync(LoginRequest request)
         {
-            //Check if its possible to log in
-            var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
+            //Check if its possible to log in. If not an identity exception will be thrown
+            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
             //Check if the logged in user is indeed a customer. If not this call will throw an ArgumentException
             var customer = await _unitOfWork.CustomerRepository.FindByEmailAsync(request.Email);
