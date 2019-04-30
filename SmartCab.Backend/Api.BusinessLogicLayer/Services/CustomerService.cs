@@ -52,7 +52,6 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A RegisterResponse object containing a valid JWT token</returns>
         public async Task<RegisterResponse> AddCustomerAsync(RegisterRequest request)
         {
-
             //Create the customer
             var customer = new Customer
             {
@@ -106,6 +105,7 @@ namespace Api.BusinessLogicLayer.Services
                 Token = token,
                 Customer = customerDto
             };
+
             return response;
         }
 

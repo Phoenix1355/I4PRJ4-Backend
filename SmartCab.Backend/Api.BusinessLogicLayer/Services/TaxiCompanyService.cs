@@ -87,13 +87,13 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A JWT token and certain information about the logged in taxi company.</returns>
         public async Task<LoginResponseTaxiCompany> LoginTaxiCompanyAsync(LoginRequest request)
         {
-            // Check if it's possible to log in
-            var result = await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
+            //Check if its possible to log in. If not an identity exception will be thrown
+            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.Password);
 
-            // Check if the logged in taxi company is indeed a taxi company. If not, this call will throw an ArgumentException
-            var taxiCompany =await _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
+            //Check if the logged in user is indeed a customer. If not this call will throw an UserIdInvalidException
+            var taxiCompany = await _unitOfWork.TaxiCompanyRepository.FindByEmail(request.Email);
 
-            // Generate the token and return it
+            //All good, now generate the token and return it with a taxiCompanyDto
             var token = _jwtService.GenerateJwtToken(taxiCompany.Id, request.Email, nameof(TaxiCompany));
             var taxiCompanyDto = _mapper.Map<TaxiCompanyDto>(taxiCompany);
             var response = new LoginResponseTaxiCompany()
@@ -101,8 +101,8 @@ namespace Api.BusinessLogicLayer.Services
                 Token = token,
                 TaxiCompany = taxiCompanyDto
             };
+
             return response;
-            
         }
     }
 }
