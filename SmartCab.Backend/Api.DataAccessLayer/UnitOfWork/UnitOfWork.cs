@@ -11,7 +11,7 @@ using CustomExceptions;
 
 namespace Api.DataAccessLayer.UnitOfWork
 {
-    public class UoW : IUoW
+    public class UnitOfWork : IUnitOfWork
     {
         public ICustomerRepository CustomerRepository { get; }
         public ITaxiCompanyRepository TaxiCompanyRepository { get; }
@@ -20,7 +20,7 @@ namespace Api.DataAccessLayer.UnitOfWork
         private ApplicationContext _context;
         public IIdentityUserRepository IdentityUserRepository { get; }
 
-        public UoW(ApplicationContext context, IIdentityUserRepository identityUserRepository)
+        public UnitOfWork(ApplicationContext context, IIdentityUserRepository identityUserRepository)
         {
             _context = context;
             CustomerRepository = new CustomerRepository(_context);

@@ -19,14 +19,14 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IMapper _mapper;
         private IOrderRepository _orderRepository;
         private OrderService _orderService;
-        private IUoW _unitOfWork;
+        private IUnitOfWork _unitOfWork;
 
         [SetUp]
         public void Setup()
         {
             _mapper = Substitute.For<IMapper>();
             _orderRepository = Substitute.For<IOrderRepository>();
-            _unitOfWork = Substitute.For<IUoW>();
+            _unitOfWork = Substitute.For<IUnitOfWork>();
             _orderService = new OrderService(_mapper, _unitOfWork);
         }
 

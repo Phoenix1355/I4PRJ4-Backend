@@ -18,14 +18,14 @@ namespace Api.BusinessLogicLayer.Services
     public class OrderService : IOrderService
     {
         private readonly IMapper _mapper;
-        private readonly IUoW _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="unitOfWork">Used to access the database repositories</param>
-        public OrderService(IMapper mapper,  IUoW unitOfWork)
+        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;

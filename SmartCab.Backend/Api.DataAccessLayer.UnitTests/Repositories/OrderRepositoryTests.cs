@@ -23,7 +23,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #region Setup
 
-        private IUoW _uut;
+        private IUnitOfWork _uut;
         private InMemorySqlLiteContextFactory _factory;
 
         [SetUp]
@@ -31,7 +31,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         {
             _factory = new InMemorySqlLiteContextFactory();
             var identityRepository = Substitute.For<IIdentityUserRepository>();
-            _uut = new UoW(_factory.CreateContext(), identityRepository);
+            _uut = new UnitOfWork.UnitOfWork(_factory.CreateContext(), identityRepository);
         }
 
         [TearDown]

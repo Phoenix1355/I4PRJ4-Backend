@@ -28,7 +28,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IMapper _mapper;
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
-        private readonly IUoW _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
         /// Constructor for this class.
@@ -42,7 +42,7 @@ namespace Api.BusinessLogicLayer.Services
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
             IPriceStrategyFactory priceStrategyFactory,
-            IUoW unitOfWork)
+            IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
