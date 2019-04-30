@@ -18,21 +18,21 @@ namespace Api.DataAccessLayer.Repositories
     public class TaxiCompanyRepository : GenericRepository<TaxiCompany>, ITaxiCompanyRepository
     {
         /// <summary>
-        /// Constructor for Taxicompany repository. 
+        /// Constructor for this class. 
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The context used to access the database.</param>
         public TaxiCompanyRepository(ApplicationContext context) : base(context)
         {
         }
 
         /// <summary>
-        /// FindAsync the taxicompany with a given email otherwise throws exceptions 
+        /// FindAsync the TaxiCompany with a given email otherwise throws exceptions 
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
         public async Task<TaxiCompany> FindByEmail(string email)
         {
-            return await FindOnlyOneAsync(taxicompany => taxicompany.Email == email);
+            return await FindOnlyOneAsync(taxiCompany => taxiCompany.Email == email);
         }
     }
 }

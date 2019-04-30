@@ -18,13 +18,13 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Constructor for order repository. 
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">The context used to access the database.</param>
         public OrderRepository(ApplicationContext context) : base(context)
         {
         }
 
         /// <summary>
-        /// AddAsync a ride to an order 
+        /// Adds a ride to an order asynchronously.
         /// </summary>
         /// <param name="ride"></param>
         /// <param name="order"></param>
@@ -44,7 +44,7 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// FindAsync all orders with status waiting for accept. 
+        /// Finds all orders with the status waiting for accept. 
         /// </summary>
         /// <returns>List of orders with status waiting for accept.</returns>
         public async Task<List<Order>> FindOpenOrdersAsync()
@@ -57,6 +57,7 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="order">The order that should have its status updated.</param>
         /// <param name="taxiCompanyId">The taxicompany that accepted the order.</param>
+        /// <exception cref="UnexpectedStatusException">Order is not waiting for accept, cannot be accepted.</exception> 
         public Task<Order> SetOrderToAccepted(Order order, string taxiCompanyId)
         {
             if (order.Status != OrderStatus.WaitingForAccept)

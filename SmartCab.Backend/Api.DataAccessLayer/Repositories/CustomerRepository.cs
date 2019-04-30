@@ -18,15 +18,16 @@ namespace Api.DataAccessLayer.Repositories
     /// </summary>
     /// <seealso cref="Api.DataAccessLayer.Interfaces.ICustomerRepository" />
     /// <seealso cref="System.IDisposable" />
-    public class CustomerRepository : GenericRepository<Customer>,ICustomerRepository
+    public class CustomerRepository : GenericRepository<Customer>, ICustomerRepository
     {
-
+        /// <summary>
+        /// Constructor for this class.
+        /// </summary>
+        /// <param name="context">The context used to access the database.</param>
         public CustomerRepository(ApplicationContext context) : base(context)
         {
 
         }
-
-
 
         public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
         {
@@ -59,31 +60,36 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-            /// Deposit amount to customer
-            /// </summary>
-            /// <param name="customerId">The customers id</param>
-            /// /// <param name="deposit">The amount to deposit</param>
-            /// <returns></returns>
-            /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-            public async Task DepositAsync(string customerId, decimal deposit)
+        /// Deposits the given amount to a customers account.
+        /// </summary>
+        /// <param name="customerId">The customers id.</param>
+        /// /// <param name="deposit">The amount to deposit.</param>
+        /// <returns></returns>
+        /// <exception cref="NegativeDepositException">Cannot deposit negative amount.</exception>
+        public async Task DepositAsync(string customerId, decimal deposit)
         {
-            if (deposit <=0)
+            if (deposit <= 0)
             {
                 throw new NegativeDepositException("Cannot deposit negative amount");
             }
 
             var customer = await FindByIDAsync(customerId);
-            
+
             //Update customer
             customer.Balance += deposit;
             await UpdateAsync(customer);
         }
+
         /// <summary>
-        /// Reserves price if customers balance is high enough to be positive. 
+        /// Reserves an amount equal to the price
         /// </summary>
+        /// <remarks>
+        /// Only succeeds if the customers has enough funds available on his/her account.<br/>
+        /// Throws an InsufficientFundsException when failing to reserve the money.
+        /// </remarks>
         /// <param name="customerId"></param>
         /// <param name="price"></param>
-        /// /// <exception cref="UserIdInvalidException">Not enough credit</exception>
+        /// <exception cref="InsufficientFundsException">Not enough credit</exception>
         public async Task ReservePriceFromCustomerAsync(string customerId, decimal price)
         {
             var customer = await FindByIDAsync(customerId);

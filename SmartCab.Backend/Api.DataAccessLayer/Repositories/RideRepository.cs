@@ -32,6 +32,7 @@ namespace Api.DataAccessLayer.Repositories
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        /// <exception cref="UnexpectedStatusException">Ride is not waiting for accept, cannot be accepted.</exception> 
         public async Task SetAllRidesToAccepted(List<Ride> rides)
         {
             foreach (var ride in rides)
