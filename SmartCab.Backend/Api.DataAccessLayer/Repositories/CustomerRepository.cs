@@ -59,24 +59,6 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Gets the customer asynchronous based on the email. Throws if customer doesn't exist. 
-        /// </summary>
-        /// <param name="email">The email.</param>
-        /// <returns></returns>
-        /// <exception cref="UserIdInvalidException">Customer does not exist.</exception>
-        public async Task<Customer> GetCustomerAsync(string email)
-        {
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
-
-            if (customer == null)
-            {
-                throw new UserIdInvalidException("Customer does not exist.");
-            }
-
-            return customer;
-        }
-
-        /// <summary>
             /// Deposit amount to customer
             /// </summary>
             /// <param name="customerId">The customers id</param>

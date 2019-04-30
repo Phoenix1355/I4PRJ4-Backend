@@ -132,6 +132,8 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns>Returns the entity</returns>
         public virtual async Task<TEntity> UpdateAsync(TEntity entityToUpdate)
         {
+            Console.WriteLine("Attention grapper: HEJ");
+            Console.WriteLine(_context.Entry(entityToUpdate).State);
             if (_context.Entry(entityToUpdate).State == EntityState.Added)
             {
                 _dbSet.Remove(entityToUpdate);
