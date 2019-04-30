@@ -107,12 +107,12 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="password"></param>
         /// <param name="oldPassword"></param>
         /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, Customer newCustomer, string password, string oldPassword)
+        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string email, string password, string oldPassword)
         {
             IdentityResult resultEmail, resultPassword;
 
-            if (newCustomer.Email != user.Email)
-                resultEmail = await ChangeEmail(user, newCustomer);
+            if (email != user.Email)
+                resultEmail = await ChangeEmail(user, email);
             else
                 resultEmail = IdentityResult.Success;
 
@@ -148,14 +148,14 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="user"></param>
         /// <param name="newCustomer"></param>
         /// <returns></returns>
-        private async Task<IdentityResult> ChangeEmail(IdentityUser user, Customer newCustomer)
+        private async Task<IdentityResult> ChangeEmail(IdentityUser user, string email)
         {
-            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, newCustomer.Email);
-            var response = await _userManager.ChangeEmailAsync(user, newCustomer.Email, emailConfirmationCode);
+            var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, email);
+            var response = await _userManager.ChangeEmailAsync(user, email, emailConfirmationCode);
             await _userManager.UpdateAsync(user);
             await _userManager.UpdateNormalizedEmailAsync(user);
 
-            await _userManager.SetUserNameAsync(user, newCustomer.Email);
+            await _userManager.SetUserNameAsync(user, email);
             await _userManager.UpdateNormalizedUserNameAsync(user);
 
             return response;

@@ -14,6 +14,6 @@ namespace Api.DataAccessLayer.Interfaces
         Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role);
         Task<SignInResult> SignInAsync(string email, string password);
         Task TransactionWrapper(Func<Task> func);
-        Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, Customer newCustomer, string password, string oldPassword);
+        Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string email, string password, string oldPassword);
     }
 }

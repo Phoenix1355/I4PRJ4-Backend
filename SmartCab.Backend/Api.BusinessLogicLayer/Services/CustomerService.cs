@@ -120,18 +120,25 @@ namespace Api.BusinessLogicLayer.Services
             //First sign in to ensure, that the old password is correct (throws identity exception if login fails)
             await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.OldPassword);
 
-            var customer = new Customer
-            {
-                Id = customerId,
-                Email = request.Email,
-                Name = request.Name,
-                PhoneNumber = request.PhoneNumber,
-            };
+            
+
+            var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
+            customer.Name = request.Name;
+            customer.PhoneNumber = request.PhoneNumber;
+
             var password = request.Password;
             var oldPassword = request.OldPassword;
 
-            customer = await _unitOfWork.CustomerRepository.EditCustomerAsync(customer, customerId, password, oldPassword);
+            await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
+            {
+                await _unitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, request.Email, password, oldPassword);
+                await _unitOfWork.CustomerRepository.UpdateAsync(customer);
+                await _unitOfWork.SaveChangesAsync();
+            });
             
+            
+
+
             var customerDto = _mapper.Map<CustomerDto>(customer);
             var response = new EditCustomerResponse
             {

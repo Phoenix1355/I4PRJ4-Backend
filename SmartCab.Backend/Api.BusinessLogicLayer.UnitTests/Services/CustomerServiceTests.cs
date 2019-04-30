@@ -237,7 +237,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [Test]
         public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponse()
         {
-
+            
             //Arrange
             var request = new EditCustomerRequest
             {
@@ -282,7 +282,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Customer = customerDto
             };
-
+            _unitOfWork.CustomerRepository.FindByIDAsync(null).ReturnsForAnyArgs(customer);
             _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
 
             //Act
@@ -290,6 +290,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             //Assert
             Assert.That(response.Customer, Is.EqualTo(editCustomerResponse.Customer));
+            
         }
         #endregion
 
