@@ -140,8 +140,7 @@ namespace Api.DataAccessLayer.Repositories
                 await _dbSet.AddAsync(entityToUpdate);
                 return entityToUpdate;
             }
-            _dbSet.Attach(entityToUpdate);
-            _context.Entry(entityToUpdate).State = EntityState.Modified;
+            _dbSet.Update(entityToUpdate);
             return entityToUpdate;
         }
     }

@@ -80,10 +80,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             using (var context = _factory.CreateContext())
             {
                 context.Customers.Add(customer);
-                foreach (var ride in rides)
-                {
-                    context.Rides.Add(ride);
-                }
                 context.SaveChanges();
             }
 
@@ -138,10 +134,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             using (var context = _factory.CreateContext())
             {
                 context.Customers.Add(customer);
-                foreach (var ride in rides)
-                {
-                    context.Rides.Add(ride);
-                }
                 context.SaveChanges();
             }
 
