@@ -40,7 +40,7 @@ namespace Api.DataAccessLayer.Repositories
 
             order.Price += ride.Price;
             order.Rides.Add(ride);
-            UpdateAsync(order);
+            Update(order);
             return order;
         }
 
@@ -59,7 +59,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <param name="order">The order that should have its status updated.</param>
         /// <param name="taxiCompanyId">The taxicompany that accepted the order.</param>
         /// <exception cref="UnexpectedStatusException">Order is not waiting for accept, cannot be accepted.</exception> 
-        public Task<Order> SetOrderToAccepted(Order order, string taxiCompanyId)
+        public Order SetOrderToAccepted(Order order, string taxiCompanyId)
         {
             if (order.Status != OrderStatus.WaitingForAccept)
             {
@@ -68,7 +68,7 @@ namespace Api.DataAccessLayer.Repositories
             //Set status
             order.TaxiCompanyId = taxiCompanyId;
             order.Status = OrderStatus.Accepted;
-            return UpdateAsync(order);
+            return Update(order);
         }
     }
 }

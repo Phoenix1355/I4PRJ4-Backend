@@ -438,7 +438,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
             var orderCreated = CreateTestOrderWithSoloRideInDatabase();
-            var order = await _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
+            var order =  _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
             Assert.That(order.Status,Is.EqualTo(OrderStatus.Accepted));
         }
 
@@ -453,7 +453,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
             var orderCreated = CreateTestOrderWithSoloRideInDatabase();
-            var order = await _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
+            var order =  _uut.OrderRepository.SetOrderToAccepted(orderCreated, taxi.Id); ;
             await _uut.SaveChangesAsync();
             using (var context = _factory.CreateContext())
             {
@@ -475,7 +475,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Status = OrderStatus.Accepted
             };
-            Assert.ThrowsAsync<UnexpectedStatusException>(async()=> await _uut.OrderRepository.SetOrderToAccepted(order, taxi.Id)); ;
+            Assert.ThrowsAsync<UnexpectedStatusException>(async()=>  _uut.OrderRepository.SetOrderToAccepted(order, taxi.Id)); ;
         }
         #endregion
 

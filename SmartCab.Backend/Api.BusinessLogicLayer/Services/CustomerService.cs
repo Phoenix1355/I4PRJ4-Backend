@@ -132,7 +132,7 @@ namespace Api.BusinessLogicLayer.Services
             await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
             {
                 await _unitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, request.Email, password, oldPassword);
-                await _unitOfWork.CustomerRepository.UpdateAsync(customer);
+                _unitOfWork.CustomerRepository.Update(customer);
                 await _unitOfWork.SaveChangesAsync();
             });
             

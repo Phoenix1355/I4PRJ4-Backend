@@ -58,7 +58,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
             
-            _unitofWork.TaxiCompanyRepository.AddAsync( null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.Add( null).ReturnsForAnyArgs(taxiCompany);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
@@ -85,7 +85,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _unitofWork.TaxiCompanyRepository.AddAsync(null).ReturnsForAnyArgs(taxiCompany);
+            _unitofWork.TaxiCompanyRepository.Add(null).ReturnsForAnyArgs(taxiCompany);
 
             var taxiCompanyDto = new TaxiCompanyDto
             {

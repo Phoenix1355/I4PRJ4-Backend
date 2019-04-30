@@ -66,7 +66,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 PhoneNumber = request.PhoneNumber
             };
 
-            _unitOfWork.CustomerRepository.AddAsync( null).ReturnsForAnyArgs(customer);
+            _unitOfWork.CustomerRepository.Add( null).ReturnsForAnyArgs(customer);
             _jwtService.GenerateJwtToken(null, null, null).ReturnsForAnyArgs("TheGeneratedToken");
 
             var response = await _customerService.AddCustomerAsync(request);

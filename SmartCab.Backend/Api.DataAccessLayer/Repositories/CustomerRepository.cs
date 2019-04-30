@@ -77,7 +77,7 @@ namespace Api.DataAccessLayer.Repositories
 
             //Update customer
             customer.Balance += deposit;
-            UpdateAsync(customer);
+            Update(customer);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Api.DataAccessLayer.Repositories
                 throw new InsufficientFundsException("Not enough credit");
             }
 
-            UpdateAsync(customer);
+            Update(customer);
         }
 
         /// <summary>

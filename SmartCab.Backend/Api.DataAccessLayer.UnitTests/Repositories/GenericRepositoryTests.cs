@@ -208,7 +208,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
         #endregion
 
-        #region AddAsync
+        #region Add
 
         [Test]
         public async Task Add_EntityAdded_EntityAddedToDatabase()
@@ -217,7 +217,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Name = "Madas"
             };
-            await _uut.AddAsync(customer);
+            _uut.Add(customer);
             //To test
             _context.SaveChanges();
 
@@ -235,7 +235,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             {
                 Name = "Madas"
             };
-            await _uut.AddAsync(customer);
+             _uut.Add(customer);
             //To test
             _context.SaveChanges();
 
@@ -310,7 +310,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
 
             customer.Name = "MadasUpdated";
-            await _uut.UpdateAsync(customer);
+            _uut.Update(customer);
             _context.SaveChanges();
 
             using (var context = _factory.CreateContext())
@@ -327,9 +327,9 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Name = "Madas"
             };
 
-            await _uut.AddAsync(customer);
+             _uut.Add(customer);
             customer.Name = "MadasUpdated";
-            await _uut.UpdateAsync(customer);
+            _uut.Update(customer);
             _context.SaveChanges();
 
             using (var context = _factory.CreateContext())

@@ -26,12 +26,12 @@ namespace Api.DataAccessLayer.Repositories
 
         Task<TEntity> FindByIDAsync(object id);
 
-        Task<TEntity> AddAsync(TEntity entity);
+        TEntity Add(TEntity entity);
 
         Task DeleteAsync(object id);
 
         void Delete(TEntity entityToDelete);
 
-        Task<TEntity> UpdateAsync(TEntity entityToUpdate);
+        TEntity Update(TEntity entityToUpdate);
     }
 }

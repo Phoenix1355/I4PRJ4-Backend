@@ -98,9 +98,9 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="entity"></param>
         /// <returns>Returns the added entity</returns>
-        public virtual async Task<TEntity> AddAsync(TEntity entity)
+        public virtual TEntity Add(TEntity entity)
         {
-            _dbSet.AddAsync(entity);
+            _dbSet.Add(entity);
             return entity;
         }
 
@@ -132,12 +132,12 @@ namespace Api.DataAccessLayer.Repositories
         /// </summary>
         /// <param name="entityToUpdate"></param>
         /// <returns>Returns the entity</returns>
-        public virtual async Task<TEntity> UpdateAsync(TEntity entityToUpdate)
+        public virtual TEntity Update(TEntity entityToUpdate)
         {
             if (_context.Entry(entityToUpdate).State == EntityState.Added)
             {
                 _dbSet.Remove(entityToUpdate);
-                _dbSet.AddAsync(entityToUpdate);
+                _dbSet.Add(entityToUpdate);
                 return entityToUpdate;
             }
             _dbSet.Update(entityToUpdate);
