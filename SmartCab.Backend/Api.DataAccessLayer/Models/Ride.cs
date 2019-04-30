@@ -37,5 +37,7 @@ namespace Api.DataAccessLayer.Models
         
         [Required]
         public RideStatus Status { get; set; }
+
+        public string DeviceId { get; set; }
     }
 }
