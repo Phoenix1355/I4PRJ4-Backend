@@ -109,5 +109,21 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
+        #region ChangeEmail
+
+        [Test]
+        public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
+        {
+            var user =_uut.
+            var email = "Axel@domain.com";
+            var NewEmail = "Hans@mail.com";
+
+            var response = await _mockUserManager.ChangeEmailAsync(, NewEmail, "token");
+
+            Assert.That(response, Is.EqualTo(NewEmail));
+        }
+
+        #endregion
+
     }
 }
