@@ -4,11 +4,12 @@ using Api.DataAccessLayer.Statuses;
 
 namespace Api.BusinessLogicLayer.DataTransferObjects
 {
-    public class OrderDto
+    public class OrderDetailedDto
     {
         public int Id { get; set; }
         public string Status { get; set; }
         public decimal Price { get; set; }
-        public List<RideDto> Rides { get; set; }
+        public List<RideDetailedDto> Rides { get; set; }
+        
     }
 }

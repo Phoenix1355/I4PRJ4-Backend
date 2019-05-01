@@ -33,38 +33,7 @@ namespace Api.Controllers
             _rideService = rideService;
         }
 
-        /// <summary>
-        /// Returns all available details about a specific ride.
-        /// </summary>
-        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
-        /// <param name="id">The id of the ride for which the details is returned.</param>
-        /// <returns>Details about a specific ride.</returns>
-        /// <response code="401">
-        /// An invalid JWT token was provided in the authorization header.<br/>
-        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
-        /// </response>
-        /// <response code="500">If an internal server error occured.</response>
-        [Produces("application/json")]
-        [Route("{id}/[action]")]
-        [HttpGet]
-        [ProducesResponseType(typeof(SoloRide), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Details([FromHeader] string authorization, int id)
-        {
-            try
-            {
-                throw new NotImplementedException("Not implemented yet");
-                var ride = new Ride(); //todo fetch details
-                return Ok(ride);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                var response = new ErrorMessage();
-                return StatusCode(StatusCodes.Status500InternalServerError, response);
-            }
-        }
-
-        /// <summary>
+       /// <summary>
         /// Creates a new ride and ties the ride to the customer sending the request.
         /// </summary>
         /// <remarks>
