@@ -71,5 +71,25 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             Assert.That(response.Order, Is.EqualTo(expectedResponse.Order));
         }
+
+
+        [Test]
+        public async Task GetOrderAsync_OrderExist_ReturnsOrderDetailedDto()
+        {
+            var order = new Order();
+            _unitOfWork.OrderRepository.FindByIDAsync(null).ReturnsForAnyArgs(order);
+            var orderDto = new OrderDetailedDto
+            {
+                Id = 1,
+                Price = 200,
+                Rides = null,
+                Status = RideStatus.WaitingForAccept.ToString()
+            };
+
+            _mapper.Map<OrderDetailedDto>(null).ReturnsForAnyArgs(orderDto);
+
+            var response = await _orderService.GetOrderAsync(1);
+            Assert.That(orderDto,Is.EqualTo(response));
+        }
     }
 }

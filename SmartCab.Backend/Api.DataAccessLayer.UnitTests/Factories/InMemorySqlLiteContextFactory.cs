@@ -10,6 +10,8 @@ namespace Api.DataAccessLayer.UnitTests.Factories
     {
         private DbConnection _connection;
 
+
+
         private DbContextOptions<ApplicationContext> CreateOptions()
         {
             return new DbContextOptionsBuilder<ApplicationContext>()

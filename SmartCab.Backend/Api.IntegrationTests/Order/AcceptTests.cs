@@ -91,7 +91,7 @@ namespace Api.IntegrationTests.Order
                 Order = new OrderDto()
                 {
                     Id = 1,
-                    Status = OrderStatus.Accepted.ToString(),
+                    Status = OrderStatus.Debited.ToString(),
                     Price = 100,
                     Rides = new List<RideDto>()
                     {
@@ -117,7 +117,7 @@ namespace Api.IntegrationTests.Order
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Orders.First().Status,Is.EqualTo(OrderStatus.Accepted));
+                Assert.That(context.Orders.First().Status,Is.EqualTo(OrderStatus.Debited));
             }
 
         }
@@ -137,7 +137,49 @@ namespace Api.IntegrationTests.Order
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Rides.First().Status, Is.EqualTo(RideStatus.Accepted));
+                Assert.That(context.Rides.First().Status, Is.EqualTo(RideStatus.Debited));
+            }
+        }
+
+        [TestCase(100, 0)]
+        [TestCase(200, 100)]
+        [TestCase(400, 300)]
+        public async Task Accept_OrderDoesExist_CustomerDebitedExpectedFixed100Price(int deposit, int expected)
+        {
+            await CreateRideWithLogin(deposit);
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            var response = await PutAsync(uri, null);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.First().Balance, Is.EqualTo(expected));
+            }
+        }
+
+        [TestCase(100, 0)]
+        [TestCase(200, 0)]
+        [TestCase(400, 0)]
+        public async Task Accept_OrderDoesExist_CustomerReservedExpectedFixed100Price(int deposit, int expected)
+        {
+            await CreateRideWithLogin(deposit);
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            var response = await PutAsync(uri, null);
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.First().ReservedAmount, Is.EqualTo(expected));
             }
         }
 
@@ -168,5 +210,6 @@ namespace Api.IntegrationTests.Order
                 
             }
         }
+
     }
 }

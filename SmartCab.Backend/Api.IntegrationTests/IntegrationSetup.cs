@@ -19,14 +19,14 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-        protected InMemoryApplicationFactory<Startup> _factory;
+        protected InMemoryApplicationFactory<FakeStartup> _factory;
 
         [SetUp]
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
             
-            _factory = new InMemoryApplicationFactory<Startup>(guid);
+            _factory = new InMemoryApplicationFactory<FakeStartup>(guid);
             
             _client = _factory.CreateClient();
         }
@@ -152,10 +152,10 @@ namespace Api.IntegrationTests
             var response = await PostAsync("api/rides/create", request);
         }
 
-        protected async Task CreateRideWithLogin(string email = "test12@gmail.com", RideType type = RideType.SoloRide)
+        protected async Task CreateRideWithLogin(int deposit = 1000,string email = "test12@gmail.com", RideType type = RideType.SoloRide)
         {
             await LoginOnCustomerAccount(email);
-            await DepositToCustomer(1000);
+            await DepositToCustomer(deposit);
             await CreateRide(type);
         }
 

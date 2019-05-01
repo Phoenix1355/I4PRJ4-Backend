@@ -51,5 +51,23 @@ namespace Api.DataAccessLayer.Repositories
                 Update(ride);
             }
         }
+
+        /// <summary>
+        /// Updates the status of all supplied rides to "Debited".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        /// <exception cref="UnexpectedStatusException">Ride is not accepted, cannot be debited.</exception> 
+        public void SetAllRidesToDebited(List<Ride> rides)
+        {
+            foreach (var ride in rides)
+            {
+                if (ride.Status != RideStatus.Accepted)
+                {
+                    throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
+                }
+                ride.Status = RideStatus.Debited;
+                Update(ride);
+            }
+        }
     }
 }
