@@ -228,7 +228,9 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPushNotificationFactory, PushNotificationFactory>();
+            services.AddScoped<IPushNotificationService, AppCenterPushNotificationService>();
         }
 
         /// <summary>

@@ -19,16 +19,22 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPushNotificationFactory _pushNotificationFactory;
+        private readonly IPushNotificationService _pushNotificationService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="unitOfWork">Used to access the database repositories</param>
-        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork)
+        /// /// <param name="pushNotificationFactory">Used to create new notifications</param>
+        /// /// <param name="pushNotificationService">Used to send notifications</param>
+        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork, IPushNotificationFactory pushNotificationFactory, IPushNotificationService pushNotificationService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _pushNotificationFactory = pushNotificationFactory;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -81,7 +87,19 @@ namespace Api.BusinessLogicLayer.Services
                 await _unitOfWork.CustomerRepository.DebitAsync(orderRide.CustomerId, orderRide.Price);
             }
 
-            //TODO: Implement UC15 (Notify customer)
+            //Send notification to customer(s)
+            foreach (var ride in order.Rides)
+            {
+                var notification = _pushNotificationFactory.GetPushNotification();
+                notification.Name = "Accept";
+                notification.Title = "Tur accepteret";
+                notification.Body = $"Din tur fra {ride.StartDestination.StreetName} {ride.StartDestination.StreetNumber} i {ride.StartDestination.CityName} til {ride.EndDestination.StreetName} {ride.EndDestination.StreetNumber} i {ride.EndDestination.CityName} er accepteret af {order.TaxiCompany.Name}";
+                notification.Devices.Add(ride.DeviceId);
+                notification.CustomData.Add("rideId", ride.Id.ToString());
+
+                await _pushNotificationService.SendAsync(notification);
+            }
+
             await _unitOfWork.SaveChangesAsync();
 
             var orderDto = _mapper.Map<OrderDto>(order);
