@@ -10,6 +10,5 @@ namespace Api.BusinessLogicLayer.DataTransferObjects
         public string Status { get; set; }
         public decimal Price { get; set; }
         public List<RideDetailedDto> Rides { get; set; }
-        
     }
 }
