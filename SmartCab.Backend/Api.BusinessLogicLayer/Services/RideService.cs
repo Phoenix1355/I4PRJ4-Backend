@@ -16,6 +16,7 @@ using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.Statuses;
 using AutoMapper;
 using CustomExceptions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
@@ -99,26 +100,80 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
         {
-            
+            //Map request to ride
             var ride = _mapper.Map<SharedRide>(request);
 
+            //Calculate price and attach customer
             ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
             ride.CustomerId = customerId;
 
-            //Reserve the money, create the order and return the created order
+            //Reserve the money and save the data to the database. 
             await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
             ride = (SharedRide)_unitOfWork.RideRepository.Add(ride);
-
-            var order = _unitOfWork.OrderRepository.Add(new Order());
-            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
             await _unitOfWork.SaveChangesAsync();
-            var response = _mapper.Map<CreateRideResponse>(ride);
 
-            //Check for match
+            
 
+            //Get other unmatched rides. 
+            var openSharedRides = await _unitOfWork.RideRepository.FindUnmatchedSharedRides();
 
+            //Match against original
+            foreach (var openSharedRide in openSharedRides)
+            {
+                //Check if it's self first
+                if (ride.Id == openSharedRide.Id)
+                {
+                    continue;
+                }
 
-            return response;
+                //If it matches close enough.
+                if (Match(ride, openSharedRide))
+                {
+                    //Opdate statuses of rides
+                    ride.Status = RideStatus.WaitingForAccept;
+                    _unitOfWork.RideRepository.Update(ride);
+                    openSharedRide.Status = RideStatus.WaitingForAccept;
+                    _unitOfWork.RideRepository.Update(openSharedRide);
+
+                    //Create order for ride
+                    var order = _unitOfWork.OrderRepository.Add(new Order());
+                    await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
+                    await _unitOfWork.OrderRepository.AddRideToOrderAsync(openSharedRide, order);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    //Return the ride
+                    var responseMatched = _mapper.Map<CreateRideResponse>(ride);
+                    return responseMatched;
+                    
+                }
+            }
+            //No match
+            var responseUnMatched = _mapper.Map<CreateRideResponse>(ride);
+            return responseUnMatched;
+        }
+
+       
+
+        /// <summary>
+        /// Matches two trips against each other. If start and end destination of the two trips are within 1 km of each other, they match. This is air distance. 
+        /// </summary>
+        /// <param name="ride1"></param>
+        /// <param name="ride2"></param>
+        /// <returns></returns>
+        private bool Match(Ride ride1, Ride ride2)
+        {
+            //This is flight distance so should be taken with a gram of salt. 
+            var distanceBetweenStartDestinationsInKm = Haversine.calculate(ride1.StartDestination.Lat, ride1.StartDestination.Lng, ride2.StartDestination.Lat,
+                ride2.StartDestination.Lng);
+            var distanceBetweenEndDestinationsInKm = Haversine.calculate(ride1.EndDestination.Lat, ride1.EndDestination.Lng, ride2.EndDestination.Lat,
+                ride2.EndDestination.Lng);
+            if (distanceBetweenEndDestinationsInKm < 1 && distanceBetweenStartDestinationsInKm < 1)
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
         /// <summary>

@@ -29,7 +29,12 @@ namespace Api.DataAccessLayer.Repositories
         }
 
 
-        public async Task<List<SharedRide>> FindUnmatchedSharedRides() { }
+        public async Task<List<Ride>> FindUnmatchedSharedRides()
+        {
+            
+            return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
+            
+        }
 
         /// <summary>
         /// Updates the status of all supplied rides to "Accepted".
