@@ -114,13 +114,15 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
         {
-            var user =_uut.
-            var email = "Axel@domain.com";
+            //var email = "Axel@domain.com";
+
+            var user = _mockUserManager.
+
             var NewEmail = "Hans@mail.com";
 
-            var response = await _mockUserManager.ChangeEmailAsync(, NewEmail, "token");
+            var response = await _mockUserManager.ChangeEmailAsync(null, NewEmail, "token");
 
-            Assert.That(response, Is.EqualTo(NewEmail));
+            Assert.That(response, Is.EqualTo(IdentityResult.Success));
         }
 
         #endregion
