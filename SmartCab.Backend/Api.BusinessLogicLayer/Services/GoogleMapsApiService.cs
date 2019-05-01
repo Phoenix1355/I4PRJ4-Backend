@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Models;
 using CustomExceptions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
@@ -93,9 +94,9 @@ namespace Api.BusinessLogicLayer.Services
         /// <param name="address">The address that should be validated.</param>
         /// <exception cref="Exception"></exception>
         /// <exception cref="GoogleMapsApiException"></exception>
-        public async Task ValidateAddressAsync(string address)
+        public async Task ValidateAddressAsync(Address address)
         {
-            var uri = new Uri(GetGeocodingRequestUrl(address));
+            var uri = new Uri(GetGeocodingRequestUrl(address.ToString()));
             var response = await _client.GetAsync(uri);
             if (!response.IsSuccessStatusCode)
             {
@@ -111,19 +112,23 @@ namespace Api.BusinessLogicLayer.Services
                 throw new Exception("The response from the Google Maps Api was invalid. Most likely due to an invalid API key.");
             }
 
-            var locationType = geocodingResponse
+
+            var geometryResponse = geocodingResponse
                                .Results.FirstOrDefault()?
-                               .Geometry
-                               .LocationType;
+                               .Geometry;
 
             //"ROOFTOP" indicates the address is precise down to street level
             //"RANGE_INTERPOLATED" indicates the result reflects an approximation (usually on a road)
             //interpolated between two precise points (such as intersections). This is good enough
             //https://developers.google.com/maps/documentation/geocoding/intro#reverse-restricted
-            if (locationType != "ROOFTOP" && locationType != "RANGE_INTERPOLATED")
+            if (geometryResponse.LocationType != "ROOFTOP" && geometryResponse.LocationType != "RANGE_INTERPOLATED")
             {
                 throw new GoogleMapsApiException($"The address \"{address}\" is not valid.");
             }
+
+            //Set lat and lon
+            address.Lat = geometryResponse.Location.Lat;
+            address.Lng = geometryResponse.Location.Lng;
         }
 
         /// <summary>

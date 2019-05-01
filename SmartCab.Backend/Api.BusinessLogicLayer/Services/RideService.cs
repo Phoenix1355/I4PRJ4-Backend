@@ -131,8 +131,8 @@ namespace Api.BusinessLogicLayer.Services
             //Validate the addresses
             var firstAsString = first.ToString();
             var secondAsString = second.ToString();
-            var validateOrigin = _googleMapsApiService.ValidateAddressAsync(firstAsString);
-            var validateDestination = _googleMapsApiService.ValidateAddressAsync(firstAsString);
+            var validateOrigin = _googleMapsApiService.ValidateAddressAsync(first);
+            var validateDestination = _googleMapsApiService.ValidateAddressAsync(second);
             await Task.WhenAll(validateOrigin, validateDestination);
 
             //Validation ok (otherwise an exception would be thrown above)
