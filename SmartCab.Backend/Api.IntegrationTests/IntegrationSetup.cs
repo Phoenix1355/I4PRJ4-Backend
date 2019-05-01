@@ -19,14 +19,14 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-        protected InMemoryApplicationFactory<Startup> _factory;
+        protected InMemoryApplicationFactory<FakeStartup> _factory;
 
         [SetUp]
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
             
-            _factory = new InMemoryApplicationFactory<Startup>(guid);
+            _factory = new InMemoryApplicationFactory<FakeStartup>(guid);
             
             _client = _factory.CreateClient();
         }

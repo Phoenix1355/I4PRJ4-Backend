@@ -65,7 +65,7 @@ namespace Api
         /// <param name="env">The environment for the application</param>
         /// <param name="dbContext">The DbContext used by the application</param>
         /// <param name="services">The service container for the application</param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationContext dbContext, IServiceProvider services)
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationContext dbContext, IServiceProvider services)
         {
             if (env.IsDevelopment())
             {
@@ -92,8 +92,9 @@ namespace Api
             app.UseMvc();
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
-            //dbContext.Database.Migrate();
-            dbContext.Database.EnsureCreated();
+            
+            dbContext.Database.Migrate();
+            //dbContext.Database.EnsureCreated();
 
             CreateRoles(services).Wait();
         }
@@ -271,7 +272,7 @@ namespace Api
         /// Creates a number of roles in the database if they do not already exist.
         /// </summary>
         /// <param name="services">The container to register to.</param>
-        private async Task CreateRoles(IServiceProvider services)
+        protected async Task CreateRoles(IServiceProvider services)
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 

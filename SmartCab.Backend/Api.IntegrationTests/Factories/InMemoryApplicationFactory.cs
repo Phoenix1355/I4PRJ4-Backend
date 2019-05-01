@@ -17,8 +17,8 @@ using Microsoft.Extensions.Logging;
 
 namespace SmartCabPoc.Integration.Test
 {
-    public class InMemoryApplicationFactory<TStartup>
-        : WebApplicationFactory<Startup>
+    public class InMemoryApplicationFactory<TFakeStartup>
+        : WebApplicationFactory<FakeStartup>
     {
 
         private string _guid;
