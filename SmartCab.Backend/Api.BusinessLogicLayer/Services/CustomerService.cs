@@ -118,15 +118,19 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
             var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
+
             customer.Name = request.Name;
             customer.PhoneNumber = request.PhoneNumber;
-
-            var password = request.Password;
-            var oldPassword = request.OldPassword;
-
+            
             await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
             {
-                await _unitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, request.Email, password, oldPassword);
+                if (request.ChangePassword == true)
+                {
+                    var password = request.Password;
+                    var oldPassword = request.OldPassword;
+                    await _unitOfWork.IdentityUserRepository.ChangePasswordAsync(customer, password, oldPassword);
+                }
+                await _unitOfWork.IdentityUserRepository.ChangeEmailAsync(customer, request.Email);
                 _unitOfWork.CustomerRepository.Update(customer);
                 await _unitOfWork.SaveChangesAsync();
             });
