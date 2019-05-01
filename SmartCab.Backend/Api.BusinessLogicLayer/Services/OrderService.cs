@@ -60,6 +60,8 @@ namespace Api.BusinessLogicLayer.Services
             _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
             _unitOfWork.OrderRepository.SetOrderToAccepted(order, taxiCompanyId);
             //TODO: Implement UC14 (debit customer)
+            _unitOfWork.OrderRepository.SetOrderToDebited(order);
+
             //TODO: Implement UC15 (Notify customer)
             await _unitOfWork.SaveChangesAsync();
 

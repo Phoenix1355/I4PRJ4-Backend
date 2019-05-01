@@ -45,5 +45,7 @@ namespace Api.DataAccessLayer.Repositories
                 Update(ride);
             }
         }
+
+
     }
 }

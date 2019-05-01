@@ -4,6 +4,7 @@
     {
         WaitingForAccept,
         Accepted,
-        Expired
+        Expired,
+        Debited
     }
 }
