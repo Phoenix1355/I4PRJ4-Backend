@@ -92,7 +92,12 @@ namespace Api
             app.UseMvc();
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
+            //ATTENTION: Make sure to use migrations when publishing to Azure:
+            // Uncomment the line below
+            // Comment out the line containing "EnsureCreated"
             //dbContext.Database.Migrate();
+            
+            //We MUST use "EnsureCreated" when running our integration tests, else they will fail.
             dbContext.Database.EnsureCreated();
 
             CreateRoles(services).Wait();
