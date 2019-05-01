@@ -129,6 +129,79 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
+        #region DebitAsync
+        [Test]
+        public async Task DebitAsync_NoCustomer_ThrowsContainsMessage()
+        {
+            try
+            {
+                await _uut.CustomerRepository.DebitAsync("Not valid Id", 1);
+            }
+            catch (UserIdInvalidException e)
+            {
+                Assert.That(e.Message, Is.EqualTo("No entity with given id"));
+            }
+        }
+
+
+
+        [TestCase(1)]
+        [TestCase(100)]
+        [TestCase(100000)]
+        public async Task DebitAsync_DebitsAmounts_CustomerAccountHasExpectedBalance(decimal debit)
+        {
+            var customer = addCustomerToTestDatabase();
+
+            await _uut.CustomerRepository.DebitAsync(customer.Id, debit);
+            _uut.SaveChangesAsync();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(-debit));
+            }
+        }
+
+        [TestCase(0)]
+        [TestCase(-100)]
+        [TestCase(-100000)]
+        public async Task DebitAsync_DepositAmountsNegativeAmount_ThrowsNegativeDepositException(decimal debit)
+        {
+            Assert.ThrowsAsync<NegativeDepositException>(async () => await _uut.CustomerRepository.DebitAsync("No Id as validation occurs first", debit));
+        }
+
+        [Test]
+        public async Task DebitAsyncc_DepositAmountTwice_CustomerAccountHasReceivedExpectedAmount()
+        {
+            var customer = addCustomerToTestDatabase();
+
+            await _uut.CustomerRepository.DebitAsync(customer.Id, 100);
+            await _uut.CustomerRepository.DebitAsync(customer.Id, 200);
+            _uut.SaveChangesAsync();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.Find(customer.Id).Balance, Is.EqualTo(-300));
+            }
+        }
+
+        [Test]
+        public async Task DebitAsyncc_DepositAmountTwice_CustomerAccountHasReservedExpectedAmount()
+        {
+            var customer = addCustomerToTestDatabase();
+
+            await _uut.CustomerRepository.DebitAsync(customer.Id, 100);
+            await _uut.CustomerRepository.DebitAsync(customer.Id, 200);
+            _uut.SaveChangesAsync();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Customers.Find(customer.Id).ReservedAmount, Is.EqualTo(-300));
+            }
+        }
+
+        #endregion
+
+
         #region ReservePriceFromCustomerAsync
 
         [Test]

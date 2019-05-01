@@ -81,6 +81,29 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
+        /// Debits the given amount to a customers account.
+        /// </summary>
+        /// <param name="customerId">The customers id.</param>
+        /// /// <param name="debit">The amount to debit.</param>
+        /// <returns></returns>
+        /// <exception cref="NegativeDepositException">Cannot debit negative amount.</exception>
+        public async Task DebitAsync(string customerId, decimal debit)
+        {
+            if (debit <= 0)
+            {
+                throw new NegativeDepositException("Cannot debit negative amount");
+            }
+
+            var customer = await FindByIDAsync(customerId);
+
+            //Debit from the customer balance
+            customer.Balance -= debit;
+            //Remove the reserved amount. 
+            customer.ReservedAmount -= debit;
+            Update(customer);
+        }
+
+        /// <summary>
         /// Reserves an amount equal to the price
         /// </summary>
         /// <remarks>
