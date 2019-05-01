@@ -52,14 +52,15 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         
 
         
-        private Customer addCustomerToTestDatabase(int balance = 0)
+        private Customer addCustomerToTestDatabase(int balance = 0, int reservedAmount = 0)
         {
             Customer customer = new Customer
             {
                 Email = "valid@email.com",
                 Name = "Name",
                 PhoneNumber = "12345678",
-                Balance = balance
+                Balance = balance,
+                ReservedAmount = reservedAmount
             };
 
             using (var context = _factory.CreateContext())
@@ -147,18 +148,30 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         [TestCase(1)]
         [TestCase(100)]
-        [TestCase(100000)]
+        [TestCase(1000)]
         public async Task DebitAsync_DebitsAmounts_CustomerAccountHasExpectedBalance(decimal debit)
         {
-            var customer = addCustomerToTestDatabase();
+            var customer = addCustomerToTestDatabase(1000,1000);
 
             await _uut.CustomerRepository.DebitAsync(customer.Id, debit);
             _uut.SaveChangesAsync();
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(-debit));
+                Assert.That(context.Customers.FirstOrDefault().Balance, Is.EqualTo(1000-debit));
             }
+        }
+
+        [TestCase(100,1500)]
+        [TestCase(1500, 100)]
+        [TestCase(999, 100)]
+        [TestCase(100, 999)]
+        [TestCase(999, 999)]
+        public async Task DebitAsync_DebitsAmounts_CustomerAccountHasInsufficientFundsThrowsException(int balance, int reserved)
+        {
+            var customer = addCustomerToTestDatabase(balance, reserved);
+            
+            Assert.ThrowsAsync<InsufficientFundsException>(async ()=>await _uut.CustomerRepository.DebitAsync(customer.Id, 1000));
         }
 
         [TestCase(0)]
@@ -172,7 +185,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public async Task DebitAsyncc_DepositAmountTwice_CustomerAccountHasReceivedExpectedAmount()
         {
-            var customer = addCustomerToTestDatabase();
+            var customer = addCustomerToTestDatabase(1000,1000);
 
             await _uut.CustomerRepository.DebitAsync(customer.Id, 100);
             await _uut.CustomerRepository.DebitAsync(customer.Id, 200);
@@ -180,14 +193,14 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.Find(customer.Id).Balance, Is.EqualTo(-300));
+                Assert.That(context.Customers.Find(customer.Id).Balance, Is.EqualTo(700));
             }
         }
 
         [Test]
         public async Task DebitAsyncc_DepositAmountTwice_CustomerAccountHasReservedExpectedAmount()
         {
-            var customer = addCustomerToTestDatabase();
+            var customer = addCustomerToTestDatabase(400,400);
 
             await _uut.CustomerRepository.DebitAsync(customer.Id, 100);
             await _uut.CustomerRepository.DebitAsync(customer.Id, 200);
@@ -195,7 +208,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.Find(customer.Id).ReservedAmount, Is.EqualTo(-300));
+                Assert.That(context.Customers.Find(customer.Id).ReservedAmount, Is.EqualTo(100));
             }
         }
 

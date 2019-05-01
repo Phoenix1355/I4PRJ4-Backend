@@ -96,6 +96,15 @@ namespace Api.DataAccessLayer.Repositories
 
             var customer = await FindByIDAsync(customerId);
 
+            //Constraints shuold be that reserved amount should atleast be debit amount, as we can never owe money to customer, 
+            //Balance should atleast be debit, as a customer cannot be lend money. 
+            //This in principal means that the order is invalid in some sense?
+            if (customer.Balance < debit || customer.ReservedAmount < debit)
+            {
+                throw new InsufficientFundsException(
+                    "Cannot debit order as customer does not hold enough funds. Invalid Order");
+            }
+
             //Debit from the customer balance
             customer.Balance -= debit;
             //Remove the reserved amount. 

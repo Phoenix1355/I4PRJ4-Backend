@@ -64,9 +64,8 @@ namespace Api.BusinessLogicLayer.Services
             _unitOfWork.RideRepository.SetAllRidesToDebited(order.Rides);
             foreach (var orderRide in order.Rides)
             {
-                
+                await _unitOfWork.CustomerRepository.DebitAsync(orderRide.CustomerId, orderRide.Price);
             }
-
 
             //TODO: Implement UC15 (Notify customer)
             await _unitOfWork.SaveChangesAsync();
