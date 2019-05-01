@@ -117,11 +117,6 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
-            //First sign in to ensure, that the old password is correct (throws identity exception if login fails)
-            await _unitOfWork.IdentityUserRepository.SignInAsync(request.Email, request.OldPassword);
-
-            
-
             var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
             customer.Name = request.Name;
             customer.PhoneNumber = request.PhoneNumber;
@@ -136,9 +131,6 @@ namespace Api.BusinessLogicLayer.Services
                 await _unitOfWork.SaveChangesAsync();
             });
             
-            
-
-
             var customerDto = _mapper.Map<CustomerDto>(customer);
             var response = new EditCustomerResponse
             {

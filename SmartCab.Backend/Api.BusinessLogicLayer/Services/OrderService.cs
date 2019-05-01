@@ -44,6 +44,17 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
+        /// Returns an orderDto containing all key information about order. 
+        /// </summary>
+        /// <returns>An object containing all open orders stored in the system</returns>
+        public async Task<OrderDetailedDto> GetOrderAsync(int orderId)
+        {
+            var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
+            var orderDto = _mapper.Map<OrderDetailedDto>(order);
+            return orderDto;
+        }
+
+        /// <summary>
         /// Changes an order and all its associated rides to the status 'Accepted'.
         /// </summary>
         /// <remarks>
