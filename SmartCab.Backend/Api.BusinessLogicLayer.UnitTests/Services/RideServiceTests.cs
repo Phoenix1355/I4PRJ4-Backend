@@ -27,6 +27,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IPriceStrategy _sharedRidePriceStrategy;
         private IPriceStrategyFactory _priceStrategyFactory;
         private RideService _rideService;
+        private IMatchService _matchService;
         private IUnitOfWork _unitOfWork;
         private Address _anAddress; //An address object to be reused throughout the tests
 
@@ -40,8 +41,10 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _sharedRidePriceStrategy = Substitute.For<IPriceStrategy>();
             _priceStrategyFactory = Substitute.For<IPriceStrategyFactory>();
             _unitOfWork = Substitute.For<IUnitOfWork>();
-            _rideService = new RideService(_mapper, _googleMapsApiService, _priceStrategyFactory, _unitOfWork);
+            _matchService = Substitute.For<IMatchService>();
+            _rideService = new RideService(_mapper, _googleMapsApiService, _priceStrategyFactory, _unitOfWork, _matchService);
             _anAddress = new Address("city", 1000, "street", 1);
+
         }
 
         [Test]
@@ -104,29 +107,37 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         }
 
         //TODO: Adding a shared ride is not implemented yet, but the test will most likely not change
-        //[Test]
-        //public async Task AddRideAsync_WhenRideIsASharedRide_ReturnsACreateRideResponseContainingTheCorrectPrice()
-        //{
-        //    decimal distance = 10;
-        //    decimal calculatedPrice = 100;
+        [Test]
+        public async Task AddRideAsync_WhenRideIsASharedRide_ReturnsACreateRideResponseContainingTheCorrectPrice()
+        {
+            decimal distance = 10;
+            decimal calculatedPrice = 100;
 
-        //    _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
-        //        .ReturnsForAnyArgs(distance);
-        //    _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
-        //    var expectedResponse = new CreateRideResponse { Price = calculatedPrice };
-        //    _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
-        //    _mapper.Map<SoloRide>(null)
-        //        .ReturnsForAnyArgs(new SoloRide { StartDestination = _anAddress, EndDestination = _anAddress });
-        //    var request = new CreateRideRequest
-        //    {
-        //        StartDestination = _anAddress,
-        //        EndDestination = _anAddress,
-        //        IsShared = true
-        //    };
+            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(distance);
+            _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
+            var expectedResponse = new CreateRideResponse { Price = calculatedPrice };
+            _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
+            _mapper.Map<SharedRide>(null)
+                .ReturnsForAnyArgs(new SharedRide { StartDestination = _anAddress, EndDestination = _anAddress });
+            var request = new CreateRideRequest
+            {
+                StartDestination = _anAddress,
+                EndDestination = _anAddress,
+                RideType = RideType.SharedRide
+            };
 
-        //    var response = await _rideService.AddRideAsync(request, "aCustomerId");
+            _unitOfWork.RideRepository.FindUnmatchedSharedRides().ReturnsForAnyArgs(new List<Ride>()
+            {
+                new Ride()
+                {
+                    StartDestination = _anAddress, EndDestination = _anAddress
+                }
+            });
 
-        //    Assert.That(response.Price, Is.EqualTo(calculatedPrice));
-        //}
+            var response = await _rideService.AddRideAsync(request, "aCustomerId");
+
+            Assert.That(response.Price, Is.EqualTo(calculatedPrice));
+        }
     }
 }

@@ -30,7 +30,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly IMatchService _matchService;
         /// <summary>
         /// Constructor for this class.
         /// </summary>
@@ -43,12 +43,14 @@ namespace Api.BusinessLogicLayer.Services
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
             IPriceStrategyFactory priceStrategyFactory,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IMatchService matchService)
         {
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
             _unitOfWork = unitOfWork;
+            _matchService = matchService;
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace Api.BusinessLogicLayer.Services
                 }
 
                 //If it matches close enough.
-                if (Match(ride, openSharedRide))
+                if (_matchService.Match(ride, openSharedRide,1))
                 {
                     //Opdate statuses of rides
                     await CreateOrderForMatchedRide(ride, openSharedRide);
@@ -148,7 +150,7 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
-        /// Opdate the given rides to WaitinForAccept and create order. 
+        /// Opdate the given rides to WaitinForAccept and creates the order. 
         /// </summary>
         /// <param name="ride1"></param>
         /// <param name="ride2"></param>
@@ -167,52 +169,6 @@ namespace Api.BusinessLogicLayer.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Matches two trips against each other. If start and end destination of the two trips are within 1 km of each other, they match. This is air distance. 
-        /// </summary>
-        /// <param name="ride1"></param>
-        /// <param name="ride2"></param>
-        /// <returns></returns>
-        private bool Match(Ride ride1, Ride ride2)
-        {
-            //This is flight distance so should be taken with a gram of salt. 
-            var distanceBetweenStartDestinationsInKm = Haversine.calculate(ride1.StartDestination.Lat, ride1.StartDestination.Lng, ride2.StartDestination.Lat,
-                ride2.StartDestination.Lng);
-            var distanceBetweenEndDestinationsInKm = Haversine.calculate(ride1.EndDestination.Lat, ride1.EndDestination.Lng, ride2.EndDestination.Lat,
-                ride2.EndDestination.Lng);
-            if (distanceBetweenEndDestinationsInKm < 1 && distanceBetweenStartDestinationsInKm < 1)
-            {
-                return true;
-            }
-
-            return false;
-
-        }
-
-        /// <summary>
-        /// Taken directly from https://stackoverflow.com/questions/41621957/a-more-efficient-haversine-function
-        /// Ugly and inaccurate way to match, but easy. 
-        /// </summary>
-        public static class Haversine
-        {
-            public static double calculate(double lat1, double lon1, double lat2, double lon2)
-            {
-                var R = 6372.8; // In kilometers
-                var dLat = toRadians(lat2 - lat1);
-                var dLon = toRadians(lon2 - lon1);
-                lat1 = toRadians(lat1);
-                lat2 = toRadians(lat2);
-
-                var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) + Math.Sin(dLon / 2) * Math.Sin(dLon / 2) * Math.Cos(lat1) * Math.Cos(lat2);
-                var c = 2 * Math.Asin(Math.Sqrt(a));
-                return R * 2 * Math.Asin(Math.Sqrt(a));
-            }
-
-            public static double toRadians(double angle)
-            {
-                return Math.PI * angle / 180.0;
-            }
-        }
 
         /// <summary>
         /// Calculates the price of a ride between two addresses.

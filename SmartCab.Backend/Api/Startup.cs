@@ -227,6 +227,7 @@ namespace Api
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
             services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IMatchService, MatchService>();
         }
 
         /// <summary>
