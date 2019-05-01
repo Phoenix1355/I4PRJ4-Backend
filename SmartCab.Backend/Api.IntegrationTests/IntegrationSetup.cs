@@ -152,10 +152,10 @@ namespace Api.IntegrationTests
             var response = await PostAsync("api/rides/create", request);
         }
 
-        protected async Task CreateRideWithLogin()
+        protected async Task CreateRideWithLogin(int deposit = 1000)
         {
             await LoginOnCustomerAccount();
-            await DepositToCustomer(1000);
+            await DepositToCustomer(deposit);
             await CreateRide();
         }
 

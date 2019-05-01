@@ -68,9 +68,19 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<AcceptOrderResponse> AcceptOrderAsync(string taxiCompanyId, int orderId)
         {
             var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
+
+            //Update status of ride and order
             _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
             _unitOfWork.OrderRepository.SetOrderToAccepted(order, taxiCompanyId);
-            //TODO: Implement UC14 (debit customer)
+            
+            //Debit customers
+            _unitOfWork.OrderRepository.SetOrderToDebited(order);
+            _unitOfWork.RideRepository.SetAllRidesToDebited(order.Rides);
+            foreach (var orderRide in order.Rides)
+            {
+                await _unitOfWork.CustomerRepository.DebitAsync(orderRide.CustomerId, orderRide.Price);
+            }
+
             //TODO: Implement UC15 (Notify customer)
             await _unitOfWork.SaveChangesAsync();
 

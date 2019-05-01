@@ -70,5 +70,22 @@ namespace Api.DataAccessLayer.Repositories
             order.Status = OrderStatus.Accepted;
             return Update(order);
         }
+
+        /// <summary>
+        /// Changes the status to Debited if order is Accepted
+        /// </summary>
+        /// <param name="order">Order to change status on</param>
+        /// /// <exception cref="UnexpectedStatusException">Order is not accepted, cannot be debited.</exception> 
+        public void SetOrderToDebited(Order order)
+        {
+            //Validate that order is accepted
+            if (order.Status != OrderStatus.Accepted)
+            {
+                throw new UnexpectedStatusException("Order is not accepted, cannot be debited");
+            }
+            order.Status = OrderStatus.Debited;
+
+            Update(order);
+        }
     }
 }
