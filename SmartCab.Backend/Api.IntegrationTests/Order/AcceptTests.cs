@@ -91,7 +91,7 @@ namespace Api.IntegrationTests.Order
                 Order = new OrderDto()
                 {
                     Id = 1,
-                    Status = OrderStatus.Accepted.ToString(),
+                    Status = OrderStatus.Debited.ToString(),
                     Price = 100,
                     Rides = new List<RideDto>()
                     {
@@ -117,7 +117,7 @@ namespace Api.IntegrationTests.Order
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Orders.First().Status,Is.EqualTo(OrderStatus.Accepted));
+                Assert.That(context.Orders.First().Status,Is.EqualTo(OrderStatus.Debited));
             }
 
         }
@@ -137,7 +137,7 @@ namespace Api.IntegrationTests.Order
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Rides.First().Status, Is.EqualTo(RideStatus.Accepted));
+                Assert.That(context.Rides.First().Status, Is.EqualTo(RideStatus.Debited));
             }
         }
     }
