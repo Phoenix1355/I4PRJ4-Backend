@@ -179,7 +179,7 @@ namespace Api.IntegrationTests.Order
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Customers.First().ReservedAmount, Is.EqualTo(deposit - expected));
+                Assert.That(context.Customers.First().ReservedAmount, Is.EqualTo(expected));
             }
         }
 
