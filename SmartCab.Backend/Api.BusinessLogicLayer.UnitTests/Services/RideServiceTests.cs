@@ -44,7 +44,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _matchService = Substitute.For<IMatchService>();
             _rideService = new RideService(_mapper, _googleMapsApiService, _priceStrategyFactory, _unitOfWork, _matchService);
             _anAddress = new Address("city", 1000, "street", 1);
-
+            _anAddress.Lat = 10;
+            _anAddress.Lng = 10;
         }
 
         [Test]
@@ -131,13 +132,55 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 new Ride()
                 {
-                    StartDestination = _anAddress, EndDestination = _anAddress
+                    StartDestination = _anAddress,
+                    EndDestination = _anAddress,
+
                 }
             });
 
             var response = await _rideService.AddRideAsync(request, "aCustomerId");
 
             Assert.That(response.Price, Is.EqualTo(calculatedPrice));
+        }
+
+        [Test]
+        public async Task AddRideAsync_WhenRideIsASharedRide_ReturnsACreateRideResponseWithWaitingForAccept()
+        {
+            decimal distance = 10;
+            decimal calculatedPrice = 100;
+
+            _googleMapsApiService.GetDistanceInKmAsync(Arg.Any<string>(), Arg.Any<string>())
+                .ReturnsForAnyArgs(distance);
+            _sharedRidePriceStrategy.CalculatePrice(distance).Returns(calculatedPrice);
+            var expectedResponse = new CreateRideResponse { Price = calculatedPrice };
+            _mapper.Map<CreateRideResponse>(null).ReturnsForAnyArgs(expectedResponse);
+            _mapper.Map<SharedRide>(null)
+                .ReturnsForAnyArgs(new SharedRide { StartDestination = _anAddress, EndDestination = _anAddress });
+            var request = new CreateRideRequest
+            {
+                StartDestination = _anAddress,
+                EndDestination = _anAddress,
+                RideType = RideType.SharedRide
+            };
+
+            //Must have ID because otherwise both are null
+            _unitOfWork.RideRepository.FindUnmatchedSharedRides().ReturnsForAnyArgs(new List<Ride>()
+            {
+                new Ride()
+                {
+                    Id = 3,
+                    StartDestination = _anAddress,
+                    EndDestination = _anAddress,
+
+                }
+            });
+            _matchService.Match(null, null, 0).ReturnsForAnyArgs(true);
+
+            var response = await _rideService.AddRideAsync(request, "aCustomerId");
+
+            //Validate through savechanges were called twice,
+            //To acknowledge that the rides have matched. 
+            _unitOfWork.Received(2).SaveChangesAsync();
         }
     }
 }
