@@ -10,6 +10,7 @@ using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Integration.Test.Fakes;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,12 @@ namespace SmartCabPoc.Integration.Test
         public InMemoryApplicationFactory(string guid)
         {
             _guid = guid;
+        }
+
+        protected override IWebHostBuilder CreateWebHostBuilder()
+        {
+            return WebHost.CreateDefaultBuilder(null)
+                .UseStartup<FakeStartup>();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
