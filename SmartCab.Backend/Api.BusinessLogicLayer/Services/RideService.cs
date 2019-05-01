@@ -112,9 +112,21 @@ namespace Api.BusinessLogicLayer.Services
             ride = (SharedRide)_unitOfWork.RideRepository.Add(ride);
             await _unitOfWork.SaveChangesAsync();
 
-            
+            //Check for matches
+            await CheckForMatches(ride);
 
-            //Get other unmatched rides. 
+            //No match
+            var responseUnMatched = _mapper.Map<CreateRideResponse>(ride);
+            return responseUnMatched;
+        }
+
+        /// <summary>
+        /// Checks against the database to see if any rides match. 
+        /// </summary>
+        /// <param name="ride"></param>
+        /// <returns></returns>
+        private async Task CheckForMatches(Ride ride)
+        {
             var openSharedRides = await _unitOfWork.RideRepository.FindUnmatchedSharedRides();
 
             //Match against original
@@ -130,29 +142,30 @@ namespace Api.BusinessLogicLayer.Services
                 if (Match(ride, openSharedRide))
                 {
                     //Opdate statuses of rides
-                    ride.Status = RideStatus.WaitingForAccept;
-                    _unitOfWork.RideRepository.Update(ride);
-                    openSharedRide.Status = RideStatus.WaitingForAccept;
-                    _unitOfWork.RideRepository.Update(openSharedRide);
-
-                    //Create order for ride
-                    var order = _unitOfWork.OrderRepository.Add(new Order());
-                    await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
-                    await _unitOfWork.OrderRepository.AddRideToOrderAsync(openSharedRide, order);
-                    await _unitOfWork.SaveChangesAsync();
-
-                    //Return the ride
-                    var responseMatched = _mapper.Map<CreateRideResponse>(ride);
-                    return responseMatched;
-                    
+                    await CreateOrderForMatchedRide(ride, openSharedRide);
                 }
             }
-            //No match
-            var responseUnMatched = _mapper.Map<CreateRideResponse>(ride);
-            return responseUnMatched;
         }
 
-       
+        /// <summary>
+        /// Opdate the given rides to WaitinForAccept and create order. 
+        /// </summary>
+        /// <param name="ride1"></param>
+        /// <param name="ride2"></param>
+        /// <returns></returns>
+        private async Task CreateOrderForMatchedRide(Ride ride1, Ride ride2)
+        {
+            ride1.Status = RideStatus.WaitingForAccept;
+            _unitOfWork.RideRepository.Update(ride1);
+            ride2.Status = RideStatus.WaitingForAccept;
+            _unitOfWork.RideRepository.Update(ride2);
+
+            //Create order for ride
+            var order = _unitOfWork.OrderRepository.Add(new Order());
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride1, order);
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride2, order);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
         /// <summary>
         /// Matches two trips against each other. If start and end destination of the two trips are within 1 km of each other, they match. This is air distance. 
