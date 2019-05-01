@@ -43,7 +43,7 @@ namespace Api.BusinessLogicLayer.Services
             return false;
         }
         /// <summary>
-        /// Using Haversine function
+        /// Using Haversine function, credits to: https://stackoverflow.com/questions/41621957/a-more-efficient-haversine-function
         /// </summary>
         /// <param name="lat1">Latitude 1</param>
         /// <param name="lon1">Latitude 2</param>

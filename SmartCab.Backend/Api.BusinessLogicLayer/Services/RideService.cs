@@ -118,8 +118,8 @@ namespace Api.BusinessLogicLayer.Services
             await CheckForMatches(ride);
 
             //No match
-            var responseUnMatched = _mapper.Map<CreateRideResponse>(ride);
-            return responseUnMatched;
+            var response = _mapper.Map<CreateRideResponse>(ride);
+            return response;
         }
 
         /// <summary>
@@ -134,8 +134,8 @@ namespace Api.BusinessLogicLayer.Services
             //Match against original
             foreach (var openSharedRide in openSharedRides)
             {
-                //Check if it's self first
-                if (ride.Id == openSharedRide.Id)
+                //Check if it's self first or same customer
+                if (ride.Id == openSharedRide.Id || ride.CustomerId == openSharedRide.CustomerId)
                 {
                     continue;
                 }

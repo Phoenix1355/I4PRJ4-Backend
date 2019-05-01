@@ -76,7 +76,7 @@ namespace Api.IntegrationTests
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
         }
 
-        protected CreateRideRequest getCreateRideRequest()
+        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide)
         {
             return new CreateRideRequest()
             {
@@ -84,7 +84,7 @@ namespace Api.IntegrationTests
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
-                RideType = RideType.SoloRide,
+                RideType = type,
                 PassengerCount = 2
             };
         }
@@ -144,19 +144,19 @@ namespace Api.IntegrationTests
             var response = await PutAsync("/api/customer/deposit", request);
         }
 
-        protected async Task CreateRide()
+        protected async Task CreateRide(RideType type = RideType.SoloRide)
         {
-            var request = getCreateRideRequest();
+            var request = getCreateRideRequest(type);
 
             //Make request
             var response = await PostAsync("api/rides/create", request);
         }
 
-        protected async Task CreateRideWithLogin()
+        protected async Task CreateRideWithLogin(string email = "test12@gmail.com", RideType type = RideType.SoloRide)
         {
-            await LoginOnCustomerAccount();
+            await LoginOnCustomerAccount(email);
             await DepositToCustomer(1000);
-            await CreateRide();
+            await CreateRide(type);
         }
 
         protected void ClearHeaders()

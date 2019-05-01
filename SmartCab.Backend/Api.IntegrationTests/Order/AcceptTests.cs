@@ -140,5 +140,33 @@ namespace Api.IntegrationTests.Order
                 Assert.That(context.Rides.First().Status, Is.EqualTo(RideStatus.Accepted));
             }
         }
+
+        [Test]
+        public async Task Accept_SharedRideOrderDoesExist_RidesChangedToAccepted()
+        {
+            await CreateRideWithLogin("test12@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+
+            await CreateRideWithLogin("test13@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            var response = await PutAsync(uri, null);
+
+            using (var context = _factory.CreateContext())
+            {
+                var order = context.Orders.First();
+                foreach (var orderRide in order.Rides)
+                {
+                    Assert.That(orderRide.Status,Is.EqualTo(RideStatus.Accepted));
+                }
+                
+            }
+        }
     }
 }
