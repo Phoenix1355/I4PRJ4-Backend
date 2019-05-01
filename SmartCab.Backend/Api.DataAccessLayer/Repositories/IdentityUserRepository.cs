@@ -142,7 +142,11 @@ namespace Api.DataAccessLayer.Repositories
         private async Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword)
         {
             var response = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
-            await _userManager.UpdateAsync(user);
+            if (response != IdentityResult.Success)
+            {
+                var error = response.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
             return response;
         }
 
