@@ -103,43 +103,13 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
-        /// Edits the users information
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="token"></param>
-        /// <param name="newCustomer"></param>
-        /// <param name="password"></param>
-        /// <param name="oldPassword"></param>
-        /// <returns></returns>
-        public async Task<IdentityResult> EditIdentityUserAsync(IdentityUser user, string email, string password, string oldPassword)
-        {
-            IdentityResult resultEmail, resultPassword;
-
-            if (email != user.Email)
-                resultEmail = await ChangeEmail(user, email);
-            else
-                resultEmail = IdentityResult.Success;
-
-            if (password != "")
-                resultPassword = await ChangePassword(password, user, oldPassword);
-            else
-                resultPassword = IdentityResult.Success;
-
-            if (resultEmail == IdentityResult.Success && 
-                resultPassword == IdentityResult.Success)
-                return IdentityResult.Success;
-            else
-                return IdentityResult.Failed();
-        }
-
-        /// <summary>
         /// Changes the identityUsers password in a asynchronous.
         /// </summary>
         /// <param name="newPassword"></param>
         /// <param name="user"></param>
         /// <param name="oldPassword"></param>
         /// <returns></returns>
-        private async Task<IdentityResult> ChangePassword(string newPassword, IdentityUser user, string oldPassword)
+        public async Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string newPassword, string oldPassword)
         {
             var response = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
             if (response != IdentityResult.Success)
@@ -154,13 +124,16 @@ namespace Api.DataAccessLayer.Repositories
         /// Changes the email, normalized email, the username and the normalized username
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="newCustomer"></param>
+        /// <param name="email"></param>
         /// <returns></returns>
-        private async Task<IdentityResult> ChangeEmail(IdentityUser user, string email)
+        public async Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string email)
         {
+            if (user.Email == email)
+                return IdentityResult.Success;
+
             var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, email);
+
             var response = await _userManager.ChangeEmailAsync(user, email, emailConfirmationCode);
-            await _userManager.UpdateAsync(user);
             await _userManager.UpdateNormalizedEmailAsync(user);
 
             await _userManager.SetUserNameAsync(user, email);

@@ -29,36 +29,6 @@ namespace Api.DataAccessLayer.Repositories
 
         }
 
-        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
-        {
-            return newCustomer;
-            /*
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                var customer = await _context.Customers.FindAsync(customerId);
-
-                if (newCustomer.Name != customer.Name)
-                    customer.Name = newCustomer.Name;
-
-                if (newCustomer.PhoneNumber != customer.PhoneNumber)
-                    customer.PhoneNumber = newCustomer.PhoneNumber;
-
-                var identityResult = await UnitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
-
-                if (identityResult.Succeeded)
-                {
-                    _context.Customers.Update(customer);
-                    await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return customer;
-                }
-                transaction.Rollback();
-
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }*/
-        }
-
         /// <summary>
         /// Deposits the given amount to a customers account.
         /// </summary>
