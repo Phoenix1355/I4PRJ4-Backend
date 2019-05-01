@@ -99,7 +99,24 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
         {
-            throw new NotImplementedException("Not currently implemented.");
+            
+            var ride = _mapper.Map<SharedRide>(request);
+
+            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
+            ride.CustomerId = customerId;
+
+            //Reserve the money, create the order and return the created order
+            await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
+            ride = (SharedRide)_unitOfWork.RideRepository.Add(ride);
+
+            var order = _unitOfWork.OrderRepository.Add(new Order());
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride, order);
+            await _unitOfWork.SaveChangesAsync();
+            var response = _mapper.Map<CreateRideResponse>(ride);
+
+            //Check for match
+
+            return response;
         }
 
         /// <summary>
