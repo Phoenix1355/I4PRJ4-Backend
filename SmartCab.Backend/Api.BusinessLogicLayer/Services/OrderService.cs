@@ -59,7 +59,7 @@ namespace Api.BusinessLogicLayer.Services
             var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
             _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
             _unitOfWork.OrderRepository.SetOrderToAccepted(order, taxiCompanyId);
-            //TODO: Implement UC14 (debit customer)
+            //Implemented Debit below this line. 
             _unitOfWork.OrderRepository.SetOrderToDebited(order);
             _unitOfWork.RideRepository.SetAllRidesToDebited(order.Rides);
             foreach (var orderRide in order.Rides)
