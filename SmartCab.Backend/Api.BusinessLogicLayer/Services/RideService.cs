@@ -137,8 +137,11 @@ namespace Api.BusinessLogicLayer.Services
                 //Check if it's self first or same customer
                 if (ride.Id == unmatchedRide.Id || ride.CustomerId == unmatchedRide.CustomerId)
                 {
+                    //Go to next iteration
                     continue;
                 }
+
+                //Remember to check for time matching. 
 
                 var match = _matchService.Match(ride, unmatchedRide, maxDistance);
                 //If it matches close enough.
@@ -146,6 +149,8 @@ namespace Api.BusinessLogicLayer.Services
                 {
                     //Opdate statuses of rides
                     await CreateOrderForMatchedRide(ride, unmatchedRide);
+                    //Found match, no need to continue search. 
+                    break;
                 }
             }
         }
