@@ -31,7 +31,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
             _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(new List<Ride>()
             {
-                ride
+                ride,
             });
 
             _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(new List<Order>()
@@ -40,8 +40,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 {
                     Rides = new List<Ride>()
                     {
-                        ride
-                    }
+                        ride,
+                    },
                 }
             });
 
