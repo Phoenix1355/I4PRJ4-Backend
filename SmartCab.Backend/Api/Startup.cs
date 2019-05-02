@@ -95,6 +95,14 @@ namespace Api
                 x.RoutePrefix = string.Empty;
             });
 
+            //Enables the handboard dashboard and server. 
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+            //An example of how to use Hangfire for background tasks. 
+            RecurringJob.AddOrUpdate(() => Console.Write("Example of recurring!"), Cron.Minutely);
+
+
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
             app.UseMvc();
