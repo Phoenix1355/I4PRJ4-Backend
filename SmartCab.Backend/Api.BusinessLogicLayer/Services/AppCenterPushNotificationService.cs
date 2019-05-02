@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 
 namespace Api.BusinessLogicLayer.Services
 {
+    /// <summary>
+    /// Push notifications service for sending push notifications through AppCenter
+    /// </summary>
     public class AppCenterPushNotificationService : IPushNotificationService
     {
         private HttpClient _httpClient;
@@ -20,11 +23,20 @@ namespace Api.BusinessLogicLayer.Services
         private const string ApiKeyName = "X-API-Token";
         private const string ApiKey = "7c415e6a7cb8feab721420bd9038c123625e3bfc"; // This Token is named "Backend" in AppCenter
 
+        /// <summary>
+        /// Constructor for the class
+        /// </summary>
+        /// <param name="httpClient">Instance of HttpClient class.</param>
         public AppCenterPushNotificationService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Sends notification through AppCenter
+        /// </summary>
+        /// <param name="notification">The notification to be sent</param>
+        /// <returns>Task/void</returns>
         public async Task SendAsync(IPushNotification notification)
         {
             var url = new Uri($"{BaseUrl}/{Organization}/{Android}/{PushNotificationUri}");
