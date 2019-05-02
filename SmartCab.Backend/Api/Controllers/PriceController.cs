@@ -26,12 +26,13 @@ namespace Api.Controllers
     [ApiController]
     public class PriceController : ControllerBase
     {
-
         private IPriceStrategy _pricestrategy;
+        private IRideService _rideService;
 
-        public PriceController(IPriceStrategy pricestrategy)
+        public PriceController(IPriceStrategy pricestrategy, IRideService rideService)
         {
             _pricestrategy = pricestrategy;
+            _rideService = rideService;
         }
 
         /// <summary>
@@ -62,9 +63,10 @@ namespace Api.Controllers
                 throw new UserIdInvalidException(
                     $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
             }
-
-            var someCalculatedPrice = _pricestrategy.CalculatePrice(20);
-            return Ok(someCalculatedPrice);
+            
+            var calculatedPrice = await
+                _rideService.CalculatePriceAsync(request.StartAddress, request.EndAddress, request.RideType);
+            return Ok(calculatedPrice);
         }
     }
 }
