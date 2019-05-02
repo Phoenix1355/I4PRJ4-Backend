@@ -82,7 +82,7 @@ namespace Api.BusinessLogicLayer.Services
         {
             var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
             UpdateState(taxiCompanyId, order);
-            await DebitCustomers(order);
+            await DebitCustomersAsync(order);
             await _unitOfWork.SaveChangesAsync();
             await NotifyCustomers(order);
 
@@ -107,7 +107,7 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="order">The order containing the customers that should be debitted.</param>
         /// <returns></returns>
-        private async Task DebitCustomers(Order order)
+        private async Task DebitCustomersAsync(Order order)
         {
             _unitOfWork.OrderRepository.SetOrderToDebited(order);
             _unitOfWork.RideRepository.SetAllRidesToDebited(order.Rides);
