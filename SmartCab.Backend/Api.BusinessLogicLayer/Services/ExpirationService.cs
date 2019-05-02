@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using Castle.Core.Internal;
@@ -13,10 +14,16 @@ namespace Api.BusinessLogicLayer.Services
     public class ExpirationService : IExpirationService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPushNotificationFactory _pushNotificationFactory;
+        private readonly IPushNotificationService _pushNotificationService;
 
-        public ExpirationService(IUnitOfWork unitOfWork)
+        public ExpirationService(IUnitOfWork unitOfWork, 
+            IPushNotificationFactory pushNotificationFactory, 
+            IPushNotificationService pushNotificationService)
         {
             _unitOfWork = unitOfWork;
+            _pushNotificationFactory = pushNotificationFactory;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -46,7 +53,9 @@ namespace Api.BusinessLogicLayer.Services
                 //Unreserve the amount
                 await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId,-ride.Price);
 
+
                 //Notify the customer
+                await NotifyCustomerAboutMatchNotFound(ride);
             }
         }
 
@@ -65,11 +74,36 @@ namespace Api.BusinessLogicLayer.Services
                 {
                     orderRide.Status = RideStatus.Expired;
                     await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(orderRide.CustomerId,-orderRide.Price);
+                    await NotifyCustomerAboutOrderExpired(orderRide);
                 }
                 _unitOfWork.OrderRepository.Update(order);
             }
         }
 
-        
+        private async Task NotifyCustomerAboutMatchNotFound(Ride expiredRide)
+        {
+            var notification = _pushNotificationFactory.GetPushNotification();
+            notification.Name = "Ingen match";
+            notification.Title = "Ingen match";
+            notification.Body =
+                $"Din dele-tur fra {expiredRide.StartDestination.StreetName} {expiredRide.StartDestination.StreetNumber} i {expiredRide.StartDestination.CityName} til {expiredRide.EndDestination.StreetName} {expiredRide.EndDestination.StreetNumber} i {expiredRide.EndDestination.CityName} fandt ingen match. Prøv en solotur. ";
+            notification.Devices.Add(expiredRide.DeviceId);
+            notification.CustomData.Add("Type", "NoMatch");
+
+            await _pushNotificationService.SendAsync(notification);
+        }
+
+        private async Task NotifyCustomerAboutOrderExpired(Ride expiredRide)
+        {
+            var notification = _pushNotificationFactory.GetPushNotification();
+            notification.Name = "Udløbet";
+            notification.Title = "Tur udløbet";
+            notification.Body =
+                $"Din tur fra {expiredRide.StartDestination.StreetName} {expiredRide.StartDestination.StreetNumber} i {expiredRide.StartDestination.CityName} til {expiredRide.EndDestination.StreetName} {expiredRide.EndDestination.StreetNumber} i {expiredRide.EndDestination.CityName} er ikke blevet accepteret af en vognmand.";
+            notification.Devices.Add(expiredRide.DeviceId);
+            notification.CustomData.Add("Type", "Expired");
+
+            await _pushNotificationService.SendAsync(notification);
+        }
     }
 }
