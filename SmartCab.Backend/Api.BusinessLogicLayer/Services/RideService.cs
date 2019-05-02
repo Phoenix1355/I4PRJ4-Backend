@@ -129,22 +129,23 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         private async Task CheckForMatches(Ride ride)
         {
-            var openSharedRides = await _unitOfWork.RideRepository.FindUnmatchedSharedRides();
-
+            var unmatchedRides = await _unitOfWork.RideRepository.FindUnmatchedSharedRides();
+            int maxDistance = 1;
             //Match against original
-            foreach (var openSharedRide in openSharedRides)
+            foreach (var unmatchedRide in unmatchedRides)
             {
                 //Check if it's self first or same customer
-                if (ride.Id == openSharedRide.Id || ride.CustomerId == openSharedRide.CustomerId)
+                if (ride.Id == unmatchedRide.Id || ride.CustomerId == unmatchedRide.CustomerId)
                 {
                     continue;
                 }
 
+                var match = _matchService.Match(ride, unmatchedRide, maxDistance);
                 //If it matches close enough.
-                if (_matchService.Match(ride, openSharedRide,1))
+                if (match)
                 {
                     //Opdate statuses of rides
-                    await CreateOrderForMatchedRide(ride, openSharedRide);
+                    await CreateOrderForMatchedRide(ride, unmatchedRide);
                 }
             }
         }
@@ -157,11 +158,6 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         private async Task CreateOrderForMatchedRide(Ride ride1, Ride ride2)
         {
-            ride1.Status = RideStatus.WaitingForAccept;
-            _unitOfWork.RideRepository.Update(ride1);
-            ride2.Status = RideStatus.WaitingForAccept;
-            _unitOfWork.RideRepository.Update(ride2);
-
             //Create order for ride
             var order = _unitOfWork.OrderRepository.Add(new Order());
             await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride1, order);
