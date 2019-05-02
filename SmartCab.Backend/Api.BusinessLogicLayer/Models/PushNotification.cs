@@ -8,24 +8,20 @@ namespace Api.BusinessLogicLayer.Models
 {
     public class PushNotification : IPushNotification
     {
-        private IList<string> _devices = new List<string>();
-    
-        private IDictionary<string, string> _customData = new Dictionary<string, string>();
-
         public string Name { get; set; }
         public string Title { get; set; }
         public string Body { get; set; }
-        public IList<string> Devices => _devices;
-        public IDictionary<string, string> CustomData => _customData;
+        public IList<string> Devices { get; } = new List<string>();
+        public IDictionary<string, string> CustomData { get; } = new Dictionary<string, string>();
 
         public void AddDeviceId(string deviceId)
         {
-            _devices.Add(deviceId);
+            Devices.Add(deviceId);
         }
 
         public void AddCustomData(string key, string value)
         {
-            _customData.Add(key, value);
+            CustomData.Add(key, value);
         }
     }
 }
