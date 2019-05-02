@@ -111,9 +111,8 @@ namespace Api
         /// <summary>
         /// Must be public to allow it to be called recurringly. 
         /// </summary>
-        public static void RecurringJobOnceAMinute()
+        public void RecurringJobOnceAMinute()
         {
-            //Updates all that have expired to
             BackgroundJob.Enqueue<IExpirationService>((service) => service.UpdateExpiredRidesAndOrders());
         }
 

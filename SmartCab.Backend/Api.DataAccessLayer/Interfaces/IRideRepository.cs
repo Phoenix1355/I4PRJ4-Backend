@@ -25,5 +25,7 @@ namespace Api.DataAccessLayer.Interfaces
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
         /// <exception cref="UnexpectedStatusException">Ride is not accepted, cannot be debited.</exception> 
         void SetAllRidesToDebited(List<Ride> rides);
+
+        Task<List<Ride>> FindExpiredUnmatchedRides();
     }
 }

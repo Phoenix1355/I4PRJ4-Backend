@@ -21,22 +21,11 @@ namespace Api.BusinessLogicLayer.Services
 
         /// <summary>
         /// Simple that only updates rides to expired
+        /// Requires Sync Behaviour
         /// </summary>
         /// <returns></returns>
         public void UpdateExpiredRidesAndOrders()
         {
-
-            /*var currentTime = DateTime.Now;
-            var rides = await _unitOfWork.RideRepository.FindAsync((ride) => 
-                ride.ConfirmationDeadline < currentTime && 
-                (ride.Status == RideStatus.LookingForMatch || ride.Status == RideStatus.WaitingForAccept));
-
-            foreach (var ride in rides)
-            {
-                ride.Status = RideStatus.Expired;
-                _unitOfWork.RideRepository.Update(ride);
-            }
-            */
              UpdateNonMatchedRides().Wait();
              UpdateOrdersWithExpiredRides().Wait();
              _unitOfWork.SaveChangesAsync().Wait();
@@ -48,9 +37,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         private async Task UpdateNonMatchedRides()
         {
-            var nonmatchedRides = await _unitOfWork.RideRepository.FindAsync((ride) =>
-                ride.ConfirmationDeadline < DateTime.Now &&
-                ride.Status == RideStatus.LookingForMatch);
+            var nonmatchedRides = await _unitOfWork.RideRepository.FindExpiredUnmatchedRides();
 
             foreach (var ride in nonmatchedRides)
             {
@@ -69,10 +56,7 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns></returns>
         private async Task UpdateOrdersWithExpiredRides()
         {
-            var ordersWithExpiredRides = await _unitOfWork.OrderRepository.FindAsync((order) =>
-                order.Rides.Where(
-                    (ride) => (ride.ConfirmationDeadline < DateTime.Now && ride.Status == RideStatus.WaitingForAccept)
-                    ).Count() > 0);
+            var ordersWithExpiredRides = await _unitOfWork.OrderRepository.FindOrdersWithExpiredRides();
 
             foreach (var order in ordersWithExpiredRides)
             {
@@ -85,5 +69,7 @@ namespace Api.BusinessLogicLayer.Services
                 _unitOfWork.OrderRepository.Update(order);
             }
         }
+
+        
     }
 }

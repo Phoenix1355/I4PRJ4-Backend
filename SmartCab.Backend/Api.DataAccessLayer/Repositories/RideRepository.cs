@@ -37,6 +37,13 @@ namespace Api.DataAccessLayer.Repositories
             return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
         }
 
+        public async Task<List<Ride>> FindExpiredUnmatchedRides()
+        {
+            return await FindAsync((ride) =>
+                ride.ConfirmationDeadline < DateTime.Now &&
+                ride.Status == RideStatus.LookingForMatch);
+        }
+
         /// <summary>
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
