@@ -139,9 +139,7 @@ namespace Api.BusinessLogicLayer.Services
                 {
                     //Go to next iteration
                     continue;
-                }
-
-                //Remember to check for time matching. 
+                } 
 
                 var match = _matchService.Match(ride, unmatchedRide, maxDistance);
                 //If it matches close enough.
