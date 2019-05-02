@@ -134,20 +134,25 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
 
 
-        [TestCase(0,ExpectedResult = true)]
-        [TestCase(1, ExpectedResult = true)]
-        [TestCase(-1, ExpectedResult = true)]
-        [TestCase(-14, ExpectedResult = true)]
-        [TestCase(-15, ExpectedResult = true)]
-        [TestCase(-16, ExpectedResult = false)]
-        [TestCase(14, ExpectedResult = true)]
-        [TestCase(15, ExpectedResult = false)]
-        [TestCase(16, ExpectedResult = false)]
-        public bool Match_WhenDepartureTimeIsCloseEnough_ReturnsExpectedResult(int minutesToAdd)
+        [TestCase(0,0,ExpectedResult = true)]
+        [TestCase(1,0, ExpectedResult = true)]
+        [TestCase(-1,0, ExpectedResult = true)]
+        [TestCase(-14,0, ExpectedResult = true)]
+        [TestCase(-16, 0, ExpectedResult = false)]
+        [TestCase(14, 0, ExpectedResult = true)]
+        [TestCase(16, 0, ExpectedResult = false)]
+        [TestCase(0, 0, ExpectedResult = true)]
+        [TestCase(0, 1, ExpectedResult = true)]
+        [TestCase(0, -1, ExpectedResult = true)]
+        [TestCase(0, -14, ExpectedResult = true)]
+        [TestCase(0, -16, ExpectedResult = false)]
+        [TestCase(0, 14, ExpectedResult = true)]
+        [TestCase(0, 16, ExpectedResult = false)]
+        public bool Match_WhenDepartureTimeIsCloseEnough_ReturnsExpectedResult(int minutesToAdd1, int minutesToAdd2)
         {
             var ride1 = new Ride()
             {
-                DepartureTime = DateTime.Now,
+                DepartureTime = DateTime.Now.AddMinutes(minutesToAdd1),
                 EndDestination = new Address("Dummy", 0, "Dummy", 0)
                 {
                     Lat = 10,
@@ -161,7 +166,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             };
             var ride2 = new Ride()
             {
-                DepartureTime = DateTime.Now.AddMinutes(minutesToAdd),
+                DepartureTime = DateTime.Now.AddMinutes(minutesToAdd2),
                 EndDestination = new Address("Dummy", 0, "Dummy", 0)
                 {
                     Lat = 10,
