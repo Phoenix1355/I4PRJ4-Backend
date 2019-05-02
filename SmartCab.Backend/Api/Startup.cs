@@ -58,12 +58,7 @@ namespace Api
             AddJsonWebTokens(services);
             AddDependencyInjection(services);
             AddSwagger(services);
-
-            //================== Hangfire setup ======================= 
-            services.AddHangfire(configuration =>
-            {
-                configuration.UseSqlServerStorage(GetConnectionString());
-            });
+            AddHangfire(services);
         }
 
         /// <summary>
@@ -99,9 +94,9 @@ namespace Api
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
-            //An example of how to use Hangfire for background tasks. 
-            RecurringJob.AddOrUpdate(() => Console.Write("Example of recurring!"), Cron.Minutely);
-
+            //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
+            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), Cron.Minutely);
+            
 
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
@@ -111,6 +106,15 @@ namespace Api
             dbContext.Database.Migrate();
 
             CreateRoles(services).Wait();
+        }
+
+        /// <summary>
+        /// Must be public to allow it to be called recurringly. 
+        /// </summary>
+        public static void RecurringJobOnceAMinute()
+        {
+            //Updates all that have expired to
+            BackgroundJob.Enqueue<IExpirationService>((service) => service.UpdateExpiredRidesAndOrders());
         }
 
         /// <summary>
@@ -249,6 +253,7 @@ namespace Api
             services.AddScoped<IPushNotificationFactory, PushNotificationFactory>();
             services.AddScoped<IPushNotificationService, AppCenterPushNotificationService>();
             services.AddScoped<IMatchService, MatchService>();
+            services.AddScoped<IExpirationService, ExpirationService>();
         }
 
         /// <summary>
@@ -272,6 +277,14 @@ namespace Api
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 x.IncludeXmlComments(xmlPath);
+            });
+        }
+
+        private void AddHangfire(IServiceCollection services)
+        {
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(GetConnectionString());
             });
         }
 
