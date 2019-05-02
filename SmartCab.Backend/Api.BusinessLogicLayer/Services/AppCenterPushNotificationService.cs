@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Api.BusinessLogicLayer.Services
@@ -21,15 +22,17 @@ namespace Api.BusinessLogicLayer.Services
         private const string PushNotificationUri = "push/notifications";
 
         private const string ApiKeyName = "X-API-Token";
-        private const string ApiKey = "7c415e6a7cb8feab721420bd9038c123625e3bfc"; // This Token is named "Backend" in AppCenter
+        private readonly string _apiKey; // This Token is named "Backend" in AppCenter
 
         /// <summary>
         /// Constructor for the class
         /// </summary>
+        /// <param name="config">The application configuration.</param>
         /// <param name="httpClient">Instance of HttpClient class.</param>
-        public AppCenterPushNotificationService(HttpClient httpClient)
+        public AppCenterPushNotificationService(IConfiguration config, HttpClient httpClient)
         {
             _httpClient = httpClient;
+            _apiKey = config["AppCenterPushApiKey"];
         }
 
         /// <summary>
@@ -43,7 +46,7 @@ namespace Api.BusinessLogicLayer.Services
             var content = new StringContent(CreateJson(notification), Encoding.UTF8, "application/json");
 
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add(ApiKeyName, ApiKey);
+            _httpClient.DefaultRequestHeaders.Add(ApiKeyName, _apiKey);
             await _httpClient.PostAsync(url, content);
         }
 
