@@ -17,6 +17,8 @@ namespace Api.DataAccessLayer.Interfaces
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
         void SetAllRidesToAccepted(List<Ride> rides);
 
+        Task<List<Ride>> FindUnmatchedSharedRides();
+
         /// <summary>
         /// Updates the status of all supplied rides to "Debited".
         /// </summary>

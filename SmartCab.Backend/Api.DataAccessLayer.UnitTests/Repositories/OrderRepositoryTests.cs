@@ -78,6 +78,39 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
+        public async Task AddRideToOrder_OrderAndRideExists_RideHasStatusWaitingForAccept()
+        {
+            Customer customer = new Customer();
+            Order order = new Order();
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Orders.Add(order);
+                context.SaveChanges();
+            }
+
+            SoloRide soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.LookingForMatch,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            await _uut.OrderRepository.AddRideToOrderAsync(soloRide, order);
+            await _uut.SaveChangesAsync();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(order.Id).Rides.First().Status, Is.EqualTo(RideStatus.WaitingForAccept));
+            }
+        }
+
+        [Test]
         public async Task AddRideToOrder_RideAlreadyAddedToOrder_ThrowsException()
         {
             Customer customer = new Customer();
@@ -460,6 +493,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 Assert.That(context.Orders.Find(order.Id).TaxiCompanyId, Is.EqualTo(taxi.Id));
             }
         }
+
 
         [Test]
         public async Task AcceptOrder_OrderExistsSoloRideNotWaitingForAcceptstatus_ThrowsException()

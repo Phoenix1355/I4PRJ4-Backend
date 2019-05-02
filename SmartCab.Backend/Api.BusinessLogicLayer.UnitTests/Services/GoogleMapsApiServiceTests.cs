@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Services;
+using Api.DataAccessLayer.Models;
 using CustomExceptions;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
@@ -117,7 +118,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             response.Content = new StringContent("some error");
 
             _client.GetAsync(null).ReturnsForAnyArgs(response);
-            var address = "Some address";
+            var address = new Address("city",1000,"Street",21);
 
             Assert.That(() => _googleMapsApiService.ValidateAddressAsync(address), Throws.TypeOf<Exception>());
         }
@@ -129,7 +130,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             response.Content = new StringContent(GetGeocoodingRequestContent(NotOkStatus, "Location type not relevant for this test"));
 
             _client.GetAsync(null).ReturnsForAnyArgs(response);
-            var address = "Some address";
+            var address = new Address("city", 1000, "Street", 21);
 
             Assert.That(() => _googleMapsApiService.ValidateAddressAsync(address), Throws.TypeOf<Exception>());
         }
@@ -144,7 +145,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             response.Content = new StringContent(GetGeocoodingRequestContent(OkStatus, invalidLocationType));
 
             _client.GetAsync(null).ReturnsForAnyArgs(response);
-            var address = "Some address";
+            var address = new Address("city", 1000, "Street", 21);
 
             Assert.That(() => _googleMapsApiService.ValidateAddressAsync(address), Throws.TypeOf<GoogleMapsApiException>());
         }
@@ -157,7 +158,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             response.Content = new StringContent(GetGeocoodingRequestContent(OkStatus, validLocationType));
 
             _client.GetAsync(null).ReturnsForAnyArgs(response);
-            var address = "Some address";
+            var address = new Address("city", 1000, "Street", 21);
 
             Assert.That(() => _googleMapsApiService.ValidateAddressAsync(address), Throws.Nothing);
         }

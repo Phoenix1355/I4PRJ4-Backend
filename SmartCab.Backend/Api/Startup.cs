@@ -233,6 +233,7 @@ namespace Api
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPushNotificationFactory, PushNotificationFactory>();
             services.AddScoped<IPushNotificationService, AppCenterPushNotificationService>();
+            services.AddScoped<IMatchService, MatchService>();
         }
 
         /// <summary>

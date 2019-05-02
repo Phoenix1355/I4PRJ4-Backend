@@ -29,6 +29,15 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
+        /// Find all rides with status LookingForMatch. This is only valid for sharedRides. 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Ride>> FindUnmatchedSharedRides()
+        {
+            return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
+        }
+
+        /// <summary>
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
