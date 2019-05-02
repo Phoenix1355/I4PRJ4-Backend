@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
@@ -19,16 +21,27 @@ namespace Api.BusinessLogicLayer.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPushNotificationFactory _pushNotificationFactory;
+        private readonly IPushNotificationService _pushNotificationService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="unitOfWork">Used to access the database repositories</param>
-        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork)
+        /// <param name="pushNotificationFactory">Used to create new notifications</param>
+        /// <param name="pushNotificationService">Used to send notifications</param>
+        public OrderService(
+            IMapper mapper,
+            IUnitOfWork unitOfWork,
+            IPushNotificationFactory pushNotificationFactory,
+            IPushNotificationService pushNotificationService
+            )
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _pushNotificationFactory = pushNotificationFactory;
+            _pushNotificationService = pushNotificationService;
         }
 
         /// <summary>
@@ -68,25 +81,68 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<AcceptOrderResponse> AcceptOrderAsync(string taxiCompanyId, int orderId)
         {
             var order = await _unitOfWork.OrderRepository.FindByIDAsync(orderId);
+            UpdateState(taxiCompanyId, order);
+            await DebitCustomers(order);
+            await _unitOfWork.SaveChangesAsync();
+            await NotifyCustomers(order);
 
-            //Update status of ride and order
+            var orderDto = _mapper.Map<OrderDto>(order);
+            var response = new AcceptOrderResponse {Order = orderDto};
+            return response;
+        }
+
+        /// <summary>
+        /// Updates the state of the order and its related rides to "Accepted".
+        /// </summary>
+        /// <param name="taxiCompanyId">The id of the TaxiCompany which accepted the order.</param>
+        /// <param name="order">The order that was accepted.</param>
+        private void UpdateState(string taxiCompanyId, Order order)
+        {
             _unitOfWork.RideRepository.SetAllRidesToAccepted(order.Rides);
             _unitOfWork.OrderRepository.SetOrderToAccepted(order, taxiCompanyId);
-            
-            //Debit customers
+        }
+
+        /// <summary>
+        /// Debits all customers related to the order.
+        /// </summary>
+        /// <param name="order">The order containing the customers that should be debitted.</param>
+        /// <returns></returns>
+        private async Task DebitCustomers(Order order)
+        {
             _unitOfWork.OrderRepository.SetOrderToDebited(order);
             _unitOfWork.RideRepository.SetAllRidesToDebited(order.Rides);
             foreach (var orderRide in order.Rides)
             {
                 await _unitOfWork.CustomerRepository.DebitAsync(orderRide.CustomerId, orderRide.Price);
             }
+        }
 
-            //TODO: Implement UC15 (Notify customer)
-            await _unitOfWork.SaveChangesAsync();
+        /// <summary>
+        /// Notify all customers related to the order that their ride has been accepted.
+        /// </summary>
+        /// <param name="order">The order containing the customers that should be notified</param>
+        /// <returns></returns>
+        private async Task NotifyCustomers(Order order)
+        {
+            try
+            {
+                foreach (var ride in order.Rides)
+                {
+                    var notification = _pushNotificationFactory.GetPushNotification();
+                    notification.Name = "Accept";
+                    notification.Title = "Tur accepteret";
+                    notification.Body =
+                        $"Din tur fra {ride.StartDestination.StreetName} {ride.StartDestination.StreetNumber} i {ride.StartDestination.CityName} til {ride.EndDestination.StreetName} {ride.EndDestination.StreetNumber} i {ride.EndDestination.CityName} er accepteret af {order.TaxiCompany.Name}";
+                    notification.Devices.Add(ride.DeviceId);
+                    notification.CustomData.Add("rideId", ride.Id.ToString());
 
-            var orderDto = _mapper.Map<OrderDto>(order);
-            var response = new AcceptOrderResponse {Order = orderDto};
-            return response;
+                    await _pushNotificationService.SendAsync(notification);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
         }
     }
 }

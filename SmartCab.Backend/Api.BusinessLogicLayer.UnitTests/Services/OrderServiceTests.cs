@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
+using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
@@ -20,6 +21,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         private IOrderRepository _orderRepository;
         private OrderService _orderService;
         private IUnitOfWork _unitOfWork;
+        private IPushNotificationFactory _pushNotificationFactory;
+        private IPushNotificationService _pushNotificationService;
 
         [SetUp]
         public void Setup()
@@ -27,7 +30,9 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             _mapper = Substitute.For<IMapper>();
             _orderRepository = Substitute.For<IOrderRepository>();
             _unitOfWork = Substitute.For<IUnitOfWork>();
-            _orderService = new OrderService(_mapper, _unitOfWork);
+            _pushNotificationFactory = Substitute.For<IPushNotificationFactory>();
+            _pushNotificationService = Substitute.For<IPushNotificationService>();
+            _orderService = new OrderService(_mapper, _unitOfWork, _pushNotificationFactory, _pushNotificationService);
         }
 
         [Test]
@@ -70,6 +75,34 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var response = await _orderService.AcceptOrderAsync(taxiCompanyId, orderId);
 
             Assert.That(response.Order, Is.EqualTo(expectedResponse.Order));
+        }
+
+        [Test]
+        public async Task AcceptOrder_WhenCalled_SendsPushNotification()
+        {
+            // Arrange
+            var taxiCompanyId = "someId";
+            var orderId = 1;
+
+            var taxiCompany = new TaxiCompany();
+            var order = new Order();
+
+            order.TaxiCompany = taxiCompany;
+            
+            var ride = new Ride();
+            ride.StartDestination = new Address("", 1, "", 1);
+            ride.EndDestination = new Address("", 1, "", 1);
+
+            order.Rides = new List<Ride> {ride};
+
+            _unitOfWork.OrderRepository.FindByIDAsync(null).ReturnsForAnyArgs(order);
+            _unitOfWork.TaxiCompanyRepository.FindByIDAsync(null).ReturnsForAnyArgs(taxiCompany);
+
+            // Act
+            await _orderService.AcceptOrderAsync(taxiCompanyId, orderId);
+
+            // Assert
+            await _pushNotificationService.Received().SendAsync(Arg.Any<IPushNotification>());
         }
 
 
