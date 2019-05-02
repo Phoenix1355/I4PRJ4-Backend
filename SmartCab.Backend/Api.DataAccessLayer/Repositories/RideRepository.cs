@@ -37,6 +37,17 @@ namespace Api.DataAccessLayer.Repositories
             return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
         }
 
+
+        public void AddSharedRide(Ride ride)
+        {
+            if (ride.PassengerCount > 2)
+            {
+                throw new TooManyPassengersException("SharedRide can only have two passengers");
+            }
+
+            Add(ride);
+        }
+
         /// <summary>
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
