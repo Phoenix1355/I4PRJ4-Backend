@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
+using Api.DataAccessLayer.Models;
 using CustomExceptions;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
@@ -46,7 +47,7 @@ namespace Api.Integration.Test.Fakes
             return Task.Run(() => (decimal)10);
         }
 
-        public async Task ValidateAddressAsync(string address)
+        public async Task ValidateAddressAsync(Address address)
         {
             return;
         }

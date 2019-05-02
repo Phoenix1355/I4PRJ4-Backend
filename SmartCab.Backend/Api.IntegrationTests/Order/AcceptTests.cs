@@ -183,5 +183,61 @@ namespace Api.IntegrationTests.Order
             }
         }
 
+        [Test]
+        public async Task Accept_SharedRideOrderDoesExist_RidesChangedToDebited()
+        {
+            await CreateRideWithLogin(1000,"test12@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+
+            await CreateRideWithLogin(1000, "test13@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            var response = await PutAsync(uri, null);
+
+            using (var context = _factory.CreateContext())
+            {
+                var order = context.Orders.First();
+                foreach (var orderRide in order.Rides)
+                {
+                    Assert.That(orderRide.Status,Is.EqualTo(RideStatus.Debited));
+                }
+                
+            }
+        }
+
+        [Test]
+        public async Task Accept_SharedRideOrderDoesExist_CustomerDebitedExpectedAmount()
+        {
+            await CreateRideWithLogin(1000, "test12@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+
+            await CreateRideWithLogin(1000, "test13@gmail.com", RideType.SharedRide);
+
+            ClearHeaders();
+            //Login
+            await LoginOnTaxiCompanyAccount("anotherEmail@test.com");
+
+            var id = 1;
+            var uri = "/api/order/" + id + "/accept";
+            var response = await PutAsync(uri, null);
+
+            using (var context = _factory.CreateContext())
+            {
+                var order = context.Orders.First();
+                foreach (var orderRide in order.Rides)
+                {
+                    Assert.That(orderRide.Customer.Balance, Is.EqualTo(925));
+                }
+
+            }
+        }
+
     }
 }
