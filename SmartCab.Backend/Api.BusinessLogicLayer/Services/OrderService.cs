@@ -84,7 +84,7 @@ namespace Api.BusinessLogicLayer.Services
             UpdateState(taxiCompanyId, order);
             await DebitCustomersAsync(order);
             await _unitOfWork.SaveChangesAsync();
-            await NotifyCustomers(order);
+            await NotifyCustomersAsync(order);
 
             var orderDto = _mapper.Map<OrderDto>(order);
             var response = new AcceptOrderResponse {Order = orderDto};
@@ -122,7 +122,7 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="order">The order containing the customers that should be notified</param>
         /// <returns></returns>
-        private async Task NotifyCustomers(Order order)
+        private async Task NotifyCustomersAsync(Order order)
         {
             try
             {
