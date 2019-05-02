@@ -193,7 +193,7 @@ namespace Api.IntegrationTests.Ride
             //Make request
             var response2 = await PostAsync("api/rides/create", request2);
             var response2object = GetObject<CreateRideResponse>(response2);
-            Assert.That(response2object.Status, Is.EqualTo(RideStatus.WaitingForAccept));
+            Assert.That(response2object.Status, Is.EqualTo(RideStatus.WaitingForAccept.ToString()));
         }
 
         [Test]
@@ -392,7 +392,7 @@ namespace Api.IntegrationTests.Ride
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Rides.Count(), Is.EqualTo(5));
+                Assert.That(context.Rides.Count(), Is.EqualTo(2));
             }
         }
 
@@ -414,7 +414,7 @@ namespace Api.IntegrationTests.Ride
 
             using (var context = _factory.CreateContext())
             {
-                Assert.That(context.Orders.Count(), Is.EqualTo(5));
+                Assert.That(context.Orders.Count(), Is.EqualTo(2));
             }
         }
 
