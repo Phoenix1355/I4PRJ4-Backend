@@ -22,6 +22,8 @@ namespace Api.BusinessLogicLayer.Services
     /// </summary>
     public class MatchService : IMatchService
     {
+        private readonly int FifteenMinutesInSeconds = 900;
+
         /// <summary>
         /// Returns true if the ride starting and endpoint is within max distance km of each other, air flight. 
         /// </summary>
@@ -30,6 +32,13 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>Whether the rides is close enough</returns>
         public bool Match(Ride ride1, Ride ride2, int maxDistance)
         {
+            var timeDifferenceBetweenDepartureTimeOfRides = Math.Abs(ride2.DepartureTime.Subtract(ride1.DepartureTime).TotalSeconds);
+
+            if (timeDifferenceBetweenDepartureTimeOfRides > FifteenMinutesInSeconds)
+            {
+                return false;
+            }
+
             //This is flight distance so should be taken with a gram of salt. 
             var distanceBetweenStartDestinationsInKm = DistanceBetweenCoordinates(ride1.StartDestination.Lat, ride1.StartDestination.Lng, ride2.StartDestination.Lat,
                 ride2.StartDestination.Lng);

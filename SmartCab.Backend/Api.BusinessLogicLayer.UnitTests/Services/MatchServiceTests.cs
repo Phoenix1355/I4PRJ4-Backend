@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
@@ -129,6 +130,50 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 }
             };
             return _matchService.Match(ride1, ride2, maxDistance);
+        }
+
+
+
+        [TestCase(0,ExpectedResult = true)]
+        [TestCase(1, ExpectedResult = true)]
+        [TestCase(-1, ExpectedResult = true)]
+        [TestCase(-14, ExpectedResult = true)]
+        [TestCase(-15, ExpectedResult = true)]
+        [TestCase(-16, ExpectedResult = false)]
+        [TestCase(14, ExpectedResult = true)]
+        [TestCase(15, ExpectedResult = false)]
+        [TestCase(16, ExpectedResult = false)]
+        public bool Match_WhenDepartureTimeIsCloseEnough_ReturnsExpectedResult(int minutesToAdd)
+        {
+            var ride1 = new Ride()
+            {
+                DepartureTime = DateTime.Now,
+                EndDestination = new Address("Dummy", 0, "Dummy", 0)
+                {
+                    Lat = 10,
+                    Lng = 10
+                },
+                StartDestination = new Address("Dummy", 0, "Dummy", 0)
+                {
+                    Lat = 10,
+                    Lng = 10
+                }
+            };
+            var ride2 = new Ride()
+            {
+                DepartureTime = DateTime.Now.AddMinutes(minutesToAdd),
+                EndDestination = new Address("Dummy", 0, "Dummy", 0)
+                {
+                    Lat = 10,
+                    Lng = 10
+                },
+                StartDestination = new Address("Dummy", 0, "Dummy", 0)
+                {
+                    Lat = 10,
+                    Lng = 10
+                }
+            };
+            return _matchService.Match(ride1, ride2, 1);
         }
     }
 }
