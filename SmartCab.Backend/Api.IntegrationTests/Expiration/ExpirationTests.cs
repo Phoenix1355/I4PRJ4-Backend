@@ -18,6 +18,10 @@ namespace Api.IntegrationTests.Expiration
     [TestFixture()]
     public class ExpirationTests : IntegrationSetup
     {
+        /// <summary>
+        /// Long test, multiple asserts. 
+        /// </summary>
+        /// <returns></returns>
         [Test]
         public async Task UpdateExpiredRidesAndOrders_UpdatesOrderToExpired_OrdersHasBeenUpdated()
         {
@@ -29,12 +33,13 @@ namespace Api.IntegrationTests.Expiration
             await CreateRide(RideType.SharedRide, 1);
 
             //Sleep to allow task to run(hopefully)
-            Thread.Sleep(30000);
+            Thread.Sleep(15000);
             
             using (var context = _factory.CreateContext())
             {
                 Assert.That(context.Orders.First().Status,Is.EqualTo(OrderStatus.Expired));
-                Assert.That(context.Orders.First().Rides.First(), Is.EqualTo(RideStatus.Expired));
+                Assert.That(context.Rides.Where(ride=>ride.Status !=RideStatus.Expired).Any, Is.EqualTo(false));
+                Assert.That(context.Customers.Where(customer=>customer.ReservedAmount!=0).Any,Is.EqualTo(false));
             }
         }
     }
