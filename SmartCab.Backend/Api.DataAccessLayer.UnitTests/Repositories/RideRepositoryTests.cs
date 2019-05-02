@@ -15,6 +15,7 @@ using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {
+    [TestFixture]
     class RideRepositoryTests
     {
 
@@ -414,6 +415,32 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             var rides = await _uut.RideRepository.FindUnmatchedSharedRides();
             Assert.That(rides.Count, Is.EqualTo(2));
         }
+        #endregion
+
+        #region AddSharedRide
+
+        [Test]
+        public void AddSharedRide_PassengerCountTooHigh_ThrowsException()
+        {
+            var ride = new Ride()
+            {
+                PassengerCount = 3
+            };
+
+            Assert.Throws<TooManyPassengersException>(() => _uut.RideRepository.AddSharedRide(ride));
+        }
+
+        [Test]
+        public void AddSharedRide_PassengerCountOkay_DoseNotThrowsException()
+        {
+            var ride = new Ride()
+            {
+                PassengerCount = 2
+            };
+
+            Assert.DoesNotThrow(() => _uut.RideRepository.AddSharedRide(ride));
+        }
+
         #endregion
 
         #region FindExpiredUnmatchedRides

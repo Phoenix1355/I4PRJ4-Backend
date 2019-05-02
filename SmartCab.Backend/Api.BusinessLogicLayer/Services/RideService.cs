@@ -111,7 +111,7 @@ namespace Api.BusinessLogicLayer.Services
 
             //Reserve the money and save the data to the database. 
             await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
-            _unitOfWork.RideRepository.Add(ride);
+            _unitOfWork.RideRepository.AddSharedRide(ride);
             await _unitOfWork.SaveChangesAsync();
 
             //Check for matches

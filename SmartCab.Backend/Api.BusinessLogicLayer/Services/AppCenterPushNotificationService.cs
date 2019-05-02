@@ -16,7 +16,7 @@ namespace Api.BusinessLogicLayer.Services
     {
         private HttpClient _httpClient;
 
-        private const string BaseUrl = "https://api.appcenter.ms/v0.1/apps/";
+        private const string BaseUrl = "https://api.appcenter.ms/v0.1/apps";
         private const string Organization = "frank.andersen-gmail.com";
         private const string Android = "SmartCab";
         private const string PushNotificationUri = "push/notifications";

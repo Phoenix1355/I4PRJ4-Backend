@@ -41,7 +41,8 @@ namespace Api.ErrorHandling
                 exceptionType == typeof(ValidationException) ||
                 exceptionType == typeof(MultipleOrderException) ||
                 exceptionType == typeof(NegativeDepositException) ||
-                exceptionType == typeof(UnexpectedStatusException))
+                exceptionType == typeof(UnexpectedStatusException) ||
+                exceptionType == typeof(TooManyPassengersException))
             {
                 status = StatusCodes.Status400BadRequest;
                 error = new ErrorMessage(exceptionMessage);

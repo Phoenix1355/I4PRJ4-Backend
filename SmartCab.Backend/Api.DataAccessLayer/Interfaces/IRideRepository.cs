@@ -26,6 +26,8 @@ namespace Api.DataAccessLayer.Interfaces
         /// <exception cref="UnexpectedStatusException">Ride is not accepted, cannot be debited.</exception> 
         void SetAllRidesToDebited(List<Ride> rides);
 
+        void AddSharedRide(Ride ride);
+
         Task<List<Ride>> FindExpiredUnmatchedRides();
     }
 }
