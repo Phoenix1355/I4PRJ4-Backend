@@ -21,6 +21,8 @@ using Api.DataAccessLayer.UnitOfWork;
 using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +34,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NUnit.Framework.Constraints;
 using Swashbuckle.AspNetCore.Swagger;
 
 
@@ -42,6 +45,11 @@ namespace Api
         public FakeStartup(IConfiguration configuration) : base(configuration)
         {
             
+        }
+
+        public override void AddHangfire(IServiceCollection services)
+        {
+            services.AddHangfire(c => c.UseMemoryStorage());
         }
 
         /// <summary>
@@ -72,6 +80,14 @@ namespace Api
                 x.SwaggerEndpoint("./swagger/v1/swagger.json", "SmartCab Web API");
                 x.RoutePrefix = string.Empty;
             });
+
+            //Enables the handboard dashboard and server. 
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+            //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
+            RecurringJob.AddOrUpdate(() => RecurringJobOnceAMinute(), Cron.Minutely);
+            RecurringJobOnceAMinute();
 
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work

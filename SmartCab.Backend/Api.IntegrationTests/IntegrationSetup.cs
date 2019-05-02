@@ -76,11 +76,11 @@ namespace Api.IntegrationTests
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
         }
 
-        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide)
+        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide, int minutes = 0)
         {
             return new CreateRideRequest()
             {
-                ConfirmationDeadline = DateTime.Now.AddSeconds(1), //added one second because those dates must be in the future
+                ConfirmationDeadline = DateTime.Now.AddSeconds(1).AddMinutes(-minutes), //added one second because those dates must be in the future
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
@@ -144,9 +144,9 @@ namespace Api.IntegrationTests
             var response = await PutAsync("/api/customer/deposit", request);
         }
 
-        protected async Task CreateRide(RideType type = RideType.SoloRide)
+        protected async Task CreateRide(RideType type = RideType.SoloRide, int minutes = 0)
         {
-            var request = getCreateRideRequest(type);
+            var request = getCreateRideRequest(type, minutes);
 
             //Make request
             var response = await PostAsync("api/rides/create", request);
