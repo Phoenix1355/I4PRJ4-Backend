@@ -5,11 +5,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
+using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
+using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
+using Api.DataAccessLayer.UnitTests.Fakes;
+using Api.IntegrationTests.Fakes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using NSubstitute;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -33,7 +39,8 @@ namespace Api.IntegrationTests.Expiration
             await CreateRide(RideType.SharedRide, 1);
 
             //Sleep to allow task to run(hopefully)
-            Thread.Sleep(15000);
+            //Prone to error, no way to substantial test this. 
+            Thread.Sleep(40000);
             
             using (var context = _factory.CreateContext())
             {
