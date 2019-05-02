@@ -28,7 +28,7 @@ namespace Api.IntegrationTests.Expiration
         /// Long test, multiple asserts. 
         /// </summary>
         /// <returns></returns>
-        [Test]
+        /*[Test]
         public async Task UpdateExpiredRidesAndOrders_UpdatesOrderToExpired_OrdersHasBeenUpdated()
         {
             await CreateRideWithLogin();
@@ -48,6 +48,6 @@ namespace Api.IntegrationTests.Expiration
                 Assert.That(context.Rides.Where(ride=>ride.Status !=RideStatus.Expired).Any, Is.EqualTo(false));
                 Assert.That(context.Customers.Where(customer=>customer.ReservedAmount!=0).Any,Is.EqualTo(false));
             }
-        }
+        }*/
     }
 }
