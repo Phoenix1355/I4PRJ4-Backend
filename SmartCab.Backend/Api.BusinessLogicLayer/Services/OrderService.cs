@@ -27,9 +27,14 @@ namespace Api.BusinessLogicLayer.Services
         /// </summary>
         /// <param name="mapper">Used to map between domain classes and request/response/dto classes.</param>
         /// <param name="unitOfWork">Used to access the database repositories</param>
-        /// /// <param name="pushNotificationFactory">Used to create new notifications</param>
-        /// /// <param name="pushNotificationService">Used to send notifications</param>
-        public OrderService(IMapper mapper,  IUnitOfWork unitOfWork, IPushNotificationFactory pushNotificationFactory, IPushNotificationService pushNotificationService)
+        /// <param name="pushNotificationFactory">Used to create new notifications</param>
+        /// <param name="pushNotificationService">Used to send notifications</param>
+        public OrderService(
+            IMapper mapper,
+            IUnitOfWork unitOfWork,
+            IPushNotificationFactory pushNotificationFactory,
+            IPushNotificationService pushNotificationService
+            )
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;

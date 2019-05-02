@@ -10,6 +10,7 @@ using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Integration.Test.Fakes;
+using Api.IntegrationTests.Fakes;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -71,6 +72,7 @@ namespace SmartCabPoc.Integration.Test
             builder.ConfigureTestServices(services =>
             {
                services.AddScoped<IGoogleMapsApiService, FakeGoogleMapsApiService>();
+               services.AddScoped<IPushNotificationService, FakeAppCenterPushNotificationService>();
             });
         }
 
