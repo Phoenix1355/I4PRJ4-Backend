@@ -26,12 +26,10 @@ namespace Api.Controllers
     [ApiController]
     public class PriceController : ControllerBase
     {
-        private IPriceStrategy _pricestrategy;
-        private IRideService _rideService;
+        private readonly IRideService _rideService;
 
-        public PriceController(IPriceStrategy pricestrategy, IRideService rideService)
+        public PriceController(IRideService rideService)
         {
-            _pricestrategy = pricestrategy;
             _rideService = rideService;
         }
 
