@@ -38,6 +38,7 @@ namespace Api.DataAccessLayer.Repositories
                 throw new MultipleOrderException("Already an order for given ride. ");
             }
 
+            ride.Status = RideStatus.WaitingForAccept;
             order.Price += ride.Price;
             order.Rides.Add(ride);
             Update(order);
