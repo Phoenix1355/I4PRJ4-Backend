@@ -13,6 +13,6 @@ namespace Api.BusinessLogicLayer.Interfaces
     /// </summary>
     public interface IMatchService
     {
-        bool Match(Ride ride1, Ride ride2, int maxDistanc);
+        bool Match(Ride ride1, Ride ride2, int maxDistance);
     }
 }
