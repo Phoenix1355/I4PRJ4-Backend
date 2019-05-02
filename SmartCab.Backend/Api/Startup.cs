@@ -34,6 +34,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using Hangfire;
 
 
 namespace Api
@@ -57,6 +58,12 @@ namespace Api
             AddJsonWebTokens(services);
             AddDependencyInjection(services);
             AddSwagger(services);
+
+            //================== Hangfire setup ======================= 
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(GetConnectionString());
+            });
         }
 
         /// <summary>
@@ -242,6 +249,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddSwagger(IServiceCollection services)
         {
+
             services.AddSwaggerGen(x =>
             {
                 //The generated Swagger JSON file will have these properties.
