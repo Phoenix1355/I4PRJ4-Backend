@@ -24,19 +24,31 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         public void UpdateExpiredRidesAndOrders_WhenCalled_SavesChanges()
         {
             var _unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
+
+            //Create
             var orderList = new List<Order>();
             var order = new Order();
             var ride = new Ride();
+
+            //Set
             ride.StartDestination = new Address("city", 1000, "street", 1);
             ride.EndDestination = new Address("city", 1000, "street", 1);
             order.Rides.Add(ride);
+            orderList.Add(order);
+            //Create and set
             var rideList = new List<Ride>();
             rideList.Add(ride);
+
+            //Stub out
             _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(orderList);
             _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(rideList);
+
+
             var push = Substitute.For<IPushNotificationFactory>();
             var pushNot = new PushNotification();
-            push.GetPushNotification().ReturnsForAnyArgs(pushNot);
+            //VERY Important that push notification gets a new otherwise it will throw misleading exception
+            //For all. So 1 order with 1 ride, and 1 ride. aka two. 
+            push.GetPushNotification().ReturnsForAnyArgs(new PushNotification(), new PushNotification());
             var center = Substitute.For<IPushNotificationService>();
 
             IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
@@ -55,19 +67,19 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             ride.StartDestination = new Address("city", 1000, "street", 1);
             ride.EndDestination = new Address("city", 1000, "street", 1);
             order.Rides.Add(ride);
+            orderList.Add(order);
             var rideList = new List<Ride>();
             rideList.Add(ride);
             _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(orderList);
             _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(rideList);
             var push = Substitute.For<IPushNotificationFactory>();
-            var pushNot = new PushNotification();
-            push.GetPushNotification().ReturnsForAnyArgs(pushNot);
+            push.GetPushNotification().ReturnsForAnyArgs(new PushNotification(), new PushNotification());
             var center = Substitute.For<IPushNotificationService>();
 
             IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
             _uut.UpdateExpiredRidesAndOrders();
 
-            center.ReceivedWithAnyArgs(1).SendAsync(null);
+            center.ReceivedWithAnyArgs(2).SendAsync(null);
         }
     }
 }
