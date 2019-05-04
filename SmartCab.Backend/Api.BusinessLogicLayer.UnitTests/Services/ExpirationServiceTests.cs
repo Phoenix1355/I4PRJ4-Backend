@@ -19,41 +19,55 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
     public class ExpirationServiceTests
     {
 
-        /*Test not working for some reason. 
+        
         [Test]
         public void UpdateExpiredRidesAndOrders_WhenCalled_SavesChanges()
         {
             var _unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
-            var ride = new Ride()
-            {
-                StartDestination = new Address("city", 1000, "street", 1),
-                EndDestination = new Address("city", 1000, "street", 1)
-            };
-            _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(new List<Ride>()
-            {
-                ride,
-            });
-
-            _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(new List<Order>()
-            {
-                new Order()
-                {
-                    Rides = 
-                    {
-                        ride,
-                    },
-                },
-            });
-
+            var orderList = new List<Order>();
+            var order = new Order();
+            var ride = new Ride();
+            ride.StartDestination = new Address("city", 1000, "street", 1);
+            ride.EndDestination = new Address("city", 1000, "street", 1);
+            order.Rides.Add(ride);
+            var rideList = new List<Ride>();
+            rideList.Add(ride);
+            _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(orderList);
+            _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(rideList);
             var push = Substitute.For<IPushNotificationFactory>();
-            push.GetPushNotification().ReturnsForAnyArgs(new PushNotification());
+            var pushNot = new PushNotification();
+            push.GetPushNotification().ReturnsForAnyArgs(pushNot);
             var center = Substitute.For<IPushNotificationService>();
 
             IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
-
             _uut.UpdateExpiredRidesAndOrders();
 
             _unitOfWork.Received(1).SaveChangesAsync();
-        }*/
+        }
+
+        [Test]
+        public void UpdateExpiredRidesAndOrders_WhenCalled_NotifiesTwice()
+        {
+            var _unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
+            var orderList = new List<Order>();
+            var order = new Order();
+            var ride = new Ride();
+            ride.StartDestination = new Address("city", 1000, "street", 1);
+            ride.EndDestination = new Address("city", 1000, "street", 1);
+            order.Rides.Add(ride);
+            var rideList = new List<Ride>();
+            rideList.Add(ride);
+            _unitOfWork.OrderRepository.FindOrdersWithExpiredRides().ReturnsForAnyArgs(orderList);
+            _unitOfWork.RideRepository.FindExpiredUnmatchedRides().ReturnsForAnyArgs(rideList);
+            var push = Substitute.For<IPushNotificationFactory>();
+            var pushNot = new PushNotification();
+            push.GetPushNotification().ReturnsForAnyArgs(pushNot);
+            var center = Substitute.For<IPushNotificationService>();
+
+            IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
+            _uut.UpdateExpiredRidesAndOrders();
+
+            center.ReceivedWithAnyArgs(1).SendAsync(null);
+        }
     }
 }
