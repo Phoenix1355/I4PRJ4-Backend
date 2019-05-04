@@ -8,6 +8,7 @@ using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
+using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
@@ -28,19 +29,25 @@ namespace Api.IntegrationTests.Expiration
         /// Long test, multiple asserts. 
         /// </summary>
         /// <returns></returns>
-        /*[Test]
+        [Test]
         public async Task UpdateExpiredRidesAndOrders_UpdatesOrderToExpired_OrdersHasBeenUpdated()
         {
             await CreateRideWithLogin();
-            await CreateRide(RideType.SoloRide, 1);
+            await CreateRide(RideType.SoloRide);
             ClearHeaders();
             await LoginOnCustomerAccount("test13@gmail.com");
             await DepositToCustomer(1000);
-            await CreateRide(RideType.SharedRide, 1);
+            await CreateRide(RideType.SharedRide);
 
             //Sleep to allow task to run(hopefully)
-            //Prone to error, no way to substantial test this. 
-            Thread.Sleep(40000);
+            Thread.Sleep(2000);
+
+            var expiration = new ExpirationService(
+                new UnitOfWork(_factory.CreateContext(),Substitute.For<IIdentityUserRepository>()),
+                new PushNotificationFactory(),
+                new FakeAppCenterPushNotificationService()
+                );
+            expiration.UpdateExpiredRidesAndOrders();
             
             using (var context = _factory.CreateContext())
             {
@@ -48,6 +55,6 @@ namespace Api.IntegrationTests.Expiration
                 Assert.That(context.Rides.Where(ride=>ride.Status !=RideStatus.Expired).Any, Is.EqualTo(false));
                 Assert.That(context.Customers.Where(customer=>customer.ReservedAmount!=0).Any,Is.EqualTo(false));
             }
-        }*/
+        }
     }
 }

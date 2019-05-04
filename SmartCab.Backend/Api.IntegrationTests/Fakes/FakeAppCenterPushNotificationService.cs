@@ -10,19 +10,9 @@ namespace Api.IntegrationTests.Fakes
 {
     class FakeAppCenterPushNotificationService : IPushNotificationService
     {
-        private HttpClient _httpClient;
-        private const string BaseUrl = "https://api.appcenter.ms/v0.1/apps/";
-        private const string Organization = "frank.andersen-gmail.com";
-        private const string Android = "SmartCab";
-        private const string PushNotificationUri = "push/notifications";
 
-        private const string ApiKeyName = "X-API-Token";
-        private readonly string _apiKey; // This Token is named "Backend" in AppCenter
-
-        public FakeAppCenterPushNotificationService(IConfiguration config, HttpClient httpClient)
+        public FakeAppCenterPushNotificationService()
         {
-            _httpClient = httpClient;
-            _apiKey = config["AppCenterPushApiKey"];
         }
 
         /// <summary>

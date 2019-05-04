@@ -46,12 +46,6 @@ namespace Api
         {
             
         }
-
-        public override void AddHangfire(IServiceCollection services)
-        {
-            services.AddHangfire(c => c.UseMemoryStorage());
-        }
-
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
@@ -80,14 +74,6 @@ namespace Api
                 x.SwaggerEndpoint("./swagger/v1/swagger.json", "SmartCab Web API");
                 x.RoutePrefix = string.Empty;
             });
-
-            //Enables the handboard dashboard and server. 
-            app.UseHangfireDashboard();
-            app.UseHangfireServer();
-
-            //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
-            RecurringJob.AddOrUpdate(() => RecurringJobOnceAMinute(), Cron.Minutely);
-            RecurringJobOnceAMinute();
 
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
