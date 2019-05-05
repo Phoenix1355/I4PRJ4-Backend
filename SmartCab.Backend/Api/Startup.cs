@@ -90,13 +90,13 @@ namespace Api
                 x.RoutePrefix = string.Empty;
             });
 
-            //Enables the handboard dashboard and server. 
+            //Enables the handboard dashboard and server. Dashboard  url -> /hangfire
             app.UseHangfireDashboard();
             app.UseHangfireServer();
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
             //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
-            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "*/15 * * * * *");
+            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "* */15 * * * *");
             
 
             app.UseHttpsRedirection();
@@ -110,7 +110,9 @@ namespace Api
         }
 
         /// <summary>
-        /// Must be public to allow it to be called recurringly. 
+        /// Must be public to allow it to be called recurringly.
+        /// Queues a job with an injected service, IExpirationService. Use the default injection supported by Asp Net Core.
+        /// Calls UpdateExpiredRidesAndOrders on the service. 
         /// </summary>
         public void RecurringJobOnceAMinute()
         {
