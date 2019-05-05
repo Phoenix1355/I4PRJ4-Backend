@@ -20,13 +20,45 @@ namespace Api.IntegrationTests.Ride
         {
             await LoginOnCustomerAccount();
 
-            await DepositToCustomer(1000);
-
             var request = getPriceRequest();
 
             var response = await PostAsync("api/rides/price", request);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public async Task Price_WhenUnauthorizedUserCallPriceWithValidRequest_ErrorMessageReturned()
+        {
+            var request = getPriceRequest();
+            var response = await PostAsync("api/rides/price", request);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
+        [Test]
+        public async Task Price_WhenAuthorizedUserCallPriceWithInvalidRequest_ErrorMessageReturned()
+        {
+            await LoginOnCustomerAccount();
+
+            var request = getPriceRequest();
+
+            // Invalidate request
+            request.EndAddress = new Address("Århus", 800, "StreetName", 1);
+
+            var response = await PostAsync("api/rides/price", request);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
+
+        [Test]
+        public async Task Price_ValidRequest_ReturnsCorrectCorrectPriceInDecimal()
+        {
+            await LoginOnCustomerAccount();
+
+            var request = getPriceRequest();
+
+            var response = await PostAsync("api/rides/price", request);
+
         }
 
     }
