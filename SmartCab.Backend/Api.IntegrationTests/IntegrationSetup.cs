@@ -89,6 +89,15 @@ namespace Api.IntegrationTests
             };
         }
 
+        protected PriceRequest getPriceRequest(RideType type = RideType.SoloRide)
+        {
+            return new PriceRequest()
+            {
+                StartAddress = new Address("Aarhus", 8000, "Søgade", 20),
+                EndAddress = new Address("Åbyhøj", 8230, "Søren Frichs Vej", 20),
+                RideType = type,
+            };
+        }
 
         protected async Task LoginOnCustomerAccount(string email = "test12@gmail.com")
         {

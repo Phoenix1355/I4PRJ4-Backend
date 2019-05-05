@@ -132,6 +132,8 @@ namespace Api
                 mapper.CreateMap<SoloRide, SoloRideDto>();
                 mapper.CreateMap<CreateRideRequest, SoloRide>();
                 mapper.CreateMap<CreateRideRequest, SharedRide>();
+                mapper.CreateMap<PriceRequest, SoloRide>();
+                mapper.CreateMap<PriceRequest, SharedRide>();
                 mapper.CreateMap<SoloRide, CreateRideResponse>();
                 mapper.CreateMap<SharedRide, CreateRideResponse>();
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
