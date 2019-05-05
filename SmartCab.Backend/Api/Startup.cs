@@ -95,7 +95,8 @@ namespace Api
             app.UseHangfireServer();
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
-            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), Cron.Minutely);
+            //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
+            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "*/15 * * * * *");
             
 
             app.UseHttpsRedirection();
@@ -279,8 +280,15 @@ namespace Api
             });
         }
 
+        /// <summary>
+        /// Configure hangfire to use SQL server to store Task/jobs.
+        /// This is done to ensure that content is stored, even if the application is recycled.
+        /// Thereby no jobs disappers. 
+        /// </summary>
+        /// <param name="services"></param>
         virtual public void AddHangfire(IServiceCollection services)
         {
+            
             services.AddHangfire(configuration =>
             {
                 configuration.UseSqlServerStorage(GetConnectionString());

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Models;
@@ -21,7 +22,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
         
         [Test]
-        public void UpdateExpiredRidesAndOrders_WhenCalled_SavesChanges()
+        public async Task UpdateExpiredRidesAndOrders_WhenCalled_SavesChanges()
         {
             var _unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
 
@@ -52,13 +53,13 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var center = Substitute.For<IPushNotificationService>();
 
             IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
-            _uut.UpdateExpiredRidesAndOrders();
+            await _uut.UpdateExpiredRidesAndOrders();
 
             _unitOfWork.Received(1).SaveChangesAsync();
         }
 
         [Test]
-        public void UpdateExpiredRidesAndOrders_WhenCalled_NotifiesTwice()
+        public async Task UpdateExpiredRidesAndOrders_WhenCalled_NotifiesTwice()
         {
             var _unitOfWork = NSubstitute.Substitute.For<IUnitOfWork>();
             var orderList = new List<Order>();
@@ -77,7 +78,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             var center = Substitute.For<IPushNotificationService>();
 
             IExpirationService _uut = new ExpirationService(_unitOfWork, push, center);
-            _uut.UpdateExpiredRidesAndOrders();
+            await _uut.UpdateExpiredRidesAndOrders();
 
             center.ReceivedWithAnyArgs(2).SendAsync(null);
         }

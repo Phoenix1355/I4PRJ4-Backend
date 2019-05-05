@@ -11,12 +11,22 @@ using Castle.Core.Internal;
 
 namespace Api.BusinessLogicLayer.Services
 {
+    /// <summary>
+    /// A class that is used by a background task to ensure that rides and orders that is expired,
+    /// gets updated and notifies the customer. 
+    /// </summary>
     public class ExpirationService : IExpirationService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPushNotificationFactory _pushNotificationFactory;
         private readonly IPushNotificationService _pushNotificationService;
 
+        /// <summary>
+        /// Constructor for Expiration service
+        /// </summary>
+        /// <param name="unitOfWork">Unit of work</param>
+        /// <param name="pushNotificationFactory">Factory for push notifications</param>
+        /// <param name="pushNotificationService">Service to send notifications</param>
         public ExpirationService(IUnitOfWork unitOfWork, 
             IPushNotificationFactory pushNotificationFactory, 
             IPushNotificationService pushNotificationService)
@@ -27,19 +37,19 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
-        /// Simple that only updates rides to expired
-        /// Requires Sync Behaviour
+        /// Updates all expired ride and orders and notifies customer. 
         /// </summary>
         /// <returns></returns>
-        public void UpdateExpiredRidesAndOrders()
+        public async Task UpdateExpiredRidesAndOrders()
         {
-             UpdateNonMatchedRides().Wait();
-             UpdateOrdersWithExpiredRides().Wait();
-             _unitOfWork.SaveChangesAsync().Wait();
+             await UpdateNonMatchedRides();
+             await UpdateOrdersWithExpiredRides();
+             await _unitOfWork.SaveChangesAsync();
         }
 
         /// <summary>
-        /// All expired shared rides that have expired. Update these. 
+        /// Updates all expired shared rides that have expired.
+        /// These are rides that have not been matched yet. 
         /// </summary>
         /// <returns></returns>
         private async Task UpdateNonMatchedRides()
@@ -61,18 +71,24 @@ namespace Api.BusinessLogicLayer.Services
 
         /// <summary>
         /// All order that contains rides that have expired
+        /// This is both shared and solo rides. 
         /// </summary>
         /// <returns></returns>
         private async Task UpdateOrdersWithExpiredRides()
         {
             var ordersWithExpiredRides = await _unitOfWork.OrderRepository.FindOrdersWithExpiredRides();
 
+            //Iterate through all orders
             foreach (var order in ordersWithExpiredRides)
             {
+                //Set status
                 order.Status = OrderStatus.Expired;
+
+                //Iterate through all rides in the given order
                 foreach (var orderRide in order.Rides)
                 {
                     orderRide.Status = RideStatus.Expired;
+                    //Unreserve amount from customer. 
                     await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(orderRide.CustomerId,-orderRide.Price);
                     await NotifyCustomerAboutOrderExpired(orderRide);
                 }
@@ -80,6 +96,11 @@ namespace Api.BusinessLogicLayer.Services
             }
         }
 
+        /// <summary>
+        /// Contains the information that should be sent to the customer about missing match
+        /// </summary>
+        /// <param name="expiredRide">Ride which did not find a match</param>
+        /// <returns></returns>
         private async Task NotifyCustomerAboutMatchNotFound(Ride expiredRide)
         {
             var notification = _pushNotificationFactory.GetPushNotification();
@@ -93,6 +114,11 @@ namespace Api.BusinessLogicLayer.Services
             await _pushNotificationService.SendAsync(notification);
         }
 
+        /// <summary>
+        /// Contains the information about the order that expired. 
+        /// </summary>
+        /// <param name="expiredRide">Ride which did not get accepted</param>
+        /// <returns></returns>
         private async Task NotifyCustomerAboutOrderExpired(Ride expiredRide)
         {
             var notification = _pushNotificationFactory.GetPushNotification();

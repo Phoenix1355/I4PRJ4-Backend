@@ -47,7 +47,7 @@ namespace Api.IntegrationTests.Expiration
                 new PushNotificationFactory(),
                 new FakeAppCenterPushNotificationService()
                 );
-            expiration.UpdateExpiredRidesAndOrders();
+            await expiration.UpdateExpiredRidesAndOrders();
             
             using (var context = _factory.CreateContext())
             {
