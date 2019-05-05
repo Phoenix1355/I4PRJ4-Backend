@@ -186,27 +186,24 @@ namespace Api.UnitTests.Controllers
         }
 
         [Test]
-        public void Price_CustomerIdIsEmptyForSharedRide_ThrowsUserIdInvalidException()
+        public void Price_CustomerIdIsNull_ThrowsUserIdInvalidException()
         {
-            decimal dec = 2;
-            _rideService.CalculatePriceAsync(null, null, RideType.SharedRide).ReturnsForAnyArgs(dec);
+            decimal dec = 1;
+            _rideService.CalculatePriceAsync(null, null, RideType.SoloRide).ReturnsForAnyArgs(dec);
 
             //Setup the user so we have access to the claim stored in 'Constants.UserIdClaim'
             _ridesController.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext
                 {
-                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-                    {
-                        new Claim(Constants.UserIdClaim, "") //This would be the id of the customer 
-                    }))
+                    User = new ClaimsPrincipal(new ClaimsIdentity()) // The claim is not set, thereby null
                 }
             };
 
             var request = new PriceRequest
             {
                 EndAddress = null,
-                RideType = RideType.SharedRide,
+                RideType = RideType.SoloRide,
                 StartAddress = null
             };
 

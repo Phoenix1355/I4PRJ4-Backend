@@ -49,17 +49,5 @@ namespace Api.IntegrationTests.Ride
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
-
-        [Test]
-        public async Task Price_ValidRequest_ReturnsCorrectCorrectPriceInDecimal()
-        {
-            await LoginOnCustomerAccount();
-
-            var request = getPriceRequest();
-
-            var response = await PostAsync("api/rides/price", request);
-
-        }
-
     }
 }
