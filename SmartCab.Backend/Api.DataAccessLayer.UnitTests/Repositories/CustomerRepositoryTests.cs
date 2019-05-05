@@ -287,34 +287,5 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
         #endregion
 
-        #region EditCustomerAsync
-        /*
-        [Test]
-        public async Task EditCustomer_CustomerEdited_ReturnsEditedCustomer()
-        {
-            var customer = new Customer
-            {
-                Email = "valid@email.com",
-                Name = "Name",
-                PhoneNumber = "12345678",
-            };
-            using (var context = _factory.CreateContext())
-            {
-
-                context.Customers.Add(customer);
-                context.SaveChanges();
-            }
-
-           await _uut.AddCustomerAsync(customer, "Qwerrr111!");
-
-            var response = await _uut.EditCustomerAsync(new Customer(), customer.Id, "Qwer111!", "Qwerrr111!");
-
-            Assert.That(response, Is.EqualTo(customer));
-        }
-        */
-
-        #endregion
-
-
     }
 }

@@ -110,7 +110,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
 
         #region ChangeEmail
-
+        /*
         [Test]
         public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
         {
@@ -124,7 +124,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
             Assert.That(response, Is.EqualTo(IdentityResult.Success));
         }
-
+        */
         #endregion
 
     }
