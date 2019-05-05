@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer;
+using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Models;
+using Api.ErrorHandling;
 using CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -82,5 +85,38 @@ namespace Api.Controllers
             var response = await _orderService.AcceptOrderAsync(taxiCompanyId, id);
             return Ok(response);
         }
+
+        /// <summary>
+        /// Returns all available details about a specific order.
+        /// </summary>
+        /// <param name="authorization">A valid JWT token that is associated with a taxi company account.</param>
+        /// <param name="id">The id of the ride for which the details is returned.</param>
+        /// <returns>Details about a specific ride.</returns>
+        /// <response code="401">
+        /// An invalid JWT token was provided in the authorization header.<br/>
+        /// This can happen if the supplied token is expired or because the user associated with the token does not have the required role needed to make the request.
+        /// </response>
+        [Authorize(Roles = nameof(TaxiCompany))]
+        [Produces("application/json")]
+        [Route("{id}/[action]")]
+        [HttpGet]
+        [ProducesResponseType(typeof(OrderDetailedDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Details([FromHeader] string authorization, int id)
+        {
+            //Get the taxiCompanyId that is stored as a claim in the token
+            var taxiCompanyId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            //This should never happen, but better safe than sorry
+            if (string.IsNullOrEmpty(taxiCompanyId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _orderService.GetOrderAsync(id);
+
+            return Ok(response);
+        }
+
     }
 }

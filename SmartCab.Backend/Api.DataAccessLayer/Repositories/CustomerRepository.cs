@@ -51,6 +51,38 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
+        /// Debits the given amount to a customers account.
+        /// </summary>
+        /// <param name="customerId">The customers id.</param>
+        /// /// <param name="debit">The amount to debit.</param>
+        /// <returns></returns>
+        /// <exception cref="NegativeDepositException">Cannot debit negative amount.</exception>
+        public async Task DebitAsync(string customerId, decimal debit)
+        {
+            if (debit <= 0)
+            {
+                throw new NegativeDepositException("Cannot debit negative amount");
+            }
+
+            var customer = await FindByIDAsync(customerId);
+
+            //Constraints shuold be that reserved amount should atleast be debit amount, as we can never owe money to customer, 
+            //Balance should atleast be debit, as a customer cannot be lend money. 
+            //This in principal means that the order is invalid in some sense?
+            if (customer.Balance < debit || customer.ReservedAmount < debit)
+            {
+                throw new InsufficientFundsException(
+                    "Cannot debit order as customer does not hold enough funds. Invalid Order");
+            }
+
+            //Debit from the customer balance
+            customer.Balance -= debit;
+            //Remove the reserved amount. 
+            customer.ReservedAmount -= debit;
+            Update(customer);
+        }
+
+        /// <summary>
         /// Reserves an amount equal to the price
         /// </summary>
         /// <remarks>

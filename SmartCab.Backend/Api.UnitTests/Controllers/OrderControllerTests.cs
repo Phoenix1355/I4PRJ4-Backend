@@ -86,5 +86,49 @@ namespace Api.UnitTests.Controllers
         }
 
         #endregion
+
+        #region Details
+
+        [Test]
+        public async Task Details_Success_ReturnsOkResponse()
+        {
+            //Set claims
+            _orderController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "SomeTaxiCompanyId")
+                    }))
+                }
+            };
+
+            //Act and assert
+            var response = await _orderController.Details(null, 1) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        [Test]
+        public void Details_TaxiCompanyIdEmpty_ThrowsUserIdInvalidException()
+        {
+            //Set claims
+            _orderController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "")
+                    }))
+                }
+            };
+
+            //Act and Assertsult;
+            Assert.ThrowsAsync<UserIdInvalidException>(async () => await _orderController.Details(null, 1));
+        }
+
+        #endregion
     }
 }

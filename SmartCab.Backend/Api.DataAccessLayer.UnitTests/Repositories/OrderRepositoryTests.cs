@@ -78,6 +78,39 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
+        public async Task AddRideToOrder_OrderAndRideExists_RideHasStatusWaitingForAccept()
+        {
+            Customer customer = new Customer();
+            Order order = new Order();
+            using (var context = _factory.CreateContext())
+            {
+                context.Customers.Add(customer);
+                context.Orders.Add(order);
+                context.SaveChanges();
+            }
+
+            SoloRide soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now,
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = RideStatus.LookingForMatch,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            await _uut.OrderRepository.AddRideToOrderAsync(soloRide, order);
+            await _uut.SaveChangesAsync();
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(order.Id).Rides.First().Status, Is.EqualTo(RideStatus.WaitingForAccept));
+            }
+        }
+
+        [Test]
         public async Task AddRideToOrder_RideAlreadyAddedToOrder_ThrowsException()
         {
             Customer customer = new Customer();
@@ -461,6 +494,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             }
         }
 
+
         [Test]
         public async Task AcceptOrder_OrderExistsSoloRideNotWaitingForAcceptstatus_ThrowsException()
         {
@@ -477,6 +511,73 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             };
             Assert.ThrowsAsync<UnexpectedStatusException>(async()=>  _uut.OrderRepository.SetOrderToAccepted(order, taxi.Id)); ;
         }
+        #endregion
+
+        #region SetOrderToDebited
+
+
+        [Test]
+        public async Task SetOrderToDebited_OrderExistsSoloRideAccepted_OrderIsDebited()
+        {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase();
+            orderCreated.Status = OrderStatus.Accepted;
+            _uut.OrderRepository.SetOrderToDebited(orderCreated);
+            Assert.That(orderCreated.Status, Is.EqualTo(OrderStatus.Debited));
+        }
+
+        [Test]
+        public async Task SetOrderToDebited_OrderExistsSoloRideAcceptedSaveChangesNotCalled_OrderIsStillAccepted()
+        {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
+            var orderCreated = CreateTestOrderWithSoloRideInDatabase();
+            using (var context = _factory.CreateContext())
+            {
+                orderCreated.Status = OrderStatus.Accepted;
+                context.Orders.Update(orderCreated);
+                context.SaveChanges();
+            }
+
+            
+            _uut.OrderRepository.SetOrderToDebited(orderCreated);
+            await _uut.SaveChangesAsync();
+            //Assert against database
+
+            using (var context = _factory.CreateContext())
+            {
+                Assert.That(context.Orders.Find(orderCreated.Id).Status, Is.EqualTo(OrderStatus.Debited));
+            }
+        }
+
+        [Test]
+        public async Task SetOrderToDebited_OrderExistsSoloRideNotWaitingForAcceptstatus_ThrowsException()
+        {
+            var taxi = new TaxiCompany();
+            using (var context = _factory.CreateContext())
+            {
+                context.TaxiCompanies.Add(taxi);
+                context.SaveChanges();
+            }
+
+            var order = new Order()
+            {
+                Status = OrderStatus.Debited
+            };
+            Assert.ThrowsAsync<UnexpectedStatusException>(async () => _uut.OrderRepository.SetOrderToAccepted(order, taxi.Id)); ;
+        }
+
         #endregion
 
     }

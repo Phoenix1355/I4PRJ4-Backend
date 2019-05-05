@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace Api
         /// <param name="env">The environment for the application</param>
         /// <param name="dbContext">The DbContext used by the application</param>
         /// <param name="services">The service container for the application</param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationContext dbContext, IServiceProvider services)
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationContext dbContext, IServiceProvider services)
         {
             if (env.IsDevelopment())
             {
@@ -92,8 +93,7 @@ namespace Api
             app.UseMvc();
 
             //Create database if it does not exist and apply pending migrations, then create role if needed
-            //dbContext.Database.Migrate();
-            dbContext.Database.EnsureCreated();
+            dbContext.Database.Migrate();
 
             CreateRoles(services).Wait();
         }
@@ -132,11 +132,16 @@ namespace Api
                 mapper.CreateMap<SoloRide, SoloRideDto>();
                 mapper.CreateMap<CreateRideRequest, SoloRide>();
                 mapper.CreateMap<CreateRideRequest, SharedRide>();
+                mapper.CreateMap<PriceRequest, SoloRide>();
+                mapper.CreateMap<PriceRequest, SharedRide>();
                 mapper.CreateMap<SoloRide, CreateRideResponse>();
                 mapper.CreateMap<SharedRide, CreateRideResponse>();
                 mapper.CreateMap<Ride, CreateRideResponse>(); //TODO: Only here because data-access layer currently uses ride and not soloride and sharedrides when adding new rides to the DB
                 mapper.CreateMap<Ride, RideDto>();
+                mapper.CreateMap<Ride, RideDetailedDto>();
                 mapper.CreateMap<TaxiCompany, TaxiCompanyDto>();
+                mapper.CreateMap<Order, OrderDto>();
+                mapper.CreateMap<Order, OrderDetailedDto>();
 
                 //Maps enum to their name, instead of integer value.
                 mapper.CreateMap<Enum, String>().ConvertUsing(e => e.ToString());
@@ -217,6 +222,7 @@ namespace Api
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IHttpClient, TestableHttpClient>();
+            services.AddScoped<HttpClient>();
             services.AddScoped<IGoogleMapsApiService, GoogleMapsApiService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<IRideRepository, RideRepository>();
@@ -226,7 +232,10 @@ namespace Api
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<ITaxiCompanyService, TaxiCompanyService>();
             services.AddScoped<ITaxiCompanyRepository, TaxiCompanyRepository>();
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPushNotificationFactory, PushNotificationFactory>();
+            services.AddScoped<IPushNotificationService, AppCenterPushNotificationService>();
+            services.AddScoped<IMatchService, MatchService>();
         }
 
         /// <summary>
@@ -268,7 +277,7 @@ namespace Api
         /// Creates a number of roles in the database if they do not already exist.
         /// </summary>
         /// <param name="services">The container to register to.</param>
-        private async Task CreateRoles(IServiceProvider services)
+        protected async Task CreateRoles(IServiceProvider services)
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 

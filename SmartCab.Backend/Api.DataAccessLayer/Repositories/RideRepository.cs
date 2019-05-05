@@ -29,6 +29,26 @@ namespace Api.DataAccessLayer.Repositories
         }
 
         /// <summary>
+        /// Find all rides with status LookingForMatch. This is only valid for sharedRides. 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Ride>> FindUnmatchedSharedRides()
+        {
+            return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
+        }
+
+
+        public void AddSharedRide(Ride ride)
+        {
+            if (ride.PassengerCount > 2)
+            {
+                throw new TooManyPassengersException("SharedRide can only have two passengers");
+            }
+
+            Add(ride);
+        }
+
+        /// <summary>
         /// Updates the status of all supplied rides to "Accepted".
         /// </summary>
         /// <param name="rides">The collection of rides, that should have their status updated.</param>
@@ -42,6 +62,24 @@ namespace Api.DataAccessLayer.Repositories
                     throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
                 }
                 ride.Status = RideStatus.Accepted;
+                Update(ride);
+            }
+        }
+
+        /// <summary>
+        /// Updates the status of all supplied rides to "Debited".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        /// <exception cref="UnexpectedStatusException">Ride is not accepted, cannot be debited.</exception> 
+        public void SetAllRidesToDebited(List<Ride> rides)
+        {
+            foreach (var ride in rides)
+            {
+                if (ride.Status != RideStatus.Accepted)
+                {
+                    throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
+                }
+                ride.Status = RideStatus.Debited;
                 Update(ride);
             }
         }

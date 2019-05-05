@@ -16,6 +16,7 @@ using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.Statuses;
 using AutoMapper;
 using CustomExceptions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
@@ -29,7 +30,7 @@ namespace Api.BusinessLogicLayer.Services
         private readonly IGoogleMapsApiService _googleMapsApiService;
         private readonly IPriceStrategyFactory _priceStrategyFactory;
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly IMatchService _matchService;
         /// <summary>
         /// Constructor for this class.
         /// </summary>
@@ -42,12 +43,14 @@ namespace Api.BusinessLogicLayer.Services
             IMapper mapper,
             IGoogleMapsApiService googleMapsApiService, 
             IPriceStrategyFactory priceStrategyFactory,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IMatchService matchService)
         {
             _mapper = mapper;
             _googleMapsApiService = googleMapsApiService;
             _priceStrategyFactory = priceStrategyFactory;
             _unitOfWork = unitOfWork;
+            _matchService = matchService;
         }
 
         /// <summary>
@@ -99,8 +102,72 @@ namespace Api.BusinessLogicLayer.Services
         /// <returns>A response object containing information about the created ride.</returns>
         private async Task<CreateRideResponse> AddSharedRideAsync(CreateRideRequest request, string customerId)
         {
-            throw new NotImplementedException("Not currently implemented.");
+            //Map request to ride
+            var ride = _mapper.Map<SharedRide>(request);
+
+            //Calculate price and attach customer
+            ride.Price = await CalculatePriceAsync(ride.StartDestination, ride.EndDestination, request.RideType);
+            ride.CustomerId = customerId;
+
+            //Reserve the money and save the data to the database. 
+            await _unitOfWork.CustomerRepository.ReservePriceFromCustomerAsync(ride.CustomerId, ride.Price);
+            _unitOfWork.RideRepository.AddSharedRide(ride);
+            await _unitOfWork.SaveChangesAsync();
+
+            //Check for matches
+            await CheckForMatches(ride);
+
+            //No match
+            var response = _mapper.Map<CreateRideResponse>(ride);
+            return response;
         }
+
+        /// <summary>
+        /// Checks against the database to see if any rides match. 
+        /// </summary>
+        /// <param name="ride"></param>
+        /// <returns></returns>
+        private async Task CheckForMatches(Ride ride)
+        {
+            var unmatchedRides = await _unitOfWork.RideRepository.FindUnmatchedSharedRides();
+            int maxDistance = 1;
+            //Match against original
+            foreach (var unmatchedRide in unmatchedRides)
+            {
+                //Check if it's self first or same customer
+                if (ride.Id == unmatchedRide.Id || ride.CustomerId == unmatchedRide.CustomerId)
+                {
+                    //Go to next iteration
+                    continue;
+                } 
+
+                var match = _matchService.Match(ride, unmatchedRide, maxDistance);
+                //If it matches close enough.
+                if (match)
+                {
+                    //Opdate statuses of rides
+                    await CreateOrderForMatchedRide(ride, unmatchedRide);
+                    //Found match, no need to continue search. 
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Opdate the given rides to WaitinForAccept and creates the order. 
+        /// </summary>
+        /// <param name="ride1"></param>
+        /// <param name="ride2"></param>
+        /// <returns></returns>
+        private async Task CreateOrderForMatchedRide(Ride ride1, Ride ride2)
+        {
+            //Create order for ride
+            var order = _unitOfWork.OrderRepository.Add(new Order());
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride1, order);
+            await _unitOfWork.OrderRepository.AddRideToOrderAsync(ride2, order);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
 
         /// <summary>
         /// Calculates the price of a ride between two addresses.
@@ -131,8 +198,8 @@ namespace Api.BusinessLogicLayer.Services
             //Validate the addresses
             var firstAsString = first.ToString();
             var secondAsString = second.ToString();
-            var validateOrigin = _googleMapsApiService.ValidateAddressAsync(firstAsString);
-            var validateDestination = _googleMapsApiService.ValidateAddressAsync(firstAsString);
+            var validateOrigin = _googleMapsApiService.ValidateAddressAsync(first);
+            var validateDestination = _googleMapsApiService.ValidateAddressAsync(second);
             await Task.WhenAll(validateOrigin, validateDestination);
 
             //Validation ok (otherwise an exception would be thrown above)
@@ -140,5 +207,7 @@ namespace Api.BusinessLogicLayer.Services
 
             return distanceInKm;
         }
+
+
     }
 }

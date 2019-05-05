@@ -19,14 +19,14 @@ namespace Api.IntegrationTests
     public class IntegrationSetup
     {
         protected HttpClient _client;
-        protected InMemoryApplicationFactory<Startup> _factory;
+        protected InMemoryApplicationFactory<FakeStartup> _factory;
 
         [SetUp]
         public void Setup()
         {
             string guid = Guid.NewGuid().ToString();
             
-            _factory = new InMemoryApplicationFactory<Startup>(guid);
+            _factory = new InMemoryApplicationFactory<FakeStartup>(guid);
             
             _client = _factory.CreateClient();
         }
@@ -76,7 +76,7 @@ namespace Api.IntegrationTests
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
         }
 
-        protected CreateRideRequest getCreateRideRequest()
+        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide)
         {
             return new CreateRideRequest()
             {
@@ -84,11 +84,20 @@ namespace Api.IntegrationTests
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
-                RideType = RideType.SoloRide,
+                RideType = type,
                 PassengerCount = 2
             };
         }
 
+        protected PriceRequest getPriceRequest(RideType type = RideType.SoloRide)
+        {
+            return new PriceRequest()
+            {
+                StartAddress = new Address("Aarhus", 8000, "Søgade", 20),
+                EndAddress = new Address("Åbyhøj", 8230, "Søren Frichs Vej", 20),
+                RideType = type,
+            };
+        }
 
         protected async Task LoginOnCustomerAccount(string email = "test12@gmail.com")
         {
@@ -144,19 +153,19 @@ namespace Api.IntegrationTests
             var response = await PutAsync("/api/customer/deposit", request);
         }
 
-        protected async Task CreateRide()
+        protected async Task CreateRide(RideType type = RideType.SoloRide)
         {
-            var request = getCreateRideRequest();
+            var request = getCreateRideRequest(type);
 
             //Make request
             var response = await PostAsync("api/rides/create", request);
         }
 
-        protected async Task CreateRideWithLogin()
+        protected async Task CreateRideWithLogin(int deposit = 1000,string email = "test12@gmail.com", RideType type = RideType.SoloRide)
         {
-            await LoginOnCustomerAccount();
-            await DepositToCustomer(1000);
-            await CreateRide();
+            await LoginOnCustomerAccount(email);
+            await DepositToCustomer(deposit);
+            await CreateRide(type);
         }
 
         protected void ClearHeaders()
