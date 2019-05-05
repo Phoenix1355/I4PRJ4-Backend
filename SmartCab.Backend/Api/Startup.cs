@@ -96,9 +96,8 @@ namespace Api
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
             //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
-            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "* */15 * * * *");
+            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "*/15 * * * *");
             
-
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
             app.UseMvc();
