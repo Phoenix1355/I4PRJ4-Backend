@@ -134,7 +134,7 @@ namespace Api.IntegrationTests
             _client.DefaultRequestHeaders.Add("authorization", "Bearer " + token);
         }
 
-        protected async Task DepositToCustomer(int amount)
+        protected async Task DepositToCustomer(decimal amount)
         {
             DepositRequest request = new DepositRequest()
             {

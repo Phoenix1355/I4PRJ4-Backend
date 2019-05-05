@@ -1,0 +1,54 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="NSubstitute" Version="4.1.0" />
+    <PackageReference Include="nunit" Version="3.11.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="SpecFlow.NUnit" Version="3.0.199" />
+    <PackageReference Include="SpecFlow.NUnit.Runners" Version="3.0.199" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.199" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Api.BusinessLogicLayer.UnitTests\Api.BusinessLogicLayer.UnitTests.csproj" />
+    <ProjectReference Include="..\Api.BusinessLogicLayer\Api.BusinessLogicLayer.csproj" />
+    <ProjectReference Include="..\Api.DataAccessLayer.UnitTests\Api.DataAccessLayer.UnitTests.csproj" />
+    <ProjectReference Include="..\Api.DataAccessLayer\Api.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\Api.IntegrationTests\Api.IntegrationTests.csproj" />
+    <ProjectReference Include="..\Api.UnitTests\Api.UnitTests.csproj" />
+    <ProjectReference Include="..\Api\Api.csproj" />
+    <ProjectReference Include="..\CustomExceptions\CustomExceptions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="API.feature.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>API.feature</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="API.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>API.feature.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="API.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>API.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
+
+</Project>
