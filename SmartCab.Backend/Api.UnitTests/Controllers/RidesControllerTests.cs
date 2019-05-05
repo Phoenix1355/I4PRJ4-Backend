@@ -155,6 +155,64 @@ namespace Api.UnitTests.Controllers
             Assert.That(() => _ridesController.Price(null, request), Throws.TypeOf<UserIdInvalidException>());
         }
 
+        [Test]
+        public async Task Price_SuccessForShareRide_ReturnsOkResponse()
+        {
+            decimal dec = 2;
+            _rideService.CalculatePriceAsync(null, null, RideType.SharedRide).ReturnsForAnyArgs(dec);
+
+            //Setup the user so we have access to the claim stored in 'Constants.UserIdClaim'
+            _ridesController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "CustomerIdNewGuy") //This would be the id of the customer 
+                    }))
+                }
+            };
+
+            var request = new PriceRequest
+            {
+                EndAddress = null,
+                RideType = RideType.SharedRide,
+                StartAddress = null
+            };
+
+            var response = await _ridesController.Price(null, request) as ObjectResult;
+
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        }
+
+        [Test]
+        public void Price_CustomerIdIsEmptyForSharedRide_ThrowsUserIdInvalidException()
+        {
+            decimal dec = 2;
+            _rideService.CalculatePriceAsync(null, null, RideType.SharedRide).ReturnsForAnyArgs(dec);
+
+            //Setup the user so we have access to the claim stored in 'Constants.UserIdClaim'
+            _ridesController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(Constants.UserIdClaim, "") //This would be the id of the customer 
+                    }))
+                }
+            };
+
+            var request = new PriceRequest
+            {
+                EndAddress = null,
+                RideType = RideType.SharedRide,
+                StartAddress = null
+            };
+
+            Assert.That(() => _ridesController.Price(null, request), Throws.TypeOf<UserIdInvalidException>());
+        }
+
         #endregion
     }
 }
