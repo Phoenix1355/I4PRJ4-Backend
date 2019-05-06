@@ -119,12 +119,12 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         [Test]
-        public async Task ChangePasswordAsync_ChangePassword_ThrowsExceptionWhenFailed()
+        public void ChangePasswordAsync_ChangePassword_ThrowsExceptionWhenFailed()
         {
             _mockUserManager.ChangePasswordReturn = IdentityResult.Failed(new IdentityError());
             Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangePasswordAsync(null, null, null));
         }
-
+        
         #endregion
 
         #region ChangeEmail
