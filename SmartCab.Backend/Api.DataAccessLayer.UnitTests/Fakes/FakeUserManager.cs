@@ -45,6 +45,7 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
         public override Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string newEmail, string token)
         {
             return Task.FromResult(ChangeEmailAsyncReturn);
+        }
 
         public override Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string password, string oldPassword)
         {

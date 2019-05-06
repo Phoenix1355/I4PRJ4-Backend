@@ -141,7 +141,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         public async Task ChangeEmailAsync_ChangingEmail_ThrowsExceptionWhenFailed()
         {
             _mockUserManager.ChangeEmailAsyncReturn = IdentityResult.Failed(new IdentityError());
-            Assert.ThrowsAsync<IdentityException>(async () => await _mockUserManager.ChangeEmailAsync(null,null, null));
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangeEmailAsync(null, null));
         }
 
 
