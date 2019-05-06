@@ -56,20 +56,20 @@ namespace Api.IntegrationTests
                 PhoneNumber = phonenumber
             };
         }
-        protected EditCustomerRequest getEditRequest(string email = "test@gmail.com",
+        protected EditCustomerRequest getEditRequest(string name = "Test Tester",
+            string email = "test@gmail.com",
             string password = "Qwer111!",
             string passwordRepeated = "Qwer111!",
             string oldPassword = "Qwerrrr111!",
-            string phonenumber = "12345678",
-            string name = "Test Tester")
+            string phonenumber = "12345678" )
         {
             return new EditCustomerRequest
             {
                 Email = email,
                 Password = password,
+                Name = name,
                 RepeatedPassword = passwordRepeated,
                 OldPassword = oldPassword,
-                Name = "TestUser",
                 PhoneNumber = phonenumber
             };
         }
