@@ -18,6 +18,15 @@ namespace Api.IntegrationTests.Customer
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
-        
+
+        [Test]
+        public async Task Edit_CustomerNotLoggedIn_ReturnsUnAuthorized()
+        {
+            var editRequest = getEditRequest();
+
+            var response = await PutAsync("api/customer/edit", editRequest);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
     }
 }
