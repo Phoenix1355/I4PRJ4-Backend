@@ -43,5 +43,23 @@ namespace Api.IntegrationTests.Customer
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
+        /*
+        [Test]
+        public async Task Edit_CostomerIsEditet_ReturnsCustomer()
+        {
+            await LoginOnCustomerAccount();
+
+            var editRequest = getEditRequest();
+            var response = await PutAsync("api/customer/edit", editRequest);
+
+            var customer = new DataAccessLayer.Models.Customer
+            {
+                Name = "Test Tester",
+                Email = "test@gmail.com",
+                PhoneNumber = "99999999"
+            };
+
+            Assert.That(response.Content, Is.EqualTo(customer.Name));
+        }*/
     }
 }
