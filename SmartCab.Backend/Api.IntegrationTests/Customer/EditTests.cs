@@ -28,5 +28,20 @@ namespace Api.IntegrationTests.Customer
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
 
+        [Test]
+        public async Task Edit_PasswordIsChanged_CanLogInWithNewCredentials()
+        {
+            await LoginOnCustomerAccount();
+
+            var editRequest = getEditRequest(changePassword: true);
+
+            await PutAsync("api/customer/edit", editRequest);
+
+            var loginRequest = getLoginRequest(editRequest.Email, editRequest.Password);
+
+            var response = await PostAsync("api/customer/login", loginRequest);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
     }
 }

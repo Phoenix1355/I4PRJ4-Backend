@@ -62,7 +62,7 @@ namespace Api.IntegrationTests
             string passwordRepeated = "Qwer11122!",
             string oldPassword = "Qwer111!",
             string phoneNumber = "99999999",
-            bool changePassword = true)
+            bool changePassword = false)
         {
             return new EditCustomerRequest
             {
