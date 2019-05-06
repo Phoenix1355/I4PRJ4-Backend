@@ -96,7 +96,7 @@ namespace Api
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
             //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
-            RecurringJob.AddOrUpdate(()=> RecurringJobOnceAMinute(), "*/15 * * * *");
+            RecurringJob.AddOrUpdate(()=> UpdateExpiredRidesAndOrders(), "*/15 * * * *");
             
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
@@ -113,7 +113,7 @@ namespace Api
         /// Queues a job with an injected service, IExpirationService. Use the default injection supported by Asp Net Core.
         /// Calls UpdateExpiredRidesAndOrders on the service. 
         /// </summary>
-        public void RecurringJobOnceAMinute()
+        public void UpdateExpiredRidesAndOrders()
         {
             BackgroundJob.Enqueue<IExpirationService>((service) => service.UpdateExpiredRidesAndOrders());
         }

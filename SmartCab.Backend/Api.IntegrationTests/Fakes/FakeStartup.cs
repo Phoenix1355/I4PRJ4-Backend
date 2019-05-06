@@ -22,7 +22,6 @@ using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
 using Hangfire;
-using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

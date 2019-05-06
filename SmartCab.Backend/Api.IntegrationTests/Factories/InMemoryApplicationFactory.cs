@@ -12,7 +12,6 @@ using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Integration.Test.Fakes;
 using Api.IntegrationTests.Fakes;
 using Hangfire;
-using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
