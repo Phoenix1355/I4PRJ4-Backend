@@ -34,6 +34,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using Hangfire;
 
 
 namespace Api
@@ -48,7 +49,7 @@ namespace Api
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             AddMvcAndExceptionHandling(services);
             AddAutoMapper(services);
@@ -57,6 +58,7 @@ namespace Api
             AddJsonWebTokens(services);
             AddDependencyInjection(services);
             AddSwagger(services);
+            AddHangfire(services);
         }
 
         /// <summary>
@@ -88,6 +90,14 @@ namespace Api
                 x.RoutePrefix = string.Empty;
             });
 
+            //Enables the handboard dashboard and server. Dashboard  url -> /hangfire
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
+
+            //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
+            //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
+            RecurringJob.AddOrUpdate(()=> UpdateExpiredRidesAndOrders(), "*/15 * * * *");
+            
             app.UseHttpsRedirection();
             app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
             app.UseMvc();
@@ -96,6 +106,16 @@ namespace Api
             dbContext.Database.Migrate();
 
             CreateRoles(services).Wait();
+        }
+
+        /// <summary>
+        /// Must be public to allow it to be called recurringly.
+        /// Queues a job with an injected service, IExpirationService. Use the default injection supported by Asp Net Core.
+        /// Calls UpdateExpiredRidesAndOrders on the service. 
+        /// </summary>
+        public void UpdateExpiredRidesAndOrders()
+        {
+            BackgroundJob.Enqueue<IExpirationService>((service) => service.UpdateExpiredRidesAndOrders());
         }
 
         /// <summary>
@@ -236,6 +256,7 @@ namespace Api
             services.AddScoped<IPushNotificationFactory, PushNotificationFactory>();
             services.AddScoped<IPushNotificationService, AppCenterPushNotificationService>();
             services.AddScoped<IMatchService, MatchService>();
+            services.AddScoped<IExpirationService, ExpirationService>();
         }
 
         /// <summary>
@@ -244,6 +265,7 @@ namespace Api
         /// <param name="services">The container to register to.</param>
         private void AddSwagger(IServiceCollection services)
         {
+
             services.AddSwaggerGen(x =>
             {
                 //The generated Swagger JSON file will have these properties.
@@ -258,6 +280,21 @@ namespace Api
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 x.IncludeXmlComments(xmlPath);
+            });
+        }
+
+        /// <summary>
+        /// Configure hangfire to use SQL server to store Task/jobs.
+        /// This is done to ensure that content is stored, even if the application is recycled.
+        /// Thereby no jobs disappers. 
+        /// </summary>
+        /// <param name="services"></param>
+        virtual public void AddHangfire(IServiceCollection services)
+        {
+            
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(GetConnectionString());
             });
         }
 

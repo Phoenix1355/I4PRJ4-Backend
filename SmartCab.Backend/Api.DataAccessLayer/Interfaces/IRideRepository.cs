@@ -27,5 +27,7 @@ namespace Api.DataAccessLayer.Interfaces
         void SetAllRidesToDebited(List<Ride> rides);
 
         void AddSharedRide(Ride ride);
+
+        Task<List<Ride>> FindExpiredUnmatchedRides();
     }
 }

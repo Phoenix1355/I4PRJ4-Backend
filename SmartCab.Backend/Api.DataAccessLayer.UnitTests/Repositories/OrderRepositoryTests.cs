@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Enums;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
@@ -370,7 +371,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(orders.FirstOrDefault().Rides.Count, Is.EqualTo(2));
         }
 
-        private Order CreateTestOrderWithSoloRideInDatabase(RideStatus rideStatus = RideStatus.WaitingForAccept, OrderStatus orderStatus = OrderStatus.WaitingForAccept)
+        private Order CreateTestOrderWithSoloRideInDatabase(RideStatus rideStatus = RideStatus.WaitingForAccept, OrderStatus orderStatus = OrderStatus.WaitingForAccept, int minutes = 0)
         {
             using (var context = _factory.CreateContext())
             {
@@ -383,7 +384,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 {
                     CustomerId = customer.Id,
                     DepartureTime = DateTime.Now,
-                    ConfirmationDeadline = DateTime.Now,
+                    ConfirmationDeadline = DateTime.Now.AddMinutes(-minutes),
                     PassengerCount = 0,
                     CreatedOn = DateTime.Now,
                     Price = 100,
@@ -453,6 +454,24 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
                 context.SaveChanges();
                 return order;
             }
+        }
+
+        #endregion
+
+        #region FindOrdersWithExpiredRides
+
+        //-1 instead of zero, since code takes time to execute. 
+        [TestCase(RideStatus.WaitingForAccept,OrderStatus.WaitingForAccept, -1,0)]
+        [TestCase(RideStatus.WaitingForAccept, OrderStatus.WaitingForAccept, 10, 1)]
+        [TestCase(RideStatus.LookingForMatch, OrderStatus.WaitingForAccept,-1, 0)]
+        [TestCase(RideStatus.WaitingForAccept, OrderStatus.Debited, 10, 0)]
+        [TestCase(RideStatus.WaitingForAccept, OrderStatus.Expired, 10, 0)]
+        public async Task FindOrdersWithExpiredRides_OrdersRideHasWaitingForAccept_OrderIsReturned(RideStatus rideStatus, OrderStatus orderStatus, int minutes,  int count)
+        {
+            CreateTestOrderWithSoloRideInDatabase(rideStatus, orderStatus,minutes);
+
+            var orders = await _uut.OrderRepository.FindOrdersWithExpiredRides();
+            Assert.That(orders.Count,Is.EqualTo(count));
         }
 
         #endregion
