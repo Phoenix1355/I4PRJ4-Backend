@@ -91,7 +91,12 @@ namespace Api
             });
 
             //Enables the handboard dashboard and server. Dashboard  url -> /hangfire
-            app.UseHangfireDashboard();
+            //app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new MyAuthorizationFilter() }
+            });
+
             app.UseHangfireServer();
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.

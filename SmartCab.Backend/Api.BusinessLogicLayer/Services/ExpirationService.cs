@@ -107,10 +107,10 @@ namespace Api.BusinessLogicLayer.Services
             notification.Name = "Ingen match";
             notification.Title = "Ingen match";
             notification.Body =
-                $"Din dele-tur fra {expiredRide.StartDestination.StreetName} {expiredRide.StartDestination.StreetNumber} i {expiredRide.StartDestination.CityName} til {expiredRide.EndDestination.StreetName} {expiredRide.EndDestination.StreetNumber} i {expiredRide.EndDestination.CityName} fandt ingen match. Prøv en solotur. ";
+                $"Din dele-tur kl. {expiredRide.DepartureTime.Hour}:{expiredRide.DepartureTime.Minute} til {expiredRide.EndDestination.StreetName} fandt ingen match. Prøv en solotur. ";
             notification.Devices.Add(expiredRide.DeviceId);
             notification.CustomData.Add("Type", "NoMatch");
-
+            notification.CustomData.Add("RideId", expiredRide.Id.ToString());
             await _pushNotificationService.SendAsync(notification);
         }
 
@@ -125,10 +125,10 @@ namespace Api.BusinessLogicLayer.Services
             notification.Name = "Udløbet";
             notification.Title = "Tur udløbet";
             notification.Body =
-                $"Din tur fra {expiredRide.StartDestination.StreetName} {expiredRide.StartDestination.StreetNumber} i {expiredRide.StartDestination.CityName} til {expiredRide.EndDestination.StreetName} {expiredRide.EndDestination.StreetNumber} i {expiredRide.EndDestination.CityName} er ikke blevet accepteret af en vognmand.";
+                $"Din tur kl. {expiredRide.DepartureTime.Hour}:{expiredRide.DepartureTime.Minute} til {expiredRide.EndDestination.StreetName} er ikke blevet accepteret af en vognmand.";
             notification.Devices.Add(expiredRide.DeviceId);
             notification.CustomData.Add("Type", "Expired");
-
+            notification.CustomData.Add("RideId", expiredRide.Id.ToString());
             await _pushNotificationService.SendAsync(notification);
         }
     }
