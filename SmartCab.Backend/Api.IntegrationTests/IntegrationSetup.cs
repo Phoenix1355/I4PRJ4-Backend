@@ -9,6 +9,7 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitTests.Factories;
+using Api.Requests;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -55,6 +56,24 @@ namespace Api.IntegrationTests
                 PhoneNumber = phonenumber
             };
         }
+        protected EditCustomerRequest getEditRequest(string email = "test@gmail.com",
+            string password = "Qwer111!",
+            string passwordRepeated = "Qwer111!",
+            string oldPassword = "Qwerrrr111!",
+            string phonenumber = "12345678",
+            string name = "Test Tester")
+        {
+            return new EditCustomerRequest
+            {
+                Email = email,
+                Password = password,
+                RepeatedPassword = passwordRepeated,
+                OldPassword = oldPassword,
+                Name = "TestUser",
+                PhoneNumber = phonenumber
+            };
+        }
+        
 
 
         protected async Task<HttpResponseMessage> PostAsync(string endPointUrl, object data)
