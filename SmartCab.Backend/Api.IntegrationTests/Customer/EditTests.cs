@@ -11,14 +11,10 @@ namespace Api.IntegrationTests.Customer
         [Test]
         public async Task Edit_UserExists_EditsUserAndReturnsCustomer()
         {
-            var request = getRegisterRequest();
-            await PostAsync("/api/customer/register", request);
-
-            var loginRequest = getLoginRequest();
-            await PostAsync("/api/customer/login", loginRequest);
-
+            await LoginOnCustomerAccount();
+            
             var editRequest = getEditRequest();
-            var response = await PostAsync("/api/customer/edit", editRequest);
+            var response = await PutAsync("/api/customer/edit", editRequest);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }

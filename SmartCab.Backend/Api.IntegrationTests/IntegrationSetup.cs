@@ -58,10 +58,11 @@ namespace Api.IntegrationTests
         }
         protected EditCustomerRequest getEditRequest(string name = "Test Tester",
             string email = "test@gmail.com",
-            string password = "Qwer111!",
-            string passwordRepeated = "Qwer111!",
-            string oldPassword = "Qwerrrr111!",
-            string phonenumber = "12345678" )
+            string password = "Qwer11122!",
+            string passwordRepeated = "Qwer11122!",
+            string oldPassword = "Qwer111!",
+            string phoneNumber = "99999999",
+            bool changePassword = true)
         {
             return new EditCustomerRequest
             {
@@ -70,7 +71,8 @@ namespace Api.IntegrationTests
                 Name = name,
                 RepeatedPassword = passwordRepeated,
                 OldPassword = oldPassword,
-                PhoneNumber = phonenumber
+                PhoneNumber = phoneNumber,
+                ChangePassword = changePassword
             };
         }
         
