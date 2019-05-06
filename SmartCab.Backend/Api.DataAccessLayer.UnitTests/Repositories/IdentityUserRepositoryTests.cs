@@ -109,6 +109,24 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
 
         #endregion
 
+        #region ChangePassword
+
+        [Test]
+        public async Task ChangePasswordAsync_ChangePassword_ReturnsOkResponse()
+        {
+            var response = await _uut.ChangePasswordAsync(null, null, null);
+            Assert.That(response,Is.EqualTo(IdentityResult.Success));
+        }
+
+        [Test]
+        public async Task ChangePasswordAsync_ChangePassword_ThrowsExceptionWhenFailed()
+        {
+            _mockUserManager.ChangePasswordReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangePasswordAsync(null, null, null));
+        }
+
+        #endregion
+
         #region ChangeEmail
         /*
         [Test]

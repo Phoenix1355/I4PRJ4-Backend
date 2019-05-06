@@ -26,6 +26,8 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
 
         public IdentityResult AddToRoleAsyncReturn { get; set; } = IdentityResult.Success;
 
+        public IdentityResult ChangePasswordReturn { get; set; } = IdentityResult.Success;
+
         public override Task<IdentityResult> CreateAsync(IdentityUser user, string password)
         {
             return Task.FromResult(CreateAsyncReturn);
@@ -34,6 +36,11 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
         public override Task<IdentityResult> AddToRoleAsync(IdentityUser user, string role)
         {
             return Task.FromResult(AddToRoleAsyncReturn);
+        }
+
+        public override Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string password, string oldPassword)
+        {
+            return Task.FromResult(ChangePasswordReturn);
         }
 
     }
