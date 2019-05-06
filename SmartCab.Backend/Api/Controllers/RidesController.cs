@@ -99,7 +99,13 @@ namespace Api.Controllers
 
             var calculatedPrice = await
                 _rideService.CalculatePriceAsync(request.StartAddress, request.EndAddress, request.RideType);
-            return Ok(calculatedPrice);
+
+            var response = new PriceResponse
+            {
+                Price = calculatedPrice
+            };
+
+            return Ok(response);
         }
     }
 }
