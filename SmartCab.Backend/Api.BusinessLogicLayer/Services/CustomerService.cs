@@ -130,7 +130,10 @@ namespace Api.BusinessLogicLayer.Services
                     var oldPassword = request.OldPassword;
                     await _unitOfWork.IdentityUserRepository.ChangePasswordAsync(customer, password, oldPassword);
                 }
-                await _unitOfWork.IdentityUserRepository.ChangeEmailAsync(customer, request.Email);
+
+                if (customer.Email != request.Email)
+                    await _unitOfWork.IdentityUserRepository.ChangeEmailAsync(customer, request.Email);
+
                 _unitOfWork.CustomerRepository.Update(customer);
                 await _unitOfWork.SaveChangesAsync();
             });

@@ -25,12 +25,17 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
         public IdentityResult CreateAsyncReturn { get; set; } = IdentityResult.Success;
 
         public IdentityResult AddToRoleAsyncReturn { get; set; } = IdentityResult.Success;
-
-
+        
         public IdentityResult ChangeEmailAsyncReturn { get; set; } = IdentityResult.Success;
 
-        public IdentityResult ChangePasswordReturn { get; set; } = IdentityResult.Success;
+        public IdentityResult ChangePasswordAsyncReturn { get; set; } = IdentityResult.Success;
 
+        public string GenerateChangeEmailTokenAsyncReturn { get; set; } = "Some token";
+
+        public override Task<string> GenerateChangeEmailTokenAsync(IdentityUser user, string email)
+        {
+            return Task.FromResult(GenerateChangeEmailTokenAsyncReturn);
+        }
 
         public override Task<IdentityResult> CreateAsync(IdentityUser user, string password)
         {
@@ -42,14 +47,14 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
             return Task.FromResult(AddToRoleAsyncReturn);
         }
 
-        public override Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string newEmail, string token)
+        public override Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string email, string token)
         {
             return Task.FromResult(ChangeEmailAsyncReturn);
         }
 
         public override Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string password, string oldPassword)
         {
-            return Task.FromResult(ChangePasswordReturn);
+            return Task.FromResult(ChangePasswordAsyncReturn);
         }
     }
 }

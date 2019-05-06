@@ -121,7 +121,7 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public void ChangePasswordAsync_ChangePassword_ThrowsExceptionWhenFailed()
         {
-            _mockUserManager.ChangePasswordReturn = IdentityResult.Failed(new IdentityError());
+            _mockUserManager.ChangePasswordAsyncReturn = IdentityResult.Failed(new IdentityError());
             Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangePasswordAsync(null, null, null));
         }
         
@@ -132,19 +132,19 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         [Test]
         public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
         {
+            var user = new IdentityUser("User name");
 
-            var response = await _mockUserManager.ChangeEmailAsync(null, null, null);
+            var response = await _uut.ChangeEmailAsync(user, null);
             Assert.That(response, Is.EqualTo(IdentityResult.Success));
         }
 
         [Test]
-        public async Task ChangeEmailAsync_ChangingEmail_ThrowsExceptionWhenFailed()
+        public void ChangeEmailAsync_ChangingEmail_ThrowsExceptionWhenFailed()
         {
             _mockUserManager.ChangeEmailAsyncReturn = IdentityResult.Failed(new IdentityError());
             Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangeEmailAsync(null, null));
         }
-
-
+        
         #endregion
 
     }

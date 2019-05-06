@@ -128,14 +128,16 @@ namespace Api.DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string email)
         {
-            if (user.Email == email)
-                return IdentityResult.Success;
-
             var emailConfirmationCode = await _userManager.GenerateChangeEmailTokenAsync(user, email);
 
             var response = await _userManager.ChangeEmailAsync(user, email, emailConfirmationCode);
-            await _userManager.UpdateNormalizedEmailAsync(user);
+            if (response != IdentityResult.Success)
+            {
+                var error = response.Errors.FirstOrDefault()?.Description;
+                throw new IdentityException(error);
+            }
 
+            await _userManager.UpdateNormalizedEmailAsync(user);
             await _userManager.SetUserNameAsync(user, email);
             await _userManager.UpdateNormalizedUserNameAsync(user);
 
