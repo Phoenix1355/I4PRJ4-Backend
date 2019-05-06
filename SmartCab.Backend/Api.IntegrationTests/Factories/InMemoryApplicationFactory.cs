@@ -11,6 +11,7 @@ using Api.DataAccessLayer;
 using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Integration.Test.Fakes;
 using Api.IntegrationTests.Fakes;
+using Hangfire;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -54,7 +55,9 @@ namespace SmartCabPoc.Integration.Test
                     options.UseInternalServiceProvider(serviceProvider);
                 });
 
+                
                 _serviceProvider = services.BuildServiceProvider();
+
 
                 // Create a scope to obtain a reference to the database
                 // context (ApplicationDbContext).

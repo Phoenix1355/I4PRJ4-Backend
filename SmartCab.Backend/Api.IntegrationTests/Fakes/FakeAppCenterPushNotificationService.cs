@@ -4,17 +4,15 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Api.IntegrationTests.Fakes
 {
     class FakeAppCenterPushNotificationService : IPushNotificationService
     {
-        private HttpClient _httpClient;
 
-
-        public FakeAppCenterPushNotificationService(HttpClient httpClient)
+        public FakeAppCenterPushNotificationService()
         {
-            _httpClient = httpClient;
         }
 
         /// <summary>

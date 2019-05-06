@@ -83,7 +83,7 @@ namespace Api.Controllers
         [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
-        [ProducesResponseType(typeof(decimal), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PriceResponse), StatusCodes.Status200OK)]
         [HttpPost]
         public async Task<IActionResult> Price([FromHeader] string authorization, [FromBody] PriceRequest request)
         {
@@ -99,7 +99,13 @@ namespace Api.Controllers
 
             var calculatedPrice = await
                 _rideService.CalculatePriceAsync(request.StartAddress, request.EndAddress, request.RideType);
-            return Ok(calculatedPrice);
+
+            var response = new PriceResponse
+            {
+                Price = calculatedPrice
+            };
+
+            return Ok(response);
         }
     }
 }

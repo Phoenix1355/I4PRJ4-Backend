@@ -21,6 +21,7 @@ using Api.DataAccessLayer.UnitOfWork;
 using Api.ErrorHandling;
 using Api.Requests;
 using AutoMapper;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +33,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NUnit.Framework.Constraints;
 using Swashbuckle.AspNetCore.Swagger;
 
 
@@ -43,7 +45,6 @@ namespace Api
         {
             
         }
-
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>

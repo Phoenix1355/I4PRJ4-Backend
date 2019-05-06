@@ -132,7 +132,7 @@ namespace Api.BusinessLogicLayer.Services
                     notification.Name = "Accept";
                     notification.Title = "Tur accepteret";
                     notification.Body =
-                        $"Din tur fra {ride.StartDestination.StreetName} {ride.StartDestination.StreetNumber} i {ride.StartDestination.CityName} til {ride.EndDestination.StreetName} {ride.EndDestination.StreetNumber} i {ride.EndDestination.CityName} er accepteret af {order.TaxiCompany.Name}";
+                        $"Din tur kl. {ride.DepartureTime.Hour}:{ride.DepartureTime.Minute} til {ride.EndDestination.StreetName} er accepteret af {order.TaxiCompany.Name}";
                     notification.Devices.Add(ride.DeviceId);
                     notification.CustomData.Add("rideId", ride.Id.ToString());
 
