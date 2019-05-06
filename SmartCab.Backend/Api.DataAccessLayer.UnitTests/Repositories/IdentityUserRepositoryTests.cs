@@ -128,21 +128,23 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         #endregion
 
         #region ChangeEmail
-        /*
+    
         [Test]
         public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
         {
-            //var email = "Axel@domain.com";
 
-            var user = _mockUserManager.
-
-            var NewEmail = "Hans@mail.com";
-
-            var response = await _mockUserManager.ChangeEmailAsync(null, NewEmail, "token");
-
+            var response = await _mockUserManager.ChangeEmailAsync(null, null, null);
             Assert.That(response, Is.EqualTo(IdentityResult.Success));
         }
-        */
+
+        [Test]
+        public async Task ChangeEmailAsync_ChangingEmail_ThrowsExceptionWhenFailed()
+        {
+            _mockUserManager.ChangeEmailAsyncReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangeEmailAsync(null, null));
+        }
+
+
         #endregion
 
     }
