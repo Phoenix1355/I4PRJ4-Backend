@@ -1,6 +1,5 @@
 using System.Net;
 using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Responses;
 using NUnit.Framework;
 
 namespace Api.IntegrationTests.Customer
