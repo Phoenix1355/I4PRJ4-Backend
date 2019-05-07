@@ -33,7 +33,8 @@ namespace Api.IntegrationTests.Customer
         {
             await LoginOnCustomerAccount();
 
-            var editRequest = getEditRequest(changePassword: true);
+            var editRequest = getEditRequest(changePassword: true, name: "TestUser", email: "test12@gmail.com",
+                phoneNumber: "12345678");
 
             await PutAsync("api/customer/edit", editRequest);
 
