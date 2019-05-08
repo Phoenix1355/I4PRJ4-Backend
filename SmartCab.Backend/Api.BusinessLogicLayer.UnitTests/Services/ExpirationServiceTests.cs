@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Models;
 using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services
 {

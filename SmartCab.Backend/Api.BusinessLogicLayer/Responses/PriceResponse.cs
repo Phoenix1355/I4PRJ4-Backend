@@ -1,6 +1,4 @@
-﻿using Api.BusinessLogicLayer.DataTransferObjects;
-
-namespace Api.BusinessLogicLayer.Responses
+﻿namespace Api.BusinessLogicLayer.Responses
 {
     /// <summary>
     /// Returnes the price when the endpoint api/rides/price successfully returns.

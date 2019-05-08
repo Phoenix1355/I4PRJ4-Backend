@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
 using Api.Requests;
 using Api.Responses;
 using AutoMapper;
-using CustomExceptions;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api.BusinessLogicLayer.Services
 {
@@ -110,23 +105,30 @@ namespace Api.BusinessLogicLayer.Services
         }
 
         /// <summary>
-        /// Gets the users info and changes the users password, name, email and phone number.
+        /// Updates the name, email, password and phone number of the customer with the specified id.
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="customerId"></param>
+        /// <param name="request">The request containing the information that should be updated for the customer.</param>
+        /// <param name="customerId">The id of the customer the changes should be applied to.</param>
         /// <returns></returns>
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
             var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
+
             customer.Name = request.Name;
             customer.PhoneNumber = request.PhoneNumber;
-
-            var password = request.Password;
-            var oldPassword = request.OldPassword;
-
+            
             await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
             {
-                await _unitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, request.Email, password, oldPassword);
+                if (request.ChangePassword == true)
+                {
+                    var password = request.Password;
+                    var oldPassword = request.OldPassword;
+                    await _unitOfWork.IdentityUserRepository.ChangePasswordAsync(customer, password, oldPassword);
+                }
+
+                if (customer.Email != request.Email)
+                    await _unitOfWork.IdentityUserRepository.ChangeEmailAsync(customer, request.Email);
+
                 _unitOfWork.CustomerRepository.Update(customer);
                 await _unitOfWork.SaveChangesAsync();
             });

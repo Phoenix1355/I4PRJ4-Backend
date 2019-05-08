@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Api.BusinessLogicLayer.Requests;
+﻿using Api.BusinessLogicLayer.Requests;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Requests

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
-using CustomExceptions;
 
 namespace Api.DataAccessLayer.Interfaces
 {

@@ -1,17 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Policy;
 using System.Threading.Tasks;
-using System.Web;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using CustomExceptions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 

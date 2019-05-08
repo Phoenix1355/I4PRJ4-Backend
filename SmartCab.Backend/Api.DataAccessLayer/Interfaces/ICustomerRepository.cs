@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
 using CustomExceptions;
-using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Interfaces
 {

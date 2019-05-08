@@ -1,29 +1,30 @@
 ﻿using System.Text;
-using Api.BusinessLogicLayer.Requests;
+using Api.Requests;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Requests
 {
     [TestFixture]
-    public class RegisterRequestTests
+    public class EditCustomerRequestTests
     {
-        private const string ValidEmail = "abc@gmail.com";
-        private const string ValidPassword = "Qwer111!";
-        private const string ValidName = "Michael Moeller";
-        private const string ValidPhoneNumber = "28515359";
+        // No tests for OldPassword as it validates through Identity
+        // No tests for ChangePassword as it's a bool with no data notation
 
-        //Source for most test cases: https://blogs.msdn.microsoft.com/testing123/2009/02/06/email-address-test-cases/
+        private const string ValidEmail = "test@domain.com";
+        private const string ValidName = "Test Tester";
+        private const string ValidPhoneNumber = "12345678";
+
         [TestCase("a.gmail.com", 1)]
         [TestCase("plaintext", 1)]
         [TestCase("#@%^%#$@#$@#.com", 1)]
-        [TestCase("Michael Moeller <email@domain.com>", 1)]
+        [TestCase("Test Tester <email@domain.com>", 1)]
         [TestCase("email.domain.com", 1)]
         [TestCase("email@domain@domain.com", 1)]
         [TestCase(".email@domain.com", 1)]
         [TestCase("email.@domain.com", 1)]
         [TestCase("email..email@domain.com", 1)]
         [TestCase("あいうえお@domain.com", 1)]
-        [TestCase("email@domain.com (Joe Smith)", 1)]
+        [TestCase("email@domain.com (Test Tester)", 1)]
         [TestCase("email@domain", 1)]
         [TestCase("email@-domain.com", 1)]
         [TestCase("email@domain..com", 1)]
@@ -42,34 +43,32 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         [TestCase("firstname-lastname@domain.com", 0)]
         public void Email_WhenSet_ValidatesInput(string email, int numberOfErrors)
         {
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
                 Email = email,
-                Password = ValidPassword,
-                PasswordRepeated = ValidPassword,
                 Name = ValidName,
-                PhoneNumber = ValidPhoneNumber
+                PhoneNumber = ValidPhoneNumber,
+                ChangePassword = false
             };
 
             Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
-        //Remember: The data annotations set on the two password attributes is only checking if the passwords are present and equal
-        //Identity framework is used to define requirements for the actual password. This is not tested.
-        [TestCase("", "", 2)]
-        [TestCase("", "a", 2)] //two errors because the "compare" data annotation is only put on the repeated password
+        // Identity framework is used to define requirements for the actual password. This is not tested.
+        [TestCase("", "a", 1)] 
         [TestCase("a", "", 1)]
         [TestCase("a", "a", 0)]
         [TestCase("abc", "qwe", 1)]
         public void Password_WhenSet_ValidatesThatBothPasswordsIsPresentAndThatTheyAreEqual(string first, string second, int numberOfErrors)
         {
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
                 Email = ValidEmail,
                 Password = first,
-                PasswordRepeated = second,
+                RepeatedPassword = second,
                 Name = ValidName,
-                PhoneNumber = ValidPhoneNumber
+                PhoneNumber = ValidPhoneNumber,
+                ChangePassword = false
             };
 
             Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
@@ -88,30 +87,27 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         {
             var name = GenerateString(numberOfCharsInName);
 
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
                 Email = ValidEmail,
-                Password = ValidPassword,
-                PasswordRepeated = ValidPassword,
                 Name = name.ToString(),
+                ChangePassword = false,
                 PhoneNumber = ValidPhoneNumber
             };
 
             Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
         }
 
-        
         [TestCase("          ", 1)]
         [TestCase(null, 1)]
         public void Name_WhenSetToWhiteSpaceOrNull_ValidationFails(string name, int numberOfErrors)
         {
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
                 Email = ValidEmail,
-                Password = ValidPassword,
-                PasswordRepeated = ValidPassword,
                 Name = name,
-                PhoneNumber = ValidPhoneNumber
+                PhoneNumber = ValidPhoneNumber,
+                ChangePassword = false
             };
 
             Assert.That(ValidateModelHelper.ValidateModel(request).Count, Is.EqualTo(numberOfErrors));
@@ -132,12 +128,11 @@ namespace Api.BusinessLogicLayer.UnitTests.Requests
         [TestCase("a1a2a3a4", 1)]
         public void PhoneNumber_WhenSet_ValidatesInput(string phoneNumber, int numberOfErrors)
         {
-            var request = new RegisterRequest
+            var request = new EditCustomerRequest
             {
                 Email = ValidEmail,
-                Password = ValidPassword,
-                PasswordRepeated = ValidPassword,
                 Name = ValidName,
+                ChangePassword = false,
                 PhoneNumber = phoneNumber
             };
 

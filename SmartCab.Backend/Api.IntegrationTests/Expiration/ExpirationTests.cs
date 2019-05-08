@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Factories;
 using Api.BusinessLogicLayer.Services;
-using Api.DataAccessLayer;
 using Api.DataAccessLayer.Interfaces;
-using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
-using Api.DataAccessLayer.UnitTests.Fakes;
 using Api.IntegrationTests.Fakes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Api.IntegrationTests.Expiration
 {

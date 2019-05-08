@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,6 +24,17 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
         public IdentityResult CreateAsyncReturn { get; set; } = IdentityResult.Success;
 
         public IdentityResult AddToRoleAsyncReturn { get; set; } = IdentityResult.Success;
+        
+        public IdentityResult ChangeEmailAsyncReturn { get; set; } = IdentityResult.Success;
+
+        public IdentityResult ChangePasswordAsyncReturn { get; set; } = IdentityResult.Success;
+
+        public string GenerateChangeEmailTokenAsyncReturn { get; set; } = "Some token";
+
+        public override Task<string> GenerateChangeEmailTokenAsync(IdentityUser user, string email)
+        {
+            return Task.FromResult(GenerateChangeEmailTokenAsyncReturn);
+        }
 
         public override Task<IdentityResult> CreateAsync(IdentityUser user, string password)
         {
@@ -36,5 +46,14 @@ namespace Api.DataAccessLayer.UnitTests.Fakes
             return Task.FromResult(AddToRoleAsyncReturn);
         }
 
+        public override Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string email, string token)
+        {
+            return Task.FromResult(ChangeEmailAsyncReturn);
+        }
+
+        public override Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string password, string oldPassword)
+        {
+            return Task.FromResult(ChangePasswordAsyncReturn);
+        }
     }
 }

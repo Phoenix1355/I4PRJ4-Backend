@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using NUnit.Framework;
 

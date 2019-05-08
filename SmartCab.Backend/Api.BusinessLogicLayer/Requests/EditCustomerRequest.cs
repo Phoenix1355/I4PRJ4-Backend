@@ -17,6 +17,9 @@ namespace Api.Requests
         [RegularExpression(Constants.PhoneNumberRegex, ErrorMessage = Constants.PhoneNumberRegexErrorMessage)] // 8 digits and cannot start with 0
         public string PhoneNumber { get; set; }
 
+        [Required]
+        public bool ChangePassword { get; set; }
+
         public string OldPassword { get; set; }
 
         public string Password { get; set; }

@@ -1,7 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-
-namespace Api.BusinessLogicLayer.Interfaces
+﻿namespace Api.BusinessLogicLayer.Interfaces
 {
     /// <summary>
     /// Defines a number of methods used to generate Json Web Tokens

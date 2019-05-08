@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
-using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
-using Api.DataAccessLayer.UnitTests.Fakes;
-using Microsoft.AspNetCore.Identity;
 using CustomExceptions;
 using NSubstitute;
 using NUnit.Framework;

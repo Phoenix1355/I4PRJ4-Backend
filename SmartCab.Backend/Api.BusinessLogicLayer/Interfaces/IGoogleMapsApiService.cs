@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.Interfaces

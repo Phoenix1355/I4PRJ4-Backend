@@ -8,7 +8,6 @@ using Api.DataAccessLayer.Models;
 using CustomExceptions;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services

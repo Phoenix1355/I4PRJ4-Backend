@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitTests.Factories;
-using Microsoft.EntityFrameworkCore;
+using Api.Requests;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;
@@ -55,6 +52,26 @@ namespace Api.IntegrationTests
                 PhoneNumber = phonenumber
             };
         }
+        protected EditCustomerRequest getEditRequest(string name = "Test Tester",
+            string email = "test@gmail.com",
+            string password = "Qwer11122!",
+            string passwordRepeated = "Qwer11122!",
+            string oldPassword = "Qwer111!",
+            string phoneNumber = "99999999",
+            bool changePassword = false)
+        {
+            return new EditCustomerRequest
+            {
+                Email = email,
+                Password = password,
+                Name = name,
+                RepeatedPassword = passwordRepeated,
+                OldPassword = oldPassword,
+                PhoneNumber = phoneNumber,
+                ChangePassword = changePassword
+            };
+        }
+        
 
 
         protected async Task<HttpResponseMessage> PostAsync(string endPointUrl, object data)
