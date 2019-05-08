@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Repositories;
-using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
 using CustomExceptions;
-using NSubstitute;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
 {

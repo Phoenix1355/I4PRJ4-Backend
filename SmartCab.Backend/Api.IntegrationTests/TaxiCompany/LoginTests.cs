@@ -1,11 +1,6 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Responses;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NSubstitute.Extensions;
 using NUnit.Framework;
 
 namespace Api.IntegrationTests.TaxiCompany

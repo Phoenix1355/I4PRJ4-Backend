@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.DataAccessLayer.Models;

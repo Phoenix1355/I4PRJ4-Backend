@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Interfaces

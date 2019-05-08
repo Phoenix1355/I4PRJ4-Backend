@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Api.BusinessLogicLayer.DataTransferObjects;
-using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Statuses;
+﻿using Api.BusinessLogicLayer.DataTransferObjects;
 
 namespace Api.BusinessLogicLayer.Responses
 {

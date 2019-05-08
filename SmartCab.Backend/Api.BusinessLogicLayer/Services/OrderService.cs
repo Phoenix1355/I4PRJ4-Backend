@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 

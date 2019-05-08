@@ -1,13 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Transactions;
+﻿using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitOfWork;
-using CustomExceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {

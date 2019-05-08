@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Api.IntegrationTests.Order
 {

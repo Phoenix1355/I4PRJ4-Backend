@@ -1,21 +1,15 @@
-﻿using System;
-using System.Data.Common;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Api;
 using Api.BusinessLogicLayer.Interfaces;
-using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer;
-using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Integration.Test.Fakes;
 using Api.IntegrationTests.Fakes;
-using Hangfire;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Logging;
 
 
 namespace SmartCabPoc.Integration.Test

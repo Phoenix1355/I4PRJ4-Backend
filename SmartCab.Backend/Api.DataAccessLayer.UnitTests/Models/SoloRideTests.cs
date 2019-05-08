@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Api.DataAccessLayer.Models;
+﻿using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 
 namespace Api.DataAccessLayer.UnitTests.Models
 {

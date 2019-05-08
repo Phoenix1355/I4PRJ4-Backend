@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
-using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 using NUnit.Framework;
-using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
@@ -213,7 +202,6 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
         }
 
         #endregion
-
 
         #region ReservePriceFromCustomerAsync
 

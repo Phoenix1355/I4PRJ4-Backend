@@ -12,10 +12,8 @@ using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
 using Api.Requests;
 using AutoMapper;
-using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services

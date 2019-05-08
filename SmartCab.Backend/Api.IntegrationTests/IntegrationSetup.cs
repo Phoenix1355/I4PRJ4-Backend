@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitTests.Factories;
 using Api.Requests;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;

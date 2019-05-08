@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
-using Api.DataAccessLayer.Models;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Primitives;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -105,9 +100,9 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Changes the identityUsers password in a asynchronous.
         /// </summary>
-        /// <param name="newPassword"></param>
-        /// <param name="user"></param>
-        /// <param name="oldPassword"></param>
+        /// <param name="newPassword">The new password.</param>
+        /// <param name="user">The user the changes should be applied to.</param>
+        /// <param name="oldPassword">The old password.</param>
         /// <returns></returns>
         public async Task<IdentityResult> ChangePasswordAsync(IdentityUser user, string newPassword, string oldPassword)
         {
@@ -123,8 +118,8 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// Changes the email, normalized email, the username and the normalized username
         /// </summary>
-        /// <param name="user"></param>
-        /// <param name="email"></param>
+        /// <param name="user">The user the change should be applied to.</param>
+        /// <param name="email">The new email.</param>
         /// <returns></returns>
         public async Task<IdentityResult> ChangeEmailAsync(IdentityUser user, string email)
         {

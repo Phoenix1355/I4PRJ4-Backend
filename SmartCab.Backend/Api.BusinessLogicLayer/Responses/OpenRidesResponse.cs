@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Api.BusinessLogicLayer.DataTransferObjects;
-using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.Responses
 {

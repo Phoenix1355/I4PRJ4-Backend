@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.Text;
 using Api.BusinessLogicLayer.Requests;
 using NUnit.Framework;
 

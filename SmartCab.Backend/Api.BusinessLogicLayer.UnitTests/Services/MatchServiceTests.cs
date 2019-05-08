@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Api.BusinessLogicLayer.Enums;
-using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
-using Api.BusinessLogicLayer.Requests;
-using Api.BusinessLogicLayer.Responses;
 using Api.BusinessLogicLayer.Services;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitOfWork;
-using Api.DataAccessLayer.Statuses;
-using AutoMapper;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services

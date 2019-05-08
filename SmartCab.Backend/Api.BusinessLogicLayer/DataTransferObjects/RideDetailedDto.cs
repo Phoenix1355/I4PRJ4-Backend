@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Statuses;
 
 namespace Api.BusinessLogicLayer.DataTransferObjects
 {

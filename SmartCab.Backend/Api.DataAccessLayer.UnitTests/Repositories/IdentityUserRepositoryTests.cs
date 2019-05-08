@@ -4,7 +4,6 @@ using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
