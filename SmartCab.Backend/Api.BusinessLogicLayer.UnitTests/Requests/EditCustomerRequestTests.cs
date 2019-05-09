@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Api.Requests;
+using Api.BusinessLogicLayer.Requests;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Requests

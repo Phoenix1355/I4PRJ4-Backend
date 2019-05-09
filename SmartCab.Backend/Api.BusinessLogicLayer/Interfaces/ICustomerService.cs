@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.Requests;
 using Api.Responses;
 
 namespace Api.BusinessLogicLayer.Interfaces

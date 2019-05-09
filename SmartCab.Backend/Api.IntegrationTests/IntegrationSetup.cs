@@ -6,7 +6,6 @@ using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.Requests;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;
