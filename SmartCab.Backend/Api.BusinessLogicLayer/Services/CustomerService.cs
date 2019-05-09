@@ -113,12 +113,12 @@ namespace Api.BusinessLogicLayer.Services
         public async Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId)
         {
             var customer = await _unitOfWork.CustomerRepository.FindByIDAsync(customerId);
-
-            customer.Name = request.Name;
-            customer.PhoneNumber = request.PhoneNumber;
             
             await _unitOfWork.IdentityUserRepository.TransactionWrapper(async () =>
             {
+                customer.Name = request.Name;
+                customer.PhoneNumber = request.PhoneNumber;
+
                 if (request.ChangePassword == true)
                 {
                     var password = request.Password;
