@@ -5,7 +5,6 @@ using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.Requests;
 using Api.Responses;
 using CustomExceptions;
 using Microsoft.AspNetCore.Authorization;

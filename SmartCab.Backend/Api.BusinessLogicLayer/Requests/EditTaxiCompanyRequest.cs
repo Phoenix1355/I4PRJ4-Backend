@@ -2,10 +2,10 @@
 
 namespace Api.BusinessLogicLayer.Requests
 {
-    public class EditCustomerRequest
+    public class EditTaxiCompanyRequest
     {
         [Required]
-        [StringLength(255, MinimumLength = 3,ErrorMessage = "Name must minimum 3 characters and a maximum of 255 characters.")]
+        [StringLength(255, MinimumLength = 3, ErrorMessage = "Name must minimum 3 characters and a maximum of 255 characters.")]
         public string Name { get; set; }
 
         [Required]

@@ -2,7 +2,6 @@
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,15 +67,15 @@ namespace Api.Controllers
         /// Updates the taxi company account with the supplied information.
         /// </summary>
         /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="model">The data used to update the taxi company account</param>
+        /// <param name="request">The data used to update the taxi company account</param>
         /// <returns></returns>
         /// <response code="401">If the taxi company was not logged in already (token was expired)</response>
         [Route("[action]")]
         [HttpPut]
-        public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditTaxiCompanyRequest model)
+        public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditTaxiCompanyRequest request)
         {
-            //update customer logic
-            return Ok("Customer account successfully updated.");
+            // Update taxi company logic
+            return Ok("Taxi company account successfully updated.");
         }
     }
 }

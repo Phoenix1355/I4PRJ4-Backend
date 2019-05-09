@@ -6,7 +6,6 @@ using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
-using Api.Requests;
 using Api.Responses;
 using AutoMapper;
 
