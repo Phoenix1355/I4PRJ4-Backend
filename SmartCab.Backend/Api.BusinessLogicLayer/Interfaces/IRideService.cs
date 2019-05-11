@@ -6,13 +6,12 @@ using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.Interfaces
 {
+    /// <summary>
+    /// Interface for all ride functions. 
+    /// </summary>
     public interface IRideService
     {
-        //Task<List<Ride>> GetAllRidesAsync();
-        //Task<Ride> GetRideByIdAsync(int id);
         Task<CreateRideResponse> AddRideAsync(CreateRideRequest request, string customerId);
         Task<decimal> CalculatePriceAsync(Address first, Address second, RideType type);
-        //Task<Ride> UpdateRideAsync(Ride ride);
-        //Task<Ride> DeleteRideAsync(int id);
     }
 }

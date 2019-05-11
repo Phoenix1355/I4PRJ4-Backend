@@ -2,6 +2,9 @@
 
 namespace Api.BusinessLogicLayer.Interfaces
 {
+    /// <summary>
+    /// Interface for push notification. 
+    /// </summary>
     public interface IPushNotification
     {
         string Name { get; set; }

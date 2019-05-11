@@ -5,6 +5,9 @@ using Api.BusinessLogicLayer.Interfaces;
 
 namespace Api.BusinessLogicLayer.Factories
 {
+    /// <summary>
+    /// Factory to return different price strategies. 
+    /// </summary>
     public class PriceStrategyFactory : IPriceStrategyFactory
     {
         /// <summary>
