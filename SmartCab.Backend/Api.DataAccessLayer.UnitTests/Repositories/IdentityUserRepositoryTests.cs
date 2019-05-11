@@ -4,7 +4,6 @@ using Api.DataAccessLayer.UnitTests.Factories;
 using Api.DataAccessLayer.UnitTests.Fakes;
 using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
-using NSubstitute;
 using NUnit.Framework;
 
 namespace Api.DataAccessLayer.UnitTests.Repositories
@@ -107,6 +106,44 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             Assert.That(i,Is.EqualTo(1));
         }
 
+        #endregion
+
+        #region ChangePassword
+
+        [Test]
+        public async Task ChangePasswordAsync_ChangePassword_ReturnsOkResponse()
+        {
+            var response = await _uut.ChangePasswordAsync(null, null, null);
+            Assert.That(response,Is.EqualTo(IdentityResult.Success));
+        }
+
+        [Test]
+        public void ChangePasswordAsync_ChangePassword_ThrowsExceptionWhenFailed()
+        {
+            _mockUserManager.ChangePasswordAsyncReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangePasswordAsync(null, null, null));
+        }
+        
+        #endregion
+
+        #region ChangeEmail
+    
+        [Test]
+        public async Task ChangeEmail_EmailIsNowChangedWithCorrectValue()
+        {
+            var user = new IdentityUser("User name");
+
+            var response = await _uut.ChangeEmailAsync(user, null);
+            Assert.That(response, Is.EqualTo(IdentityResult.Success));
+        }
+
+        [Test]
+        public void ChangeEmailAsync_ChangingEmail_ThrowsExceptionWhenFailed()
+        {
+            _mockUserManager.ChangeEmailAsyncReturn = IdentityResult.Failed(new IdentityError());
+            Assert.ThrowsAsync<IdentityException>(async () => await _uut.ChangeEmailAsync(null, null));
+        }
+        
         #endregion
 
     }

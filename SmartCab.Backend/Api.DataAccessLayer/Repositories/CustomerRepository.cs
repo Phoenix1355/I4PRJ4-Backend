@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Transactions;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -27,36 +20,6 @@ namespace Api.DataAccessLayer.Repositories
         public CustomerRepository(ApplicationContext context) : base(context)
         {
 
-        }
-
-        public async Task<Customer> EditCustomerAsync(Customer newCustomer, string customerId, string password, string oldPassword)
-        {
-            return newCustomer;
-            /*
-            using (var transaction = _context.Database.BeginTransaction())
-            {
-                var customer = await _context.Customers.FindAsync(customerId);
-
-                if (newCustomer.Name != customer.Name)
-                    customer.Name = newCustomer.Name;
-
-                if (newCustomer.PhoneNumber != customer.PhoneNumber)
-                    customer.PhoneNumber = newCustomer.PhoneNumber;
-
-                var identityResult = await UnitOfWork.IdentityUserRepository.EditIdentityUserAsync(customer, newCustomer, password, oldPassword);
-
-                if (identityResult.Succeeded)
-                {
-                    _context.Customers.Update(customer);
-                    await _context.SaveChangesAsync();
-                    transaction.Commit();
-                    return customer;
-                }
-                transaction.Rollback();
-
-                var error = identityResult.Errors.FirstOrDefault()?.Description;
-                throw new IdentityException(error);
-            }*/
         }
 
         /// <summary>
@@ -119,8 +82,8 @@ namespace Api.DataAccessLayer.Repositories
         /// Only succeeds if the customers has enough funds available on his/her account.<br/>
         /// Throws an InsufficientFundsException when failing to reserve the money.
         /// </remarks>
-        /// <param name="customerId"></param>
-        /// <param name="price"></param>
+        /// <param name="customerId">The customers id.</param>
+        /// <param name="price">The amount to reserve.</param>
         /// <exception cref="InsufficientFundsException">Not enough credit</exception>
         public async Task ReservePriceFromCustomerAsync(string customerId, decimal price)
         {
@@ -141,7 +104,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// FindAsync customer by email
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="email">The email of the customer.</param>
         /// <returns></returns>
         public Task<Customer> FindByEmailAsync(string email)
         {
@@ -151,7 +114,7 @@ namespace Api.DataAccessLayer.Repositories
         /// <summary>
         /// FindAsync the customers rides
         /// </summary>
-        /// <param name="customerId"></param>
+        /// <param name="customerId">The id of the customer.</param>
         /// <returns></returns>
         public async Task<List<Ride>> FindCustomerRidesAsync(string customerId)
         {

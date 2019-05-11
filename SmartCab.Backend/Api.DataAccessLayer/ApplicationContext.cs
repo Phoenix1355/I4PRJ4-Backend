@@ -1,9 +1,7 @@
-﻿using System;
-using Api.DataAccessLayer.Models;
+﻿using Api.DataAccessLayer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Api.DataAccessLayer
 {

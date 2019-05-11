@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
-using Api.DataAccessLayer.Migrations;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
-using Api.DataAccessLayer.UnitOfWork;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using CustomExceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -46,6 +41,13 @@ namespace Api.DataAccessLayer.Repositories
             }
 
             Add(ride);
+        }
+
+        public async Task<List<Ride>> FindExpiredUnmatchedRides()
+        {
+            return await FindAsync((ride) =>
+                ride.ConfirmationDeadline < DateTime.Now &&
+                ride.Status == RideStatus.LookingForMatch);
         }
 
         /// <summary>

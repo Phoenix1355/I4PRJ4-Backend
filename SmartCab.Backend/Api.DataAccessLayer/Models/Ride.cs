@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 using Api.DataAccessLayer.Statuses;
 
 namespace Api.DataAccessLayer.Models

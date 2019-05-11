@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Statuses;
 
 namespace Api.BusinessLogicLayer.DataTransferObjects
 {

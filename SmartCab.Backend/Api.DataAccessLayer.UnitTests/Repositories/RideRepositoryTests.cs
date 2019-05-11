@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Repositories;
 using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using Api.DataAccessLayer.UnitTests.Factories;
@@ -439,6 +437,41 @@ namespace Api.DataAccessLayer.UnitTests.Repositories
             };
 
             Assert.DoesNotThrow(() => _uut.RideRepository.AddSharedRide(ride));
+        }
+
+        #endregion
+
+        #region FindExpiredUnmatchedRides
+        //Minus to not be expired
+        [TestCase( RideStatus.LookingForMatch,-1,0)]
+        [TestCase(RideStatus.LookingForMatch, 1, 1)]
+        [TestCase(RideStatus.Accepted, 1, 0)]
+        [TestCase(RideStatus.Debited, 1, 0)]
+        [TestCase(RideStatus.Expired, 1, 0)]
+        public async Task FindExpiredUnmatchedRides_SearchRides_FindExpectedAmoutn(RideStatus status, int expiredMinutse, int count)
+        {
+            var customer = new Customer();
+            var soloRide = new SoloRide()
+            {
+                CustomerId = customer.Id,
+                DepartureTime = DateTime.Now,
+                ConfirmationDeadline = DateTime.Now.AddMinutes(-expiredMinutse),
+                PassengerCount = 0,
+                CreatedOn = DateTime.Now,
+                Price = 100,
+                Status = status,
+                EndDestination = new Address("City", 8200, "Street", 21),
+                StartDestination = new Address("City", 8200, "Street", 21)
+            };
+            using (var context = _factory.CreateContext())
+            {
+                context.Add(customer);
+                context.Add(soloRide);
+                context.SaveChanges();
+            }
+
+            var rides = await _uut.RideRepository.FindExpiredUnmatchedRides();
+            Assert.That(rides.Count,Is.EqualTo(count));
         }
 
         #endregion

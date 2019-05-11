@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Interfaces;
 
 namespace Api.IntegrationTests.Fakes
 {
     class FakeAppCenterPushNotificationService : IPushNotificationService
     {
-        private HttpClient _httpClient;
 
-
-        public FakeAppCenterPushNotificationService(HttpClient httpClient)
+        public FakeAppCenterPushNotificationService()
         {
-            _httpClient = httpClient;
         }
 
         /// <summary>

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitTests.Factories;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using SmartCabPoc.Integration.Test;
@@ -55,6 +51,26 @@ namespace Api.IntegrationTests
                 PhoneNumber = phonenumber
             };
         }
+        protected EditCustomerRequest getEditRequest(string name = "Test Tester",
+            string email = "test@gmail.com",
+            string password = "Qwer11122!",
+            string passwordRepeated = "Qwer11122!",
+            string oldPassword = "Qwer111!",
+            string phoneNumber = "99999999",
+            bool changePassword = false)
+        {
+            return new EditCustomerRequest
+            {
+                Email = email,
+                Password = password,
+                Name = name,
+                RepeatedPassword = passwordRepeated,
+                OldPassword = oldPassword,
+                PhoneNumber = phoneNumber,
+                ChangePassword = changePassword
+            };
+        }
+        
 
 
         protected async Task<HttpResponseMessage> PostAsync(string endPointUrl, object data)
@@ -76,11 +92,11 @@ namespace Api.IntegrationTests
             return JsonConvert.DeserializeObject<T>(response.Content.ReadAsStringAsync().Result);
         }
 
-        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide)
+        protected CreateRideRequest getCreateRideRequest(RideType type = RideType.SoloRide, int minutes = 0)
         {
             return new CreateRideRequest()
             {
-                ConfirmationDeadline = DateTime.Now.AddSeconds(1), //added one second because those dates must be in the future
+                ConfirmationDeadline = DateTime.Now.AddSeconds(1).AddMinutes(-minutes), //added one second because those dates must be in the future
                 DepartureTime = DateTime.Now.AddSeconds(1),
                 StartDestination = new Address("City", 8000, "Street", 21),
                 EndDestination = new Address("City", 8000, "Street", 21),
@@ -89,6 +105,15 @@ namespace Api.IntegrationTests
             };
         }
 
+        protected PriceRequest getPriceRequest(RideType type = RideType.SoloRide)
+        {
+            return new PriceRequest()
+            {
+                StartAddress = new Address("Aarhus", 8000, "Søgade", 20),
+                EndAddress = new Address("Åbyhøj", 8230, "Søren Frichs Vej", 20),
+                RideType = type,
+            };
+        }
 
         protected async Task LoginOnCustomerAccount(string email = "test12@gmail.com")
         {
@@ -144,9 +169,9 @@ namespace Api.IntegrationTests
             var response = await PutAsync("/api/customer/deposit", request);
         }
 
-        protected async Task CreateRide(RideType type = RideType.SoloRide)
+        protected async Task CreateRide(RideType type = RideType.SoloRide, int minutes = 0)
         {
-            var request = getCreateRideRequest(type);
+            var request = getCreateRideRequest(type, minutes);
 
             //Make request
             var response = await PostAsync("api/rides/create", request);

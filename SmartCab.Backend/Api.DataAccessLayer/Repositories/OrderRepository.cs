@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.Statuses;
-using Api.DataAccessLayer.UnitOfWork;
 using CustomExceptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Api.DataAccessLayer.Repositories
 {
@@ -22,6 +21,20 @@ namespace Api.DataAccessLayer.Repositories
         public OrderRepository(ApplicationContext context) : base(context)
         {
         }
+
+        /// <summary>
+        /// Find all orders that have a ride which is expired. Includes both shared and solo rides. 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Order>> FindOrdersWithExpiredRides()
+        {
+            return await FindAsync((order) =>
+                order.Rides.Where(
+                    (ride) => (ride.ConfirmationDeadline < DateTime.Now && ride.Status == RideStatus.WaitingForAccept)
+                ).Any() &&
+                order.Status == OrderStatus.WaitingForAccept);
+        }
+
 
         /// <summary>
         /// Adds a ride to an order asynchronously.

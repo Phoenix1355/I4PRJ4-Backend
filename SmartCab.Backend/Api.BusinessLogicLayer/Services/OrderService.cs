@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Api.BusinessLogicLayer.DataTransferObjects;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.Statuses;
 using Api.DataAccessLayer.UnitOfWork;
 using AutoMapper;
 
@@ -132,7 +129,7 @@ namespace Api.BusinessLogicLayer.Services
                     notification.Name = "Accept";
                     notification.Title = "Tur accepteret";
                     notification.Body =
-                        $"Din tur fra {ride.StartDestination.StreetName} {ride.StartDestination.StreetNumber} i {ride.StartDestination.CityName} til {ride.EndDestination.StreetName} {ride.EndDestination.StreetNumber} i {ride.EndDestination.CityName} er accepteret af {order.TaxiCompany.Name}";
+                        $"Din tur kl. {ride.DepartureTime.Hour}:{ride.DepartureTime.Minute} til {ride.EndDestination.StreetName} er accepteret af {order.TaxiCompany.Name}";
                     notification.Devices.Add(ride.DeviceId);
                     notification.CustomData.Add("rideId", ride.Id.ToString());
 

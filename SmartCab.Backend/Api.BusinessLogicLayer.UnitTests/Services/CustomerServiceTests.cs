@@ -10,12 +10,9 @@ using Api.BusinessLogicLayer.Services;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
-using Api.Requests;
 using AutoMapper;
-using CustomExceptions;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services
@@ -236,7 +233,6 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
         [Test]
         public async Task EditCustomerAsync_EditingCustomerSucceeds__ReturnsAEditCustomerResponse()
         {
-            
             //Arrange
             var request = new EditCustomerRequest
             {
@@ -245,30 +241,23 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
                 Password = "Qwer111!",
                 RepeatedPassword = "Qwer111!",
                 PhoneNumber = "66666666",
-                OldPassword = "Qwerrr111!"
+                OldPassword = "Qwerrr111!",
+                ChangePassword = true
             };
 
             var customer = new Customer
             {
                 Id = "SomeId",
-                Email = request.Email
+                Email = "test@gmail.com",
+                PhoneNumber = "11111111",
+                Name = "Hans"
             };
 
-            var loginResponse = new LoginResponse
-            {
-                Customer = new CustomerDto
-                    { Email = customer.Email, Name = customer.Name, PhoneNumber = customer.PhoneNumber },
-                Token = "SomeToken"
-            };
+            _unitOfWork.IdentityUserRepository.AddIdentityUserAsync(customer, request.OldPassword)
+                .ReturnsForAnyArgs(IdentityResult.Success);
 
-            var loginRequest = new LoginRequest
-            {
-                Email = customer.Email,
-                Password = "Qwer111!"
-            };
-
-            _identityUserRepository.SignInAsync("test@domain.com", "Qwer111!").ReturnsForAnyArgs(SignInResult.Success);
-            //_unitOfWork.CustomerRepository.GetCustomerAsync(null).ReturnsForAnyArgs(customer);
+            _unitOfWork.IdentityUserRepository.SignInAsync(customer.Email, request.OldPassword)
+                .ReturnsForAnyArgs(SignInResult.Success);
             
             var customerDto = new CustomerDto
             {
@@ -281,6 +270,7 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
             {
                 Customer = customerDto
             };
+
             _unitOfWork.CustomerRepository.FindByIDAsync(null).ReturnsForAnyArgs(customer);
             _mapper.Map<CustomerDto>(null).ReturnsForAnyArgs(customerDto);
 
@@ -289,8 +279,8 @@ namespace Api.BusinessLogicLayer.UnitTests.Services
 
             //Assert
             Assert.That(response.Customer, Is.EqualTo(editCustomerResponse.Customer));
-            
         }
+
         #endregion
 
         #region DepositAsync

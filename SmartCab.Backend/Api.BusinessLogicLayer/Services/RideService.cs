@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Api.BusinessLogicLayer.DataTransferObjects;
+﻿using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Enums;
-using Api.BusinessLogicLayer.Helpers;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
 using Api.DataAccessLayer.UnitOfWork;
-using Api.DataAccessLayer.Statuses;
 using AutoMapper;
-using CustomExceptions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Api.BusinessLogicLayer.Services
 {

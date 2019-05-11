@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-using Api.DataAccessLayer.Models;
 
 namespace Api.BusinessLogicLayer.CustomDataAnnotations
 {

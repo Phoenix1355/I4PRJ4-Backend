@@ -1,6 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Api.DataAccessLayer.Models;
-using Api.DataAccessLayer.UnitTests.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

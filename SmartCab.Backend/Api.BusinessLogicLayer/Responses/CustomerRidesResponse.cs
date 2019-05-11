@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Api.BusinessLogicLayer.DataTransferObjects;
-using Api.DataAccessLayer.Models;
 
 namespace Api.Responses
 {

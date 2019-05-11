@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Api.BusinessLogicLayer.Requests;
-using Api.BusinessLogicLayer.UnitTests.Requests;
+﻿using Api.BusinessLogicLayer.UnitTests.Requests;
 using Api.DataAccessLayer.Models;
 using NUnit.Framework;
 

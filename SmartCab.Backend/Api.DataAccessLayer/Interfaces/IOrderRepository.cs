@@ -14,5 +14,11 @@ namespace Api.DataAccessLayer.Interfaces
         Task<List<Order>> FindOpenOrdersAsync();
         Order SetOrderToAccepted(Order order, string taxiCompanyId);
         void SetOrderToDebited(Order order);
+
+        /// <summary>
+        /// Find all orders that have a ride which is expired. Includes both shared and solo rides. 
+        /// </summary>
+        /// <returns></returns>
+        Task<List<Order>> FindOrdersWithExpiredRides();
     }
 }

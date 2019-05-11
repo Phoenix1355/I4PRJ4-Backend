@@ -7,7 +7,6 @@ using NUnit.Framework;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using Api.BusinessLogicLayer.Interfaces;
 
 namespace Api.BusinessLogicLayer.UnitTests.Services
 {
