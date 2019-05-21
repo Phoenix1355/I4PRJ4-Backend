@@ -83,6 +83,15 @@ namespace Api
                 x.SwaggerEndpoint("./swagger/v1/swagger.json", "SmartCab Web API");
                 x.RoutePrefix = string.Empty;
             });
+            
+            app.UseHttpsRedirection();
+            app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
+            app.UseMvc();
+
+            //Create database if it does not exist and apply pending migrations, then create role if needed
+            dbContext.Database.Migrate();
+
+            CreateRoles(services).Wait();
 
             //Enables the handboard dashboard and server. Dashboard  url -> /hangfire
             //app.UseHangfireDashboard();
@@ -95,16 +104,7 @@ namespace Api
 
             //Use hangfire to enqueue a recurring task, that calls ExpirationService UpdateExpiredRidesAndOrders.
             //Call every fifteen minutes. See https://www.electrictoolbox.com/run-cron-command-every-15-minutes/
-            RecurringJob.AddOrUpdate(()=> UpdateExpiredRidesAndOrders(), "*/15 * * * *");
-            
-            app.UseHttpsRedirection();
-            app.UseAuthentication(); //Important to add this before "app.UseMvc" otherwise authentication won't work
-            app.UseMvc();
-
-            //Create database if it does not exist and apply pending migrations, then create role if needed
-            dbContext.Database.Migrate();
-
-            CreateRoles(services).Wait();
+            RecurringJob.AddOrUpdate(() => UpdateExpiredRidesAndOrders(), "*/15 * * * *");
         }
 
         /// <summary>
