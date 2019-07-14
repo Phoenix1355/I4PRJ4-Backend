@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer;
 using Api.BusinessLogicLayer.Interfaces;
+using Api.BusinessLogicLayer.Requests;
+using Api.BusinessLogicLayer.Responses;
 using Api.DataAccessLayer.Models;
-using Api.Requests;
-using AutoMapper;
+using CustomExceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,60 +17,85 @@ namespace Api.Controllers
     public class RidesController : ControllerBase
     {
         private readonly IRideService _rideService;
-        private readonly IMapper _mapper;
 
-        public RidesController(IRideService rideService, IMapper mapper)
+        public RidesController(IRideService rideService)
         {
             _rideService = rideService;
-            _mapper = mapper;
         }
 
-        /// <summary>
-        /// Returns all open rides stored in the system.
+       /// <summary>
+        /// Creates a new ride and ties the ride to the customer sending the request.
         /// </summary>
-        /// <param name="authorization">A valid JWT token that is associated to a taxi company account</param>
-        /// <returns>All open rides stored in the system</returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
-        [Produces("application/json")]
-        [Route("[action]")]
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Ride>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Open([FromHeader] string authorization)
-        {
-            var rides = new List<Ride>(); //TODO make some call to service layer
-            return Ok(rides);
-        }
-
-        /// <summary>
-        /// Creates a new ride
-        /// </summary>
+        /// <remarks>
+        /// Required role: "Customer".<br/>
+        /// If the ride is a solo ride the type should have the value "SoloRide".<br/>
+        /// If the ride is a shared ride the type must have the value "SharedRide".
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">Information about the ride that should be updated.</param>
         /// <returns>The created ride.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="500">If an internal server error occured.</response>
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(Ride), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CreateRideResponse), StatusCodes.Status200OK)]
         [Route("[action]")]
         [HttpPost]
         public async Task<IActionResult> Create([FromHeader] string authorization, [FromBody] CreateRideRequest request)
         {
-            var ride = new Ride(); //TODO call service layer
-            return Ok(ride);
+            //Get the customerId that is stored as a claim in the token
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            //This should never happen, but better safe than sorry
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _rideService.AddRideAsync(request, customerId);
+            return Ok(response);
         }
 
         /// <summary>
-        /// Updates the ride with the supplied ID so it is accepted.
+        /// Calculates and returns the price for a taxi ride based on two addresses.
         /// </summary>
+        /// <remarks>
+        /// Currently now authorization is required to make this request.
+        /// </remarks>
         /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="id">The id of the ride that should be accepted.</param>
-        /// <returns></returns>
-        /// <response code="400">Could mean that the ride was no longer in an "accepted" state when the request made it to the server</response>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
-        [Route("{id}/[action]")]
-        [HttpPut]
-        public async Task<ActionResult<Ride>> Accept([FromHeader] string authorization, int id)
+        /// <param name="request">Consists of an start address and an end address.</param>
+        /// <returns> the price</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="401">If the token was expired</response>
+        /// <response code="500">If an internal server error occured.</response>
+        [Authorize(Roles = nameof(Customer))]
+        [Produces("application/json")]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(PriceResponse), StatusCodes.Status200OK)]
+        [HttpPost]
+        public async Task<IActionResult> Price([FromHeader] string authorization, [FromBody] PriceRequest request)
         {
-            return Ok($"The ride with {id} is now successfully marked as accepted.");
+            //Get the customerId, stored as a claim in the token
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            //should never happen
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var calculatedPrice = await
+                _rideService.CalculatePriceAsync(request.StartAddress, request.EndAddress, request.RideType);
+
+            var response = new PriceResponse
+            {
+                Price = calculatedPrice
+            };
+
+            return Ok(response);
         }
     }
 }

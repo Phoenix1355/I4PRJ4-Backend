@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Api.BusinessLogicLayer;
 using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer;
 using Api.DataAccessLayer.Models;
-using Api.Requests;
 using Api.Responses;
+using CustomExceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 
 namespace Api.Controllers
 {
@@ -44,51 +41,33 @@ namespace Api.Controllers
         /// </remarks>
         /// <param name="request">The data needed to create the customer</param>
         /// <returns>A valid JWT token that is tied to the created customer</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
         [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            try
-            {
-                var response = await _customerService.AddCustomerAsync(request);
-                return Ok(response);
-            }
-            catch (ArgumentException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
-            }
+            var response = await _customerService.AddCustomerAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
         /// Validates the user credentials and returns a JWT token if validation is successful.
         /// </summary>
-        /// <param name="request">The username and password that will be validated.</param>
+        /// <param name="request">The email and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
         [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            try
-            {
-                var response = await _customerService.LoginCustomerAsync(request);
-                return Ok(response);
-            }
-            catch (ArgumentException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "An unknown error occured on the server");
-            }
+            var response = await _customerService.LoginCustomerAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
@@ -97,13 +76,24 @@ namespace Api.Controllers
         /// <param name="authorization">A valid JWT token.</param>
         /// <param name="request">The data used to update the customer account</param>
         /// <returns></returns>
-        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        /// <response code="401">If the customer was not logged in already</response>
+        [Authorize(Roles = nameof(Customer))]
+        [Produces("application/json")]
         [Route("[action]")]
         [HttpPut]
         public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditCustomerRequest request)
         {
-            //update customer logic
-            return Ok("Customer account successfully updated.");
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+            
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _customerService.EditCustomerAsync(request, customerId);
+
+            return Ok(response);
         }
 
         /// <summary>
@@ -112,15 +102,48 @@ namespace Api.Controllers
         /// <param name="authorization">A valid JWT token.</param>
         /// <returns></returns>
         /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
         [Produces("application/json")]
         [Route("[action]")]
         [HttpGet]
-        [ProducesResponseType(typeof(RidesResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CustomerRidesResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> Rides([FromHeader] string authorization)
         {
-            //Get name from JWT token --> User.Identity.Name --> this will access a claim set on the token
-            //Get rides from database and return it
-            return Ok();
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            var response = await _customerService.GetRidesAsync(customerId);
+
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Deposit amount in request to the customer associated with the supplied JWT token.
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="401">If the customer was not logged in already (token was expired)</response>
+        [Authorize(Roles = nameof(Customer))]
+        [Route("[action]")]
+        [HttpPut]
+        [ProducesResponseType(typeof(CustomerRidesResponse), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Deposit([FromHeader] string authorization, [FromBody] DepositRequest request)
+        {
+            var customerId = User.Claims.FirstOrDefault(x => x.Type == Constants.UserIdClaim)?.Value;
+
+            if (string.IsNullOrEmpty(customerId))
+            {
+                throw new UserIdInvalidException(
+                    $"The supplied JSON Web Token does not contain a valid value in the '{ Constants.UserIdClaim }' claim.");
+            }
+
+            await _customerService.DepositAsync(request, customerId);
+
+            return NoContent();
         }
     }
 }

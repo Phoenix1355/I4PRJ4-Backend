@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Api.BusinessLogicLayer.Interfaces;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.Requests;
-using Api.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,56 +11,71 @@ namespace Api.Controllers
     [ApiController]
     public class TaxiCompanyController : ControllerBase
     {
+        private readonly ITaxiCompanyService _taxiCompanyService;
+
+        public TaxiCompanyController(ITaxiCompanyService taxiCompanyService)
+        {
+            _taxiCompanyService = taxiCompanyService;
+        }
+
         /// <summary>
-        /// Registers a new taxi company account and returns the username for the created account.
+        /// Registers a new taxi company account and returns a token to the calling client
         /// </summary>
         /// <remarks>
-        /// The following requirements apply to the username:
-        /// ---- Some requirement: Some value
-        /// 
+        /// When a taxi company is successfully created, a status code 200 will be returned
+        /// This response will contain a JWT token that is tied to the taxi company account
+        /// <br/>
         /// The following requirements apply to the password:
-        /// ---- Some requirement: Some value
+        /// ---- Minimum 8 characters long
+        /// ---- Minimum one lower case letter
+        /// ---- Minimum one upper case letter
+        /// ---- Minimum one number
+        /// ---- Minimum one non-alphanumeric letter
         /// </remarks>
-        /// <param name="model">The data needed to create the taxi company account.</param>
-        /// <returns>The created taxi company's username.</returns>
+        /// <param name="request">The data needed to create the taxi company account.</param>
+        /// <returns>The valid JWT token that is tied to the taxi company</returns>
+        /// <response code="400">If the supplied request wasn't valid</response>
+        /// <response code="500">If an internal server error occured</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
-        [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Register(RegisterRequest model)
+        [ProducesResponseType(typeof(RegisterResponseTaxiCompany), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
-            //register logic
-            return Ok(new RegisterResponse { Token = "Some username" });
+            var response = await _taxiCompanyService.AddTaxiCompanyAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
         /// Validates the user credentials and returns a JWT token if validation is successful.
         /// </summary>
-        /// <param name="model">The username and password that will be validated.</param>
+        /// <param name="request">The username and password that will be validated.</param>
         /// <returns>Returns a new JWT token.</returns>
+        /// <response code="400">If the supplied request wasn't valid.</response>
+        /// <response code="500">If an internal server error occured.</response>
         [Produces("application/json")]
         [Route("[action]")]
         [HttpPost]
-        [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Login(LoginRequest model)
+        [ProducesResponseType(typeof(LoginResponseTaxiCompany), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Login(LoginRequest request)
         {
-            //check credentials logic
-            return Ok(new LoginResponse { Token = "Some generated token" });
+            var response = await _taxiCompanyService.LoginTaxiCompanyAsync(request);
+            return Ok(response);
         }
 
         /// <summary>
         /// Updates the taxi company account with the supplied information.
         /// </summary>
         /// <param name="authorization">A valid JWT token.</param>
-        /// <param name="model">The data used to update the taxi company account</param>
+        /// <param name="request">The data used to update the taxi company account</param>
         /// <returns></returns>
         /// <response code="401">If the taxi company was not logged in already (token was expired)</response>
         [Route("[action]")]
         [HttpPut]
-        public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditTaxiCompanyRequest model)
+        public async Task<IActionResult> Edit([FromHeader] string authorization, [FromBody] EditTaxiCompanyRequest request)
         {
-            //update customer logic
-            return Ok("Customer account successfully updated.");
+            // Update taxi company logic
+            return Ok("Taxi company account successfully updated.");
         }
     }
 }

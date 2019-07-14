@@ -8,10 +8,17 @@
     <Compile Remove="Migrations\20190320200745_InitialConstraintsAdded.cs" />
     <Compile Remove="Migrations\20190320210902_AddressConstraints.cs" />
     <Compile Remove="Migrations\20190321141734_addedApplicationUserTable.cs" />
+    <Compile Remove="Migrations\20190402132155_added-annotations-to-order-table.cs" />
+    <Compile Remove="Migrations\20190402140415_renamed-status-enum-to-ridestatus.cs" />
+    <Compile Remove="Migrations\20190402143039_added-one-to-one-between-ride-and-address.cs" />
+    <Compile Remove="Migrations\20190409153828_constraintsAddedToAddress.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ErikEJ.EntityFrameworkCore.DgmlBuilder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="2.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
@@ -19,15 +26,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore">
-      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.identity.entityframeworkcore\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Identity.Stores">
-      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.identity.stores\2.2.0\lib\netstandard2.0\Microsoft.Extensions.Identity.Stores.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\CustomExceptions\CustomExceptions.csproj" />
   </ItemGroup>
+
+  
 
 </Project>

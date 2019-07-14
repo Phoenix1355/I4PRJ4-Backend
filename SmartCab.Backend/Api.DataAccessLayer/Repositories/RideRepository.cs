@@ -1,76 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Api.DataAccessLayer.Interfaces;
 using Api.DataAccessLayer.Models;
-using Microsoft.EntityFrameworkCore;
+using Api.DataAccessLayer.Statuses;
+using CustomExceptions;
 
 namespace Api.DataAccessLayer.Repositories
 {
     /// <summary>
     /// This class exposes all the possible request to the database that is related to "Rides"
     /// </summary>
-    public class RideRepository : IRideRepository, IDisposable
+    public class RideRepository : GenericRepository<Ride>, IRideRepository
     {
-        private readonly ApplicationContext _context;
-
-        public RideRepository(ApplicationContext context)
+        /// <summary>
+        /// Constructor for Ride Repository. 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public RideRepository(ApplicationContext context) : base(context)
         {
-            _context = context;
+
         }
 
-        public async Task<List<Ride>> GetAllRidesAsync()
+        /// <summary>
+        /// Find all rides with status LookingForMatch. This is only valid for sharedRides. 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Ride>> FindUnmatchedSharedRides()
         {
-            var rides = await _context.Rides.ToListAsync();
-            return rides;
+            return await FindAsync(ride => ride.Status == RideStatus.LookingForMatch);
         }
 
-        public async Task<Ride> GetRideByIdAsync(int id)
+
+        public void AddSharedRide(Ride ride)
         {
-            var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
-            return ride;
+            if (ride.PassengerCount > 2)
+            {
+                throw new TooManyPassengersException("SharedRide can only have two passengers");
+            }
+
+            Add(ride);
         }
 
-        public async Task<Ride> AddRideAsync(Ride ride)
+        public async Task<List<Ride>> FindExpiredUnmatchedRides()
         {
-            await _context.Rides.AddAsync(ride);
-            await _context.SaveChangesAsync();
-            return ride;
+            return await FindAsync((ride) =>
+                ride.ConfirmationDeadline < DateTime.Now &&
+                ride.Status == RideStatus.LookingForMatch);
         }
 
-        public async Task<Ride> UpdateRideAsync(Ride ride)
+        /// <summary>
+        /// Updates the status of all supplied rides to "Accepted".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        /// <exception cref="UnexpectedStatusException">Ride is not waiting for accept, cannot be accepted.</exception> 
+        public void SetAllRidesToAccepted(List<Ride> rides)
         {
-            _context.Rides.Update(ride);
-            await _context.SaveChangesAsync();
-            return ride;
+            foreach (var ride in rides)
+            {
+                if (ride.Status != RideStatus.WaitingForAccept)
+                {
+                    throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
+                }
+                ride.Status = RideStatus.Accepted;
+                Update(ride);
+            }
         }
 
-        public async Task<Ride> DeleteRideAsync(int id)
+        /// <summary>
+        /// Updates the status of all supplied rides to "Debited".
+        /// </summary>
+        /// <param name="rides">The collection of rides, that should have their status updated.</param>
+        /// <exception cref="UnexpectedStatusException">Ride is not accepted, cannot be debited.</exception> 
+        public void SetAllRidesToDebited(List<Ride> rides)
         {
-            var ride = await _context.Rides.SingleOrDefaultAsync(r => r.Id == id);
-            _context.Rides.Remove(ride);
-            await _context.SaveChangesAsync();
-            return ride;
+            foreach (var ride in rides)
+            {
+                if (ride.Status != RideStatus.Accepted)
+                {
+                    throw new UnexpectedStatusException("Ride is not waiting for accept, cannot be accepted");
+                }
+                ride.Status = RideStatus.Debited;
+                Update(ride);
+            }
         }
-
-        #region IDisposable implementation
-
-        //Dispose pattern:
-        //https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-dispose#basic_pattern
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            _context?.Dispose();
-        }
-
-        #endregion
     }
 }

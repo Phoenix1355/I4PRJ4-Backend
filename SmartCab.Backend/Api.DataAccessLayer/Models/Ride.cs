@@ -1,35 +1,42 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
+using Api.DataAccessLayer.Statuses;
 
 namespace Api.DataAccessLayer.Models
 {
+    /// <summary>
+    /// A base ride containing all common ride attributes. 
+    /// </summary>
     public class Ride
     {
         public int Id { get; set; }
 
+        public virtual Address StartDestination { get; set; }
+    
+        public virtual Address EndDestination { get; set; }
+        public virtual Customer Customer { get; set; }
+
+        [Required]
+        public string CustomerId { get; set; }
+
         [Required]
         public DateTime DepartureTime { get; set; }
 
-        public int StartDestinationId { get; set; }
-
-        public virtual Address StartDestination { get; set; }
-    
-        public int  SlutDestinationId { get; set; }
-
-        public virtual Address SlutDestination { get; set; }
-
         [Required]
-        public DateTime LatestConfirmed { get; set; }
+        public DateTime ConfirmationDeadline { get; set; }
         
         [Required]
-        public int CountPassengers { get; set; }
+        public int PassengerCount { get; set; }
 
         [Required]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedOn { get; set; }
 
         [Required]
-        public int Price { get; set; }
+        public decimal Price { get; set; }
         
+        [Required]
+        public RideStatus Status { get; set; }
+
+        public string DeviceId { get; set; }
     }
 }

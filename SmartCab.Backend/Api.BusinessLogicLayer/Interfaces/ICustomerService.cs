@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Api.BusinessLogicLayer.Requests;
 using Api.BusinessLogicLayer.Responses;
-using Api.DataAccessLayer.Models;
-using Microsoft.AspNetCore.Identity;
+using Api.Responses;
 
 namespace Api.BusinessLogicLayer.Interfaces
 {
@@ -13,5 +12,8 @@ namespace Api.BusinessLogicLayer.Interfaces
     {
         Task<RegisterResponse> AddCustomerAsync(RegisterRequest request);
         Task<LoginResponse> LoginCustomerAsync(LoginRequest request);
+        Task DepositAsync(DepositRequest request, string customerId);
+        Task<CustomerRidesResponse> GetRidesAsync(string customerId);
+        Task<EditCustomerResponse> EditCustomerAsync(EditCustomerRequest request, string customerId);
     }
 }

@@ -1,15 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.DataAccessLayer.Models
 {
-    public class TaxiCompany
+    /// <summary>
+    /// This class represents a taxi company account.
+    /// </summary>
+    /// <remarks>
+    /// Inherits from IdentityUser which means a taxi company object has access to all the properties in the identity framework.<br/>
+    /// </remarks>
+    public class TaxiCompany : IdentityUser
     {
-        public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
-        public string PhoneNumber { get; set; }
-        public string ApplicationUserId { get; set; }
-        public virtual ApplicationUser ApplicationUser { get; set; }
-        public virtual List<CustomerRides> CustomerRides { get; set; }
+
+        public virtual List<Order> Orders { get; set; }
     }
 }
